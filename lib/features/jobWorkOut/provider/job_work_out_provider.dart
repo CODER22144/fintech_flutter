@@ -25,6 +25,8 @@ class JobWorkOutProvider with ChangeNotifier {
   TextEditingController matController = TextEditingController();
   TextEditingController qtyController = TextEditingController();
 
+  List<List<TextEditingController>> rowControllers = [];
+
   void initWidget() async {
     matController.clear();
     qtyController.clear();
@@ -153,6 +155,26 @@ class JobWorkOutProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       jobWorkoutReport = jsonDecode(await response.stream.bytesToString());
     }
+    notifyListeners();
+  }
+
+  void initDetailsTab(List<List<String>> tableRows) {
+    rowControllers = tableRows
+        .map((row) => row.map((field) => TextEditingController(text: field)).toList())
+        .toList();
+    notifyListeners();
+  }
+
+  void deleteRowController(int index) {
+    rowControllers.removeAt(index);
+    notifyListeners();
+  }
+
+  void addRowController() {
+    rowControllers.add([
+      TextEditingController(),
+      TextEditingController(),
+    ]);
     notifyListeners();
   }
 }

@@ -6,21 +6,20 @@ class GrDetailsRowField extends StatefulWidget {
   final List<List<String>> tableRows;
   final List<SearchableDropdownMenuItem<String>> validOrder;
   final Function deleteRow;
+  final List<List<TextEditingController>> controllers;
   const GrDetailsRowField(
       {super.key,
       required this.index,
       required this.tableRows,
       required this.validOrder,
-      required this.deleteRow});
+      required this.deleteRow,
+      required this.controllers});
 
   @override
   State<GrDetailsRowField> createState() => _GrDetailsRowFieldState();
 }
 
 class _GrDetailsRowFieldState extends State<GrDetailsRowField> {
-  TextEditingController rateController = TextEditingController();
-  TextEditingController hsnController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -72,9 +71,14 @@ class _GrDetailsRowFieldState extends State<GrDetailsRowField> {
                       widget.tableRows[widget.index][1] = value!.split("|")[0];
                       widget.tableRows[widget.index][4] = value!.split("|")[2];
                       widget.tableRows[widget.index][3] = value!.split("|")[3];
-                      rateController.text = value!.split("|")[3];
-                      rateController.selection = TextSelection.fromPosition(TextPosition(offset: rateController.text.length));
-                      hsnController.text =widget.tableRows[widget.index][4] = value!.split("|")[2];
+                      widget.controllers[widget.index][2].text =
+                          value!.split("|")[3];
+                      widget.controllers[widget.index][2].selection =
+                          TextSelection.fromPosition(TextPosition(
+                              offset: widget
+                                  .controllers[widget.index][2].text.length));
+                      widget.controllers[widget.index][1].text = widget
+                          .tableRows[widget.index][4] = value!.split("|")[2];
                     });
                   },
                   hasTrailingClearIcon: false,
@@ -145,7 +149,7 @@ class _GrDetailsRowFieldState extends State<GrDetailsRowField> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            initialValue: widget.tableRows[widget.index][2],
+            controller: widget.controllers[widget.index][0],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][2] = value;
@@ -180,12 +184,15 @@ class _GrDetailsRowFieldState extends State<GrDetailsRowField> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            controller: rateController,
+            controller: widget.controllers[widget.index][2],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][3] = value;
-                rateController.text = value;
-                rateController.selection = TextSelection.fromPosition(TextPosition(offset: rateController.text.length));
+                widget.controllers[widget.index][2].text = value;
+                widget.controllers[widget.index][2].selection =
+                    TextSelection.fromPosition(TextPosition(
+                        offset:
+                            widget.controllers[widget.index][2].text.length));
               });
             },
             decoration: InputDecoration(
@@ -217,12 +224,15 @@ class _GrDetailsRowFieldState extends State<GrDetailsRowField> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            controller: hsnController,
+            controller: widget.controllers[widget.index][1],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][4] = value;
-                hsnController.text = value;
-                hsnController.selection = TextSelection.fromPosition(TextPosition(offset: hsnController.text.length));
+                widget.controllers[widget.index][1].text = value;
+                widget.controllers[widget.index][1].selection =
+                    TextSelection.fromPosition(TextPosition(
+                        offset:
+                            widget.controllers[widget.index][1].text.length));
               });
             },
             decoration: InputDecoration(

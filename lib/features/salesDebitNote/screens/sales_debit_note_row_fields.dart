@@ -13,13 +13,14 @@ class SalesDebitNoteRowFields extends StatefulWidget {
   final int index;
   final List<List<String>> tableRows;
   final List<SearchableDropdownMenuItem<String>> discountType;
+  final List<SearchableDropdownMenuItem<String>> materialUnit;
   final Function deleteRow;
   const SalesDebitNoteRowFields(
       {super.key,
         required this.index,
         required this.tableRows,
         required this.discountType,
-        required this.deleteRow});
+        required this.deleteRow, required this.materialUnit});
 
   @override
   State<SalesDebitNoteRowFields> createState() => _SalesDebitNoteRowFieldsState();
@@ -40,6 +41,8 @@ class _SalesDebitNoteRowFieldsState extends State<SalesDebitNoteRowFields> {
   TextEditingController hsnController = TextEditingController();
   TextEditingController materialController = TextEditingController();
   TextEditingController rateController = TextEditingController();
+
+  SearchableDropdownController<String> unitController = SearchableDropdownController();
 
   @override
   Widget build(BuildContext context) {
@@ -326,6 +329,58 @@ class _SalesDebitNoteRowFieldsState extends State<SalesDebitNoteRowFields> {
             ),
           ),
         ),
+
+        Stack(
+          children: [
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SearchableDropdown<String>(
+                  controller: unitController,
+                  isEnabled: true,
+                  backgroundDecoration: (child) => Container(
+                    height: 40,
+                    margin: EdgeInsets.zero,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.black, width: 0.5),
+                    ),
+                    child: child,
+                  ),
+                  items: widget.materialUnit,
+                  onChanged: (value) {
+                    setState(() {
+                      widget.tableRows[widget.index][19] = value!;
+                    });
+                  },
+                  hasTrailingClearIcon: false,
+                )),
+            Positioned(
+              left: 15,
+              top: 1,
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: const Wrap(
+                  children: [
+                    Text(
+                      "Material Unit",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      "*",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(

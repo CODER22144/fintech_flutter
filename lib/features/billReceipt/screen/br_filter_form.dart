@@ -24,7 +24,7 @@ class _BrFilterFormState extends State<BrFilterForm> {
     super.initState();
     BillReceiptProvider provider =
     Provider.of<BillReceiptProvider>(context, listen: false);
-    provider.initReport();
+    provider.initPendingReport();
   }
 
   @override

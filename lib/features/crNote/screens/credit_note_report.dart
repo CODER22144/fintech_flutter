@@ -40,13 +40,14 @@ class _CreditNoteReportState extends State<CreditNoteReport> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
+                      columnSpacing: 20,
                       columns: const [
                         DataColumn(label: Text("Doc. No")),
                         DataColumn(label: Text("Doc. Date")),
                         DataColumn(label: Text("Doc Proof")),
                         DataColumn(label: Text("Party Code")),
-                        DataColumn(label: Text("Document Reason")),
-                        DataColumn(label: Text("Document Against")),
+                        DataColumn(label: Text("Document\nReason")),
+                        DataColumn(label: Text("Document\nAgainst")),
                         DataColumn(label: Text("Debit Code")),
                         DataColumn(label: Text("Supply Type")),
                         DataColumn(label: Text("Supplier Type")),

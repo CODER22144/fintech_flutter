@@ -4,18 +4,29 @@ import 'package:fintech_new_web/features/JVoucher/screens/journal_voucher_report
 import 'package:fintech_new_web/features/additionalOrder/screen/additional_order.dart';
 import 'package:fintech_new_web/features/additionalOrder/screen/additional_purchase_order_report.dart';
 import 'package:fintech_new_web/features/additionalOrder/screen/additional_purchase_order_report_form.dart';
+import 'package:fintech_new_web/features/advanceRequirement/screens/add_advance_req.dart';
+import 'package:fintech_new_web/features/advanceRequirement/screens/advance_req_report.dart';
 import 'package:fintech_new_web/features/attendence/screen/attendace_report.dart';
 import 'package:fintech_new_web/features/attendence/screen/get_attendance_report.dart';
 import 'package:fintech_new_web/features/auth/screen/otp_verification.dart';
 import 'package:fintech_new_web/features/auth/screen/register_2fa.dart';
+import 'package:fintech_new_web/features/auth/screen/update_password.dart';
 import 'package:fintech_new_web/features/bankUpload/screens/bank_report.dart';
 import 'package:fintech_new_web/features/bankUpload/screens/bank_report_form.dart';
+import 'package:fintech_new_web/features/bankUpload/screens/bank_report_form_sales.dart';
+import 'package:fintech_new_web/features/bankUpload/screens/bank_update.dart';
 import 'package:fintech_new_web/features/bankUpload/screens/bank_upload.dart';
+import 'package:fintech_new_web/features/bankUpload/screens/upload_hdfc.dart';
+import 'package:fintech_new_web/features/bankUpload/screens/upload_kotak.dart';
 import 'package:fintech_new_web/features/billPayable/screen/add_bill_payable.dart';
 import 'package:fintech_new_web/features/billReceipt/screen/bill_receipt.dart';
 import 'package:fintech_new_web/features/billReceipt/screen/br_filter_form.dart';
+import 'package:fintech_new_web/features/billReceipt/screen/br_report.dart';
+import 'package:fintech_new_web/features/billReceipt/screen/br_report_form.dart';
 import 'package:fintech_new_web/features/billReceipt/screen/create_bill_receipt.dart';
 import 'package:fintech_new_web/features/billReceivable/screens/add_bill_receivable.dart';
+import 'package:fintech_new_web/features/bpPayNTaxInfo/screen/edit_bp_tax_info.dart';
+import 'package:fintech_new_web/features/bpPayNTaxInfo/screen/get_bp_tax_info.dart';
 import 'package:fintech_new_web/features/bpShipping/screens/bp_shipping.dart';
 import 'package:fintech_new_web/features/bpShipping/screens/get_bp_shipping.dart';
 import 'package:fintech_new_web/features/bpShipping/screens/shipping_report.dart';
@@ -32,9 +43,11 @@ import 'package:fintech_new_web/features/costResource/screens/get_cost_resource.
 import 'package:fintech_new_web/features/crNote/screens/cr_note_details.dart';
 import 'package:fintech_new_web/features/crNote/screens/cr_note_report_form.dart';
 import 'package:fintech_new_web/features/crNote/screens/credit_note_report.dart';
+import 'package:fintech_new_web/features/crNote/screens/export_ecr_note.dart';
 import 'package:fintech_new_web/features/dbNote/screens/db_note_details.dart';
 import 'package:fintech_new_web/features/dbNote/screens/db_note_report.dart';
 import 'package:fintech_new_web/features/dbNote/screens/db_note_report_form.dart';
+import 'package:fintech_new_web/features/dbNote/screens/export_edb_note.dart';
 import 'package:fintech_new_web/features/debitNoteAgainstCreditNote/screens/add_db_note_against_cr_note.dart';
 import 'package:fintech_new_web/features/debitNoteDispatch/screens/add_debit_note_dispatch.dart';
 import 'package:fintech_new_web/features/dlChallan/screens/add_dl_challan.dart';
@@ -53,6 +66,10 @@ import 'package:fintech_new_web/features/grIqsRep/screens/add_gr_iqs_rep.dart';
 import 'package:fintech_new_web/features/grOtherCharges/screens/add_gr_charges.dart';
 import 'package:fintech_new_web/features/grQtyClear/screens/add_gr_qty_clear.dart';
 import 'package:fintech_new_web/features/grQtyClear/screens/gr_qty_clear_pending.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/b2b_report_form.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/crdr_note.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/doc_type_report.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/gst_hsn_report.dart';
 import 'package:fintech_new_web/features/hsn/screens/add_hsn.dart';
 import 'package:fintech_new_web/features/hsn/screens/get_hsn.dart';
 import 'package:fintech_new_web/features/hsn/screens/hsn_report.dart';
@@ -61,6 +78,7 @@ import 'package:fintech_new_web/features/invenReq/screens/add_req_details.dart';
 import 'package:fintech_new_web/features/inward/screens/inward.dart';
 import 'package:fintech_new_web/features/inward/screens/inward_report.dart';
 import 'package:fintech_new_web/features/inward/screens/inward_report_form.dart';
+import 'package:fintech_new_web/features/inward/screens/tds_report_form.dart';
 import 'package:fintech_new_web/features/inwardVoucher/screens/create_inward_voucher.dart';
 import 'package:fintech_new_web/features/jobWorkOut/screens/add_job_work_out.dart';
 import 'package:fintech_new_web/features/jobWorkOut/screens/add_job_work_out_details.dart';
@@ -75,6 +93,7 @@ import 'package:fintech_new_web/features/lineRejection/screens/add_line_rejectio
 import 'package:fintech_new_web/features/manufacturing/screens/add_manufacturing.dart';
 import 'package:fintech_new_web/features/manufacturing/screens/manufacturing_report.dart';
 import 'package:fintech_new_web/features/manufacturing/screens/manufacturing_report_form.dart';
+import 'package:fintech_new_web/features/material/screen/edit_material_bulk.dart';
 import 'package:fintech_new_web/features/material/screen/get_material.dart';
 import 'package:fintech_new_web/features/material/screen/mat_stock_report.dart';
 import 'package:fintech_new_web/features/material/screen/mat_stock_report_form.dart';
@@ -89,12 +108,15 @@ import 'package:fintech_new_web/features/materialIQS/screens/get-material-iqs.da
 import 'package:fintech_new_web/features/materialIncomingStandard/screens/add_material_incoming_standard.dart';
 import 'package:fintech_new_web/features/materialIncomingStandard/screens/material_incoming_standard_report.dart';
 import 'package:fintech_new_web/features/materialReturn/screens/add_material_return.dart';
+import 'package:fintech_new_web/features/materialSource/screen/edit_material_source_bulk.dart';
 import 'package:fintech_new_web/features/materialSource/screen/get_material_source.dart';
 import 'package:fintech_new_web/features/materialSource/screen/material_source.dart';
 import 'package:fintech_new_web/features/materialSource/screen/material_source_report.dart';
 import 'package:fintech_new_web/features/materialSource/screen/material_source_report_form.dart';
 import 'package:fintech_new_web/features/obalance/screens/create-obalance.dart';
 import 'package:fintech_new_web/features/obalance/screens/get-obalance.dart';
+import 'package:fintech_new_web/features/obalance/screens/obalance_report.dart';
+import 'package:fintech_new_web/features/obalance/screens/obalance_report_form.dart';
 import 'package:fintech_new_web/features/orderApRequest/screens/add_order_ap_request.dart';
 import 'package:fintech_new_web/features/orderApRequest/screens/get_pending_ap_request.dart';
 import 'package:fintech_new_web/features/orderApproval/screens/add_order_approval.dart';
@@ -116,18 +138,27 @@ import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_by_m
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_details.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_details_master_table.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_processing_table.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_report.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_report_form.dart';
+import 'package:fintech_new_web/features/partSubAssembly/screens/part_sub_assembly_report_form.dart';
 import 'package:fintech_new_web/features/payment/screens/add_payment.dart';
+import 'package:fintech_new_web/features/payment/screens/payment_outward_report.dart';
+import 'package:fintech_new_web/features/payment/screens/payment_outward_report_form.dart';
 import 'package:fintech_new_web/features/paymentClear/screens/add_payment_clear.dart';
 import 'package:fintech_new_web/features/paymentClear/screens/payment_advance_pending.dart';
 import 'package:fintech_new_web/features/payment/screens/bill_pending_report.dart';
 import 'package:fintech_new_web/features/paymentClear/screens/unadjusted_payment_pending.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/add_cr_note_clear.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/add_payment_inward.dart';
+import 'package:fintech_new_web/features/paymentInward/screens/payment_inward_post.dart';
+import 'package:fintech_new_web/features/paymentInward/screens/payment_inward_report_form.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/unadjusted_payment_inward.dart';
+import 'package:fintech_new_web/features/prTaxInvoice/screens/export_pr_tax_invoice.dart';
 import 'package:fintech_new_web/features/prTaxInvoice/screens/pr_tax_invoice_details.dart';
 import 'package:fintech_new_web/features/prTaxInvoice/screens/pr_tax_invoice_report.dart';
 import 'package:fintech_new_web/features/prTaxInvoice/screens/pr_tax_invoice_report_form.dart';
 import 'package:fintech_new_web/features/prTaxInvoiceDispatch/screens/add_pr_tax_invoice_dispatch.dart';
+import 'package:fintech_new_web/features/productBreakup/screens/product_breakup_report_form.dart';
 import 'package:fintech_new_web/features/productBreakupTechDetails/screens/add_product_breakup_tech_details.dart';
 import 'package:fintech_new_web/features/productFinalStandard/screens/add_product_final_standard.dart';
 import 'package:fintech_new_web/features/productionPlan/screens/add_production_plan.dart';
@@ -136,9 +167,13 @@ import 'package:fintech_new_web/features/purchaseTransfer/screens/add_purchase_t
 import 'package:fintech_new_web/features/purchaseTransfer/screens/add_purchase_transfer_clear.dart';
 import 'package:fintech_new_web/features/purchaseTransfer/screens/purchase_bill_pending_report.dart';
 import 'package:fintech_new_web/features/purchaseTransfer/screens/purchase_bill_pending_report_form.dart';
+import 'package:fintech_new_web/features/reOrderBalanceMaterial/screens/re_order_bal_mat_report.dart';
+import 'package:fintech_new_web/features/reOrderBalanceMaterial/screens/re_order_bal_mat_report_form.dart';
 import 'package:fintech_new_web/features/receiptVoucher/screens/create_receipt_voucher.dart';
 import 'package:fintech_new_web/features/reqIssue/screens/add_req_issue.dart';
 import 'package:fintech_new_web/features/reqIssue/screens/req_issue_pending.dart';
+import 'package:fintech_new_web/features/reqIssue/screens/req_issue_pending_form.dart';
+import 'package:fintech_new_web/features/reqIssue/screens/req_issue_summary.dart';
 import 'package:fintech_new_web/features/reqPacked/screens/add_req_packed.dart';
 import 'package:fintech_new_web/features/reqPacked/screens/req_packed_pending.dart';
 import 'package:fintech_new_web/features/reqPacking/screens/add_req_packing.dart';
@@ -153,14 +188,17 @@ import 'package:fintech_new_web/features/saleTransfer/screens/payment_pending_re
 import 'package:fintech_new_web/features/saleTransfer/screens/payment_pending_report_form.dart';
 import 'package:fintech_new_web/features/saleTransfer/screens/sale_payment_pending_report.dart';
 import 'package:fintech_new_web/features/saleTransfer/screens/sale_payment_pending_report_form.dart';
+import 'package:fintech_new_web/features/salesDebitNote/screens/export_sales_edb_note.dart';
 import 'package:fintech_new_web/features/salesDebitNote/screens/sale_debit_note_report_form.dart';
 import 'package:fintech_new_web/features/salesDebitNote/screens/sales_debit_note_details.dart';
 import 'package:fintech_new_web/features/salesOrder/screens/export_eway_bill_sale.dart';
+import 'package:fintech_new_web/features/salesOrder/screens/orderBalance/order_balance_report_form.dart';
 import 'package:fintech_new_web/features/salesOrder/screens/order_report.dart';
 import 'package:fintech_new_web/features/salesOrder/screens/sales_order.dart';
 import 'package:fintech_new_web/features/salesOrder/screens/sales_order_add_item.dart';
 import 'package:fintech_new_web/features/salesOrder/screens/sales_order_report.dart';
 import 'package:fintech_new_web/features/salesOrder/screens/sales_order_report_form.dart';
+import 'package:fintech_new_web/features/salesOrder/screens/sales_order_short_qty.dart';
 import 'package:fintech_new_web/features/salesOrder/screens/sales_report_form.dart';
 import 'package:fintech_new_web/features/taClaim/screens/add_ta_claim.dart';
 import 'package:fintech_new_web/features/taClaim/screens/claim_report.dart';
@@ -176,22 +214,28 @@ import 'package:fintech_new_web/features/workProcess/screens/work_process_report
 import 'package:fintech_new_web/main.dart';
 import 'package:go_router/go_router.dart';
 
+import 'features/auth/screen/forget_password.dart';
 import 'features/auth/screen/login.dart';
 import 'features/businessPartner/screen/get-business-partner.dart';
 import 'features/businessPartner/screen/bp_search_report.dart';
 import 'features/businessPartner/screen/business_partner_search_form.dart';
 import 'features/businessPartner/screen/business_partner_tabs.dart';
 import 'features/company/screens/add_company_form.dart';
+import 'features/crNote/screens/upload_cr_note_invoice.dart';
 import 'features/gr/screen/add_gr_rate_approval.dart';
 import 'features/gr/screen/gr_rate_difference_pending.dart';
 import 'features/gr/screen/pending_gr_report.dart';
+import 'features/gstReturn/screens/b2b_report.dart';
+import 'features/gstReturn/screens/b2c_report.dart';
 import 'features/home.dart';
 import 'features/hsn/screens/ac_groups_report.dart';
+import 'features/inward/screens/tds_report.dart';
 import 'features/material/screen/material_screen.dart';
 import 'features/material/screen/material_unit_report.dart';
 import 'features/orderApproval/screens/get_order_approval_pending.dart';
 import 'features/orderApproval/screens/hold_denied_order_report.dart';
 import 'features/partAssembly/screens/part_assembly_details_table.dart';
+import 'features/partAssembly/screens/work_in_progress_report.dart';
 import 'features/partSubAssembly/screens/create_part_sub_assembly_details.dart';
 import 'features/partSubAssembly/screens/create_part_sub_assembly_processing.dart';
 import 'features/partSubAssembly/screens/part_sub_assembly_by_matno.dart';
@@ -199,7 +243,10 @@ import 'features/partSubAssembly/screens/part_sub_assembly_details.dart';
 import 'features/partSubAssembly/screens/part_sub_assembly_details_master_table.dart';
 import 'features/partSubAssembly/screens/part_sub_assembly_details_table.dart';
 import 'features/partSubAssembly/screens/part_sub_assembly_processing_table.dart';
+import 'features/partSubAssembly/screens/part_sub_assembly_report.dart';
 import 'features/payment/screens/bill_pending_report_form.dart';
+import 'features/paymentInward/screens/payment_inward_report.dart';
+import 'features/paymentInwardClear/screens/add_payment_inward_clear.dart';
 import 'features/paymentVoucher/screens/create_payment_voucher.dart';
 import 'features/productBreakup/screens/create_product_breakup_details.dart';
 import 'features/productBreakup/screens/create_product_breakup_processing.dart';
@@ -208,6 +255,7 @@ import 'features/productBreakup/screens/product_breakup_details.dart';
 import 'features/productBreakup/screens/product_breakup_details_master_table.dart';
 import 'features/productBreakup/screens/product_breakup_details_table.dart';
 import 'features/productBreakup/screens/product_breakup_processing_table.dart';
+import 'features/productBreakup/screens/product_breakup_report.dart';
 import 'features/productionPlanA/screen/add_production_planA.dart';
 import 'features/purchaseOrder/screen/purchase_order.dart';
 import 'features/purchaseOrder/screen/purchase_order_report_form.dart';
@@ -215,7 +263,10 @@ import 'features/purchaseOrder/screen/purchase_order_report_screen.dart';
 import 'features/resources/screens/get_resources.dart';
 import 'features/salesDebitNote/screens/sale_debit_note_report.dart';
 import 'features/salesOrder/screens/delete_order_material.dart';
+import 'features/salesOrder/screens/orderBalance/order_balance_report.dart';
 import 'features/salesOrder/screens/sales_report.dart';
+import 'features/salesOrder/screens/transport_slip.dart';
+import 'features/salesOrderAdvance/screens/sales_order_advance.dart';
 import 'features/visitInfo/screens/visit_info_report.dart';
 import 'features/warehouse/screen/warehouse.dart';
 import 'features/wireSize/screens/edit_wire_size.dart';
@@ -251,6 +302,20 @@ class AppRouter {
             name: Register2fa.routeName,
             builder: (context, state) {
               return Register2fa(qrUrl: state.uri.queryParameters['qrUrl'] ?? "");
+            },
+          ),
+          GoRoute(
+            path: ForgetPassword.routeName,
+            name: ForgetPassword.routeName,
+            builder: (context, state) {
+              return const ForgetPassword();
+            },
+          ),
+          GoRoute(
+            path: UpdatePassword.routeName,
+            name: UpdatePassword.routeName,
+            builder: (context, state) {
+              return UpdatePassword(email: state.uri.queryParameters['email'] ?? "");
             },
           ),
         ]
@@ -318,6 +383,22 @@ class AppRouter {
           return BusinessPartner(
               editing: state.uri.queryParameters['editing'] ?? '');
         },
+        routes: [
+          GoRoute(
+            path: GetBpTaxInfo.routeName,
+            name: GetBpTaxInfo.routeName,
+            builder: (context, state) {
+              return const GetBpTaxInfo();
+            },
+          ),
+          GoRoute(
+            path: EditBpTaxInfo.routeName,
+            name: EditBpTaxInfo.routeName,
+            builder: (context, state) {
+              return EditBpTaxInfo(bpCode: state.uri.queryParameters['bpCode'] ?? "");
+            },
+          ),
+        ]
       ),
       GoRoute(
           path: LedgerCodes.routeName,
@@ -358,6 +439,13 @@ class AppRouter {
                 editing: state.uri.queryParameters['editing'] ?? "");
           },
           routes: [
+            GoRoute(
+              path: EditMaterialBulk.routeName,
+              name: EditMaterialBulk.routeName,
+              builder: (context, state) {
+                return const EditMaterialBulk();
+              },
+            ),
             GoRoute(
               path: GetMaterial.routeName,
               name: GetMaterial.routeName,
@@ -442,6 +530,13 @@ class AppRouter {
               name: GetMaterialSource.routeName,
               builder: (context, state) {
                 return const GetMaterialSource();
+              },
+            ),
+            GoRoute(
+              path: EditMaterialSourceBulk.routeName,
+              name: EditMaterialSourceBulk.routeName,
+              builder: (context, state) {
+                return const EditMaterialSourceBulk();
               },
             ),
           ]),
@@ -552,6 +647,18 @@ class AppRouter {
                 builder: (context, state) {
                   return const BrFilterForm();
                 }),
+            GoRoute(
+                path: BrReportForm.routeName,
+                name: BrReportForm.routeName,
+                builder: (context, state) {
+                  return const BrReportForm();
+                }),
+            GoRoute(
+                path: BrReport.routeName,
+                name: BrReport.routeName,
+                builder: (context, state) {
+                  return const BrReport();
+                }),
           ]),
       GoRoute(
           path: EvOrder.routeName,
@@ -608,6 +715,18 @@ class AppRouter {
                 name: GetOBalance.routeName,
                 builder: (context, state) {
                   return const GetOBalance();
+                }),
+            GoRoute(
+                path: ObalanceReportForm.routeName,
+                name: ObalanceReportForm.routeName,
+                builder: (context, state) {
+                  return const ObalanceReportForm();
+                }),
+            GoRoute(
+                path: ObalanceReport.routeName,
+                name: ObalanceReport.routeName,
+                builder: (context, state) {
+                  return const ObalanceReport();
                 })
           ]),
       GoRoute(
@@ -642,6 +761,18 @@ class AppRouter {
                 name: InwardReport.routeName,
                 builder: (context, state) {
                   return const InwardReport();
+                }),
+            GoRoute(
+                path: TdsReportForm.routeName,
+                name: TdsReportForm.routeName,
+                builder: (context, state) {
+                  return const TdsReportForm();
+                }),
+            GoRoute(
+                path: TdsReport.routeName,
+                name: TdsReport.routeName,
+                builder: (context, state) {
+                  return const TdsReport();
                 }),
           ]),
       GoRoute(
@@ -939,6 +1070,18 @@ class AppRouter {
                 builder: (context, state) {
                   return const SalesReportForm();
                 }),
+            GoRoute(
+                path: OrderBalanceReportForm.routeName,
+                name: OrderBalanceReportForm.routeName,
+                builder: (context, state) {
+                  return const OrderBalanceReportForm();
+                }),
+            GoRoute(
+                path: OrderBalanceReport.routeName,
+                name: OrderBalanceReport.routeName,
+                builder: (context, state) {
+                  return const OrderBalanceReport();
+                }),
           ]),
       GoRoute(
           path: AddGrCharges.routeName,
@@ -1154,6 +1297,19 @@ class AppRouter {
                 builder: (context, state) {
                   return const BillPendingReport();
                 }),
+
+            GoRoute(
+                path: PaymentOutwardReportForm.routeName,
+                name: PaymentOutwardReportForm.routeName,
+                builder: (context, state) {
+                  return const PaymentOutwardReportForm();
+                }),
+            GoRoute(
+                path: PaymentOutwardReport.routeName,
+                name: PaymentOutwardReport.routeName,
+                builder: (context, state) {
+                  return const PaymentOutwardReport();
+                }),
           ]),
       GoRoute(
           path: BankUpload.routeName,
@@ -1161,6 +1317,12 @@ class AppRouter {
           builder: (context, state) {
             return const BankUpload();
           }, routes: [
+        GoRoute(
+            path: BankReportFormSales.routeName,
+            name: BankReportFormSales.routeName,
+            builder: (context, state) {
+              return const BankReportFormSales();
+            }),
         GoRoute(
             path: BankReportForm.routeName,
             name: BankReportForm.routeName,
@@ -1172,6 +1334,24 @@ class AppRouter {
             name: BankReport.routeName,
             builder: (context, state) {
               return const BankReport();
+            }),
+        GoRoute(
+            path: BankUpdate.routeName,
+            name: BankUpdate.routeName,
+            builder: (context, state) {
+              return BankUpdate(bankDetails: state.uri.queryParameters['bankDetails'] ?? "");
+            }),
+        GoRoute(
+            path: UploadKotak.routeName,
+            name: UploadKotak.routeName,
+            builder: (context, state) {
+              return const UploadKotak();
+            }),
+        GoRoute(
+            path: UploadHdfc.routeName,
+            name: UploadHdfc.routeName,
+            builder: (context, state) {
+              return const UploadHdfc();
             }),
       ]),
 
@@ -1218,6 +1398,24 @@ class AppRouter {
                 builder: (context, state) {
                   return const PartAssemblyProcessingTable();
                 }),
+            GoRoute(
+                path: PartAssemblyReportForm.routeName,
+                name: PartAssemblyReportForm.routeName,
+                builder: (context, state) {
+                  return const PartAssemblyReportForm();
+                }),
+            GoRoute(
+                path: PartAssemblyReport.routeName,
+                name: PartAssemblyReport.routeName,
+                builder: (context, state) {
+                  return const PartAssemblyReport();
+                }),
+            GoRoute(
+                path: WorkInProgressReport.routeName,
+                name: WorkInProgressReport.routeName,
+                builder: (context, state) {
+                  return const WorkInProgressReport();
+                }),
           ]),
 
       GoRoute(
@@ -1262,6 +1460,18 @@ class AppRouter {
                 name: PartSubAssemblyProcessingTable.routeName,
                 builder: (context, state) {
                   return const PartSubAssemblyProcessingTable();
+                }),
+            GoRoute(
+                path: PartSubAssemblyReportForm.routeName,
+                name: PartSubAssemblyReportForm.routeName,
+                builder: (context, state) {
+                  return const PartSubAssemblyReportForm();
+                }),
+            GoRoute(
+                path: PartSubAssemblyReport.routeName,
+                name: PartSubAssemblyReport.routeName,
+                builder: (context, state) {
+                  return const PartSubAssemblyReport();
                 }),
           ]),
 
@@ -1309,6 +1519,18 @@ class AppRouter {
                 name: ProductBreakupProcessingTable.routeName,
                 builder: (context, state) {
                   return const ProductBreakupProcessingTable();
+                }),
+            GoRoute(
+                path: ProductBreakupReportForm.routeName,
+                name: ProductBreakupReportForm.routeName,
+                builder: (context, state) {
+                  return const ProductBreakupReportForm();
+                }),
+            GoRoute(
+                path: ProductBreakupReport.routeName,
+                name: ProductBreakupReport.routeName,
+                builder: (context, state) {
+                  return const ProductBreakupReport();
                 }),
           ]),
       GoRoute(
@@ -1461,6 +1683,12 @@ class AppRouter {
           },
           routes: [
             GoRoute(
+                path: PaymentInwardPost.routeName,
+                name: PaymentInwardPost.routeName,
+                builder: (context, state) {
+                  return const PaymentInwardPost();
+                }),
+            GoRoute(
                 path: AddCrNoteClear.routeName,
                 name: AddCrNoteClear.routeName,
                 builder: (context, state) {
@@ -1472,6 +1700,18 @@ class AppRouter {
                 name: UnadjustedPaymentInward.routeName,
                 builder: (context, state) {
                   return const UnadjustedPaymentInward();
+                }),
+            GoRoute(
+                path: PaymentInwardReportForm.routeName,
+                name: PaymentInwardReportForm.routeName,
+                builder: (context, state) {
+                  return const PaymentInwardReportForm();
+                }),
+            GoRoute(
+                path: PaymentInwardReport.routeName,
+                name: PaymentInwardReport.routeName,
+                builder: (context, state) {
+                  return const PaymentInwardReport();
                 }),
           ]),
       GoRoute(
@@ -1664,7 +1904,19 @@ class AppRouter {
                 name: ReqIssuePending.routeName,
                 builder: (context, state) {
                   return const ReqIssuePending();
-                })
+                }),
+            GoRoute(
+                path: ReqIssuePendingForm.routeName,
+                name: ReqIssuePendingForm.routeName,
+                builder: (context, state) {
+                  return const ReqIssuePendingForm();
+                }),
+            GoRoute(
+                path: ReqIssueSummary.routeName,
+                name: ReqIssueSummary.routeName,
+                builder: (context, state) {
+                  return const ReqIssueSummary();
+                }),
           ]),
       GoRoute(
           path: AddDlChallan.routeName,
@@ -1721,7 +1973,125 @@ class AppRouter {
           name: AddMaterialReturn.routeName,
           builder: (context, state) {
             return const AddMaterialReturn();
-          })
+          }),
+      GoRoute(
+          path: SalesOrderAdvance.routeName,
+          name: SalesOrderAdvance.routeName,
+          builder: (context, state) {
+            return const SalesOrderAdvance();
+          }),
+      GoRoute(
+          path: SalesOrderShortQty.routeName,
+          name: SalesOrderShortQty.routeName,
+          builder: (context, state) {
+            return const SalesOrderShortQty();
+          }),
+      GoRoute(
+          path: AddPaymentInwardClear.routeName,
+          name: AddPaymentInwardClear.routeName,
+          builder: (context, state) {
+            return AddPaymentInwardClear(details: state.uri.queryParameters['details'] ?? "");
+          }),
+      GoRoute(
+          path: AddAdvanceReq.routeName,
+          name: AddAdvanceReq.routeName,
+          builder: (context, state) {
+            return const AddAdvanceReq();
+          }, routes: [
+        GoRoute(
+            path: AdvanceReqReport.routeName,
+            name: AdvanceReqReport.routeName,
+            builder: (context, state) {
+              return AdvanceReqReport(reportData: state.uri.queryParameters['reportData'] ?? "");
+            }),
+      ]),
+      GoRoute(
+          path: TransportSlip.routeName,
+          name: TransportSlip.routeName,
+          builder: (context, state) {
+            return const TransportSlip();
+          }),
+      GoRoute(
+          path: ExportEcrNote.routeName,
+          name: ExportEcrNote.routeName,
+          builder: (context, state) {
+            return const ExportEcrNote();
+          }),
+      GoRoute(
+          path: UploadCrNoteInvoice.routeName,
+          name: UploadCrNoteInvoice.routeName,
+          builder: (context, state) {
+            return const UploadCrNoteInvoice();
+          }),
+      GoRoute(
+          path: ReOrderBalMatReportForm.routeName,
+          name: ReOrderBalMatReportForm.routeName,
+          builder: (context, state) {
+            return const ReOrderBalMatReportForm();
+          }, routes: [
+        GoRoute(
+            path: ReOrderBalMatReport.routeName,
+            name: ReOrderBalMatReport.routeName,
+            builder: (context, state) {
+              return const ReOrderBalMatReport();
+            }),
+      ]),
+      GoRoute(
+          path: ExportEdbNote.routeName,
+          name: ExportEdbNote.routeName,
+          builder: (context, state) {
+            return const ExportEdbNote();
+          }),
+      GoRoute(
+          path: ExportSalesEdbNote.routeName,
+          name: ExportSalesEdbNote.routeName,
+          builder: (context, state) {
+            return const ExportSalesEdbNote();
+          }),
+      GoRoute(
+          path: ExportPrTaxInvoice.routeName,
+          name: ExportPrTaxInvoice.routeName,
+          builder: (context, state) {
+            return const ExportPrTaxInvoice();
+          }),
+
+      GoRoute(
+          path: B2bReportForm.routeName,
+          name: B2bReportForm.routeName,
+          builder: (context, state) {
+            return B2bReportForm(type: state.uri.queryParameters['type'] ?? "");
+          }, routes: [
+        GoRoute(
+            path: B2bReport.routeName,
+            name: B2bReport.routeName,
+            builder: (context, state) {
+              return const B2bReport();
+            }),
+        GoRoute(
+            path: B2cReport.routeName,
+            name: B2cReport.routeName,
+            builder: (context, state) {
+              return const B2cReport();
+            }),
+        GoRoute(
+            path: GstHsnReport.routeName,
+            name: GstHsnReport.routeName,
+            builder: (context, state) {
+              return const GstHsnReport();
+            }),
+        GoRoute(
+            path: CrdrNote.routeName,
+            name: CrdrNote.routeName,
+            builder: (context, state) {
+              return const CrdrNote();
+            }),
+        GoRoute(
+            path: DocTypeReport.routeName,
+            name: DocTypeReport.routeName,
+            builder: (context, state) {
+              return const DocTypeReport();
+            }),
+      ]),
     ],
   );
 }

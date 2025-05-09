@@ -5,6 +5,7 @@ import 'package:fintech_new_web/features/utility/models/forms_UI.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../common/widgets/custom_dropdown_field.dart';
 import '../../network/service/network_service.dart';
@@ -208,7 +209,21 @@ class PrTaxInvoiceProvider with ChangeNotifier {
       totals[8] = totals[8] + parseEmptyStringToDouble('${data['bamount']}');
 
       rows.add(DataRow(cells: [
-        DataCell(Text('${data['docno'] ?? "-"}')),
+        DataCell(InkWell(
+            onTap: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              var cid = prefs.getString("currentLoginCid");
+              final Uri uri = Uri.parse(
+                  "${NetworkService.baseUrl}/prtax-invoice/${data['docno']}/$cid/");
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+              } else {
+                throw 'Could not launch';
+              }
+            },
+            child: Text('${data['docno'] ?? "-"}',
+                style: const TextStyle(
+                    color: Colors.blueAccent, fontWeight: FontWeight.w500)))),
         DataCell(Text('${data['ddocDate'] ?? "-"}')),
         DataCell(Visibility(
           visible: data['DocProof'] != null && data['DocProof'] != "",

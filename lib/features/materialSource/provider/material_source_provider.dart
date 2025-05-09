@@ -19,16 +19,15 @@ class MaterialSourceProvider with ChangeNotifier {
   TextEditingController editController = TextEditingController();
   TextEditingController bpController = TextEditingController();
 
-
   List<SearchableDropdownMenuItem<String>> businessPartner = [];
 
   DataTable table =
-  DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
+      DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
   String jsonData =
-      '[{"id": "matno","name": "Material Code","isMandatory": true,"inputType": "text"},  {"id": "bpCode","name": "Business Partner Code","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-business-partner/"},{"id": "matDescription","name": "Material Description","isMandatory": true,"inputType": "text","maxCharacter": 100},{"id" : "hsnCode", "name" : "HSN Code", "isMandatory" : true, "inputType":"text", "maxCharacter": 10},{"id": "bpPartNo","name": "Business Partner Part No.","isMandatory": false,"inputType": "text","maxCharacter": 30},{"id": "bpRate","name": "Rate","isMandatory": true,"inputType": "number","maxCharacter": 16},{"id": "rateType","name": "Rate Type","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-rate-type/"},{"id": "rateEf","name": "Rate EF","isMandatory": true,"inputType": "datetime","maxCharacter": 12},{"id": "moq","name": "MOQ","isMandatory": true,"inputType": "number"},{"id": "leadTime","name": "Lead Time","isMandatory": true,"inputType": "number"},{"id": "bpRating","name": "Business Partner Rating","isMandatory": true,"inputType": "number"}]';
+      '[{"id": "matno","name": "Material Code","isMandatory": true,"inputType": "text"},  {"id": "bpCode","name": "Business Partner Code","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-business-partner/"},{"id": "matDescription","name": "Material Description","isMandatory": true,"inputType": "text","maxCharacter": 100},{"id" : "hsnCode", "name" : "HSN Code", "isMandatory" : true, "inputType":"text", "maxCharacter": 10},{"id": "bpPartNo","name": "Business Partner Part No.","isMandatory": false,"inputType": "text","maxCharacter": 30},{"id": "puUnit","name": "Material Unit","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-material-unit/"  },{"id": "bpRate","name": "Rate","isMandatory": true,"inputType": "number","maxCharacter": 16},{"id": "rateType","name": "Rate Type","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-rate-type/"},{"id": "rateEf","name": "Rate EF","isMandatory": true,"inputType": "datetime","maxCharacter": 12},{"id": "moq","name": "MOQ","isMandatory": true,"inputType": "number"},{"id": "leadTime","name": "Lead Time","isMandatory": true,"inputType": "number"},{"id": "bpRating","name": "Business Partner Rating","isMandatory": true,"inputType": "number"}]';
 
   void reset() {
     GlobalVariables.requestBody[featureName] = {};
@@ -67,8 +66,8 @@ class MaterialSourceProvider with ChangeNotifier {
     var payload = manualOrder
         ? [GlobalVariables.requestBody[featureName]]
         : GlobalVariables.requestBody[featureName];
-    http.StreamedResponse response = await networkService.post(
-        "/add-material-source/", payload);
+    http.StreamedResponse response =
+        await networkService.post("/add-material-source/", payload);
     return response;
   }
 
@@ -90,14 +89,15 @@ class MaterialSourceProvider with ChangeNotifier {
     }
 
     List<Widget> widgets =
-    await formService.generateDynamicForm(formFieldDetails, reportFeature);
+        await formService.generateDynamicForm(formFieldDetails, reportFeature);
     widgetList.addAll(widgets);
     notifyListeners();
   }
 
   Future<dynamic> getMaterialSourceReport() async {
     http.StreamedResponse response = await networkService.post(
-        "/get-material-source-report/", GlobalVariables.requestBody[reportFeature]);
+        "/get-material-source-report/",
+        GlobalVariables.requestBody[reportFeature]);
     if (response.statusCode == 200) {
       return jsonDecode(await response.stream.bytesToString());
     }
@@ -105,6 +105,8 @@ class MaterialSourceProvider with ChangeNotifier {
   }
 
   void nestedTable() async {
+    table =
+        DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
     var purchaseOrderReport = await getMaterialSourceReport();
     List<DataRow> rows = [];
 
@@ -119,46 +121,54 @@ class MaterialSourceProvider with ChangeNotifier {
         DataCell(Text('${data['puUnit'] ?? "-"}')),
         DataCell(Text('${data['rateType'] ?? "-"}')),
         DataCell(Text('${data['moq'] ?? "-"}')),
+        DataCell(Text('${data['rateEf'] ?? "-"}')),
         DataCell(Text('${data['leadTime'] ?? "-"}')),
         DataCell(Text('${data['bpRating'] ?? "-"}')),
       ]));
-
     }
 
     table = DataTable(columns: const [
       DataColumn(
-          label:
-          Text("Material No.", style: TextStyle(fontWeight: FontWeight.bold))),
+          label: Text("Material No.",
+              style: TextStyle(fontWeight: FontWeight.bold))),
       DataColumn(
           label: Text("Description",
               style: TextStyle(fontWeight: FontWeight.bold))),
       DataColumn(
-          label: Text("Part No.",
-              style: TextStyle(fontWeight: FontWeight.bold))),
+          label:
+              Text("Part No.", style: TextStyle(fontWeight: FontWeight.bold))),
       DataColumn(
           label: Text("Business Partner",
               style: TextStyle(fontWeight: FontWeight.bold))),
       DataColumn(
-          label: Text("HSN Code", style: TextStyle(fontWeight: FontWeight.bold))),
+          label:
+              Text("HSN Code", style: TextStyle(fontWeight: FontWeight.bold))),
       DataColumn(
           label: Text("Rate", style: TextStyle(fontWeight: FontWeight.bold))),
       DataColumn(
-          label: Text("Unit",
-              style: TextStyle(fontWeight: FontWeight.bold))),
+          label: Text("Unit", style: TextStyle(fontWeight: FontWeight.bold))),
       DataColumn(
           label:
-          Text("Rate Type", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(label: Text("MOQ", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(label: Text("Lead Time", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(label: Text("Partner Rating", style: TextStyle(fontWeight: FontWeight.bold))),
+              Text("Rate Type", style: TextStyle(fontWeight: FontWeight.bold))),
+      DataColumn(
+          label: Text("MOQ", style: TextStyle(fontWeight: FontWeight.bold))),
+      DataColumn(
+          label: Text("Rate EF", style: TextStyle(fontWeight: FontWeight.bold))),
+      DataColumn(
+          label:
+              Text("Lead Time", style: TextStyle(fontWeight: FontWeight.bold))),
+      DataColumn(
+          label: Text("Partner Rating",
+              style: TextStyle(fontWeight: FontWeight.bold))),
     ], rows: rows);
 
     notifyListeners();
   }
 
   Future<Map<String, dynamic>> getByIdMaterialSource() async {
-    http.StreamedResponse response =
-    await networkService.post("/get-material-source-details/",{"bpCode" : bpController.text, "matno" : editController.text});
+    http.StreamedResponse response = await networkService.post(
+        "/get-material-source-details/",
+        {"bpCode": bpController.text, "matno": editController.text});
     if (response.statusCode == 200) {
       return jsonDecode(await response.stream.bytesToString())[0];
     }
@@ -185,7 +195,7 @@ class MaterialSourceProvider with ChangeNotifier {
     }
 
     List<Widget> widgets =
-    await formService.generateDynamicForm(formFieldDetails, featureName);
+        await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
     notifyListeners();
   }
@@ -198,8 +208,7 @@ class MaterialSourceProvider with ChangeNotifier {
 
   void getBusinessPartner() async {
     businessPartner =
-    await formService.getDropdownMenuItem("/get-business-partner/");
+        await formService.getDropdownMenuItem("/get-business-partner/");
     notifyListeners();
   }
-
 }

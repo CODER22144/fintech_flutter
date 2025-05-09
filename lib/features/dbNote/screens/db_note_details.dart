@@ -50,7 +50,7 @@ class DbNoteDetailsState extends State<DbNoteDetails>
     Provider.of<DbnoteProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
-    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
     tabController = TabController(length: 2, vsync: this);
     provider.getDiscountType();
     provider.setDropdowns();
@@ -65,7 +65,7 @@ class DbNoteDetailsState extends State<DbNoteDetails>
   // Function to add a new row
   void addRow() {
     setState(() {
-      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
     });
   }
 
@@ -172,6 +172,7 @@ class DbNoteDetailsState extends State<DbNoteDetails>
                                         index: i,
                                         tableRows: tableRows,
                                         discountType: provider.discountType,
+                                        materialUnit: provider.materialUnit,
                                         deleteRow: deleteRow),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment

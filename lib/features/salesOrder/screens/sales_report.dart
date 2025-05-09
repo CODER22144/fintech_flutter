@@ -2,8 +2,6 @@ import 'package:fintech_new_web/features/salesOrder/provider/sales_order_provide
 import 'package:fintech_new_web/features/utility/services/common_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../network/service/network_service.dart';

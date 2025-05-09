@@ -41,7 +41,9 @@ class _BpShippingState extends State<BpShipping> {
   @override
   void dispose() {
     super.dispose();
-    provider.reset();
+    if (widget.editing == "true") {
+      provider.reset();
+    }
   }
 
   @override

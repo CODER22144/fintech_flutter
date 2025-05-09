@@ -37,7 +37,7 @@ class _SalesOrderReportFormState extends State<SalesOrderReportForm> {
             appBar: PreferredSize(
                 preferredSize:
                 Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-                child: const CommonAppbar(title: 'Get Sales Order Report')),
+                child: const CommonAppbar(title: 'Order Report')),
             body: SingleChildScrollView(
               child: Center(
                 child: Container(

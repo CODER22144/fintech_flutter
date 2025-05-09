@@ -13,14 +13,17 @@ import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart
 
 class ProductBreakupProvider with ChangeNotifier {
   static const String featureName = "productBreakup";
+  static const String reportFeature = "productBreakupReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
+  List<Widget> reportWidgetList = [];
   List<SearchableDropdownMenuItem<String>> workProcess = [];
   List<SearchableDropdownMenuItem<String>> rmType = [];
   List<SearchableDropdownMenuItem<String>> resources = [];
   List<SearchableDropdownMenuItem<String>> units = [];
 
+  List<dynamic> breakupReport = [];
   TextEditingController materialController = TextEditingController();
   dynamic productBreakupMap = {};
   List<dynamic> productBreakupDetailsList = [];
@@ -208,4 +211,39 @@ class ProductBreakupProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void initReport() async {
+    String jsonData =
+        '[{"id":"matno","name":"Material No.","isMandatory":true,"inputType":"text","maxCharacter":15}]';
+    GlobalVariables.requestBody[reportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          controller: controller,
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, reportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getProductBreakupReport() async {
+    breakupReport.clear();
+    http.StreamedResponse response =
+    await networkService.post(
+        "/pbu-report/", GlobalVariables.requestBody[reportFeature]);
+    if (response.statusCode == 200) {
+      String respData = jsonDecode(await response.stream.bytesToString());
+      breakupReport = jsonDecode(respData);
+    }
+    notifyListeners();
+  }
 }

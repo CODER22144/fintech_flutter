@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../common/widgets/custom_dropdown_field.dart';
 import '../../network/service/network_service.dart';
@@ -24,6 +25,7 @@ class SalesDebitNoteProvider with ChangeNotifier {
   List<DataRow> rows = [];
 
   List<SearchableDropdownMenuItem<String>> discountType = [];
+  List<SearchableDropdownMenuItem<String>> materialUnit = [];
   List<SearchableDropdownMenuItem<String>> supplyType = [];
   List<SearchableDropdownMenuItem<String>> supplierType = [];
   List<SearchableDropdownMenuItem<String>> crCodes = [];
@@ -64,6 +66,8 @@ class SalesDebitNoteProvider with ChangeNotifier {
     List<Widget> widgets =
     await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
+    materialUnit.clear();
+    materialUnit = await formService.getDropdownMenuItem("/get-material-unit/");
     initCustomObject();
   }
 
@@ -129,6 +133,7 @@ class SalesDebitNoteProvider with ChangeNotifier {
         "gstAmount": tableRows[i][16],
         // "tcsAmount": tableRows[i][17],
         "tamount" : tableRows[i][18],
+        'unit' : tableRows[i][19],
         "docno" : GlobalVariables.requestBody[featureName]['docno']
       });
     }
@@ -221,7 +226,21 @@ class SalesDebitNoteProvider with ChangeNotifier {
       totals[8] = totals[8] + parseEmptyStringToDouble('${data['bamount']}');
 
       rows.add(DataRow(cells: [
-        DataCell(Text('${data['docno'] ?? "-"}')),
+        DataCell(InkWell(
+            onTap: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              var cid = prefs.getString("currentLoginCid");
+              final Uri uri = Uri.parse(
+                  "${NetworkService.baseUrl}/sale-db-note/${data['docno']}/$cid/");
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+              } else {
+                throw 'Could not launch';
+              }
+            },
+            child: Text('${data['docno'] ?? "-"}',
+                style: const TextStyle(
+                    color: Colors.blueAccent, fontWeight: FontWeight.w500)))),
         DataCell(Text('${data['ddocDate'] ?? "-"}')),
         DataCell(Text('${data['invoiceType'] ?? "-"}')),
         DataCell(Visibility(

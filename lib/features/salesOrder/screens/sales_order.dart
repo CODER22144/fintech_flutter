@@ -12,7 +12,9 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:excel/excel.dart';
+import 'package:excel/excel.dart' as exl;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../common/widgets/pop_ups.dart';
@@ -36,13 +38,24 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
   bool autoOrder = false;
   bool isFileUploaded = false;
 
+  bool isLoading = false;
+
   List<Map<String, dynamic>> jsonData = [];
+  late SalesOrderProvider provider;
+
+  // List<SearchableDropdownMenuItem<String>>? get shipping =>
+  //     GlobalVariables.requestBody[SalesOrderProvider.featureName]['custCode'] !=
+  //             null
+  //         ? provider.shipCodes[GlobalVariables
+  //             .requestBody[SalesOrderProvider.featureName]['custCode']]
+  //         : [];
+
+  List<SearchableDropdownMenuItem<String>> shipping = [];
 
   @override
   void initState() {
     super.initState();
-    SalesOrderProvider provider =
-        Provider.of<SalesOrderProvider>(context, listen: false);
+    provider = Provider.of<SalesOrderProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
     tableRows.add(['', '']);
@@ -60,12 +73,33 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
     setState(() {
       tableRows.add(['', '']);
     });
+    provider.addRowController();
   }
 
   // Function to delete a row
   void deleteRow(int index) {
     setState(() {
       tableRows.removeAt(index);
+    });
+    provider.deleteRowController(index);
+  }
+
+  void onChangeBpCodeForShipping(String? value) async {
+    setState(() {
+      isLoading = true;
+    });
+    GlobalVariables.requestBody[
+    SalesOrderProvider
+        .featureName]
+    ['custCode'] = value;
+
+    await Future.delayed(const Duration(milliseconds: 100)); // Optional delay
+
+
+    setState(() {
+      shipping = provider.shipCodes[GlobalVariables
+          .requestBody[SalesOrderProvider.featureName]['custCode']] ?? [];
+      isLoading = false;
     });
   }
 
@@ -104,6 +138,129 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
                             key: formKey,
                             child: Column(
                               children: [
+                                Visibility(
+                                  visible: provider.widgetList.isNotEmpty,
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        color: Colors.white,
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 10),
+                                        child: SearchableDropdown<String>(
+                                          isEnabled: true,
+                                          backgroundDecoration: (child) =>
+                                              Container(
+                                            height: 40,
+                                            margin: EdgeInsets.zero,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              border: Border.all(
+                                                  color: Colors.black,
+                                                  width: 0.5),
+                                            ),
+                                            child: child,
+                                          ),
+                                          items: provider.bpCodes,
+                                          onChanged: onChangeBpCodeForShipping,
+                                          hasTrailingClearIcon: false,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 10,
+                                        top: 3,
+                                        child: Container(
+                                          color: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 2),
+                                          child: const Wrap(
+                                            children: [
+                                              Text(
+                                                "Business Partner",
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                "*",
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if(isLoading)
+                                  const CircularProgressIndicator()
+                                else
+                                Visibility(
+                                  visible: provider.widgetList.isNotEmpty,
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        color: Colors.white,
+                                        margin: const EdgeInsets.only(top: 10),
+                                        child: SearchableDropdown<String>(
+                                          isEnabled: true,
+                                          backgroundDecoration: (child) =>
+                                              Container(
+                                            height: 40,
+                                            margin: EdgeInsets.zero,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              border: Border.all(
+                                                  color: Colors.black,
+                                                  width: 0.5),
+                                            ),
+                                            child: child,
+                                          ),
+                                          items: shipping,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              GlobalVariables.requestBody[
+                                                      SalesOrderProvider
+                                                          .featureName]
+                                                  ['shipCode'] = value;
+                                            });
+                                          },
+                                          hasTrailingClearIcon: false,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 10,
+                                        top: 3,
+                                        child: Container(
+                                          color: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 2),
+                                          child: const Wrap(
+                                            children: [
+                                              Text(
+                                                "Shipping",
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                "*",
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 Padding(
                                   padding:
                                       const EdgeInsets.only(top: 5, bottom: 5),
@@ -216,16 +373,38 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
                                           });
                                         },
                                         child: const Text(
-                                            "Manually Add Order Materials",
+                                          "Manually Add Order Materials",
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontWeight: FontWeight.bold),),
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 20)
+                                  const SizedBox(height: 20),
                                 ],
                               ),
+                              const SizedBox(height: 20),
+                              Visibility(
+                                  visible: autoOrder,
+                                  child: InkWell(
+                                    child: const Text(
+                                      "Click to View file format for Import",
+                                      style: TextStyle(
+                                          color: Colors.blueAccent,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    onTap: () async {
+                                      final Uri uri = Uri.parse(
+                                          "https://docs.google.com/spreadsheets/d/1g5wfprUEw2shCbdDNv5HPVVK88SZNoppUbJ3teJ22ws/edit?usp=sharing");
+                                      if (await canLaunchUrl(uri)) {
+                                        await launchUrl(uri,
+                                            mode: LaunchMode.inAppBrowserView);
+                                      } else {
+                                        throw 'Could not launch';
+                                      }
+                                    },
+                                  )),
                               Row(
                                 children: [
                                   Visibility(
@@ -246,9 +425,12 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
                                           minimumSize: const Size(150,
                                               50), // Width and height for the button
                                         ),
-                                        child: const Text('Choose File',style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),),
+                                        child: const Text(
+                                          'Choose File',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -281,13 +463,13 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
                                               Radius.circular(5)))),
                                   onPressed: () async {
                                     http.StreamedResponse result =
-                                    await provider.processFormInfo(
-                                        tableRows, manualOrder);
+                                        await provider.processFormInfo(
+                                            tableRows, manualOrder);
                                     var message = jsonDecode(
                                         await result.stream.bytesToString());
                                     if (result.statusCode == 200) {
-                                      context
-                                          .pushReplacementNamed(SalesOrderDetails.routeName);
+                                      context.pushReplacementNamed(
+                                          SalesOrderDetails.routeName);
                                     } else if (result.statusCode == 400) {
                                       await showAlertDialog(
                                           context,
@@ -323,7 +505,7 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
                                   child: SalesOrderDetailsRowField(
                                       index: i,
                                       tableRows: tableRows,
-                                      discountType: provider.discountType,
+                                      controllers: provider.rowControllers,
                                       deleteRow: deleteRow),
                                 ),
                               Padding(
@@ -338,10 +520,14 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
                                         visible: manualOrder,
                                         child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                              backgroundColor: HexColor("#0B6EFE"),
-                                              shape: const RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(5)))),
+                                              backgroundColor:
+                                                  HexColor("#0B6EFE"),
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  5)))),
                                           onPressed: addRow,
                                           child: const Text('Add Row',
                                               style: TextStyle(
@@ -379,12 +565,11 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
         // Use the bytes directly if the path is null
         final bytes = result.files.single.bytes ??
             File(result.files.single.path!).readAsBytesSync();
-        var excel = Excel.decodeBytes(bytes);
+        var excel = exl.Excel.decodeBytes(bytes);
 
         var sheet = excel.tables.values.first;
 
         if (sheet != null) {
-
           // Get the first row as headers
           List<String> headers = sheet.rows.first
               .map((cell) => cell?.value?.toString() ?? '')
@@ -409,12 +594,12 @@ class SalesOrderDetailsState extends State<SalesOrderDetails>
             });
           }
           GlobalVariables.requestBody[SalesOrderProvider.featureName]
-          ['orderdetails'] = jsonData;
+              ['orderdetails'] = jsonData;
         }
       } else {
         showAlertDialog(context, "File selection canceled", "OKAY", false);
       }
-    } catch(e) {
+    } catch (e) {
       showAlertDialog(context, "Unable to access file.", "OKAY", false);
     }
   }

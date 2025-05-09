@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../utility/global_variables.dart';
+import '../../utility/services/common_utility.dart';
 
 class BillPendingReport extends StatefulWidget {
   static String routeName = "billPendingReport";
@@ -37,7 +38,7 @@ class _BillPendingReportState extends State<BillPendingReport> {
           appBar: PreferredSize(
               preferredSize:
                   Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-              child: const CommonAppbar(title: 'Bill Pending Report')),
+              child: const CommonAppbar(title: 'Bill Pending')),
           body: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(
@@ -45,54 +46,103 @@ class _BillPendingReportState extends State<BillPendingReport> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text("Tran Id")),
-                    DataColumn(label: Text("Date")),
-                    DataColumn(label: Text("Voucher Type")),
-                    DataColumn(label: Text("Party Code")),
-                    DataColumn(label: Text("Bill No.")),
-                    DataColumn(label: Text("Bill Date")),
-                    DataColumn(label: Text("Amount")),
-                    DataColumn(label: Text("Pay Amount")),
-                    DataColumn(label: Text("Balance Amount")),
-                    DataColumn(label: Text("")),
+                  columnSpacing: 20,
+                  columns: [
+                    const DataColumn(label: Text("Tran Id")),
+                    const DataColumn(label: Text("Date")),
+                    const DataColumn(label: Text("Voucher Type")),
+                    const DataColumn(label: Text("Bill No.")),
+                    const DataColumn(label: Text("Bill Date")),
+                    const DataColumn(label: Text("Total Days")),
+                    const DataColumn(label: Text("Amount")),
+                    const DataColumn(label: Text("Pay Amount")),
+                    const DataColumn(label: Text("Balance Amount")),
+                    const DataColumn(label: Text("")),
+                    DataColumn(label: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(5)),
+                        ),
+                      ),
+                      onPressed: () async {
+                        downloadJsonToExcel(provider.billPendingExport, "bill_pending_export");
+                      },
+                      child: const Text(
+                        'Export',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                    )),
                   ],
                   rows: provider.billPending.map((data) {
                     return DataRow(cells: [
                       DataCell(InkWell(
-                          child: Text('${data['transId'] ?? "-"}', style: const TextStyle(color: Colors.blue)),
+                          child: Text('${data['transId'] ?? ""}',
+                              style: num.tryParse(data['transId'].toString()) != null
+                                  ? const TextStyle(color: Colors.blue)
+                                  : null),
                           onTap: () async {
-                            var resp = await provider.getInwardClear(
-                                '${data['transId'] ?? "-"}',
-                                '${data['vtype'] ?? "-"}');
-                            _showTablePopup(context, resp);
+                            if (num.tryParse(data['transId'].toString()) != null) {
+                              var resp = await provider.getInwardClear(
+                                  '${data['transId'] ?? "-"}',
+                                  '${data['vtype'] ?? "-"}');
+                              _showTablePopup(context, resp);
+                            }
                           })),
-                      DataCell(Text('${data['dDate'] ?? "-"}')),
-                      DataCell(Text('${data['vtype'] ?? "-"}')),
-                      DataCell(Text('${data['lName'] ?? "-"}')),
-                      DataCell(Text('${data['billNo'] ?? ""}')),
+                      DataCell(SizedBox(width: 260,child: Text('${data['dDate'] ?? ""}'))),
+                      DataCell(Text('${data['vtype'] ?? ""}')),
+                      DataCell(Text('${data['billNo'] ?? ""}',
+                          style: data['billNo'] == 'Total' ||
+                                  data['billNo'] == 'Grand Total'
+                              ? const TextStyle(fontWeight: FontWeight.bold)
+                              : null)),
                       DataCell(Text('${data['billDate'] ?? ""}')),
-                      DataCell(Text('${data['amount'] ?? "-"}')),
-                      DataCell(Text('${data['payamount'] ?? "-"}')),
-                      DataCell(Text('${data['bamount'] ?? "-"}')),
-                      DataCell(ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5)))),
-                        onPressed: () async {
-                          context.pushNamed(AddPayment.routeName,
-                              queryParameters: {"partyCode": jsonEncode(data)});
-                        },
-                        child: const Text(
-                          'Make Payment',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white),
+                      DataCell(Text('${data['tdays'] ?? ""}')),
+                      DataCell(Text('${data['amount'] ?? ""}',
+                          style: data['billNo'] == 'Total' ||
+                                  data['billNo'] == 'Grand Total'
+                              ? const TextStyle(fontWeight: FontWeight.bold)
+                              : null)),
+                      DataCell(Text('${data['payamount'] ?? ""}',
+                          style: data['billNo'] == 'Total' ||
+                                  data['billNo'] == 'Grand Total'
+                              ? const TextStyle(fontWeight: FontWeight.bold)
+                              : null)),
+                      DataCell(Text('${data['bamount'] ?? ""}',
+                          style: data['billNo'] == 'Total' ||
+                                  data['billNo'] == 'Grand Total'
+                              ? const TextStyle(fontWeight: FontWeight.bold)
+                              : null)),
+                      DataCell(Visibility(
+                        visible: data['bamount'] != null &&
+                            data['billNo'] != 'Total' &&
+                            data['billNo'] != 'Grand Total',
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)))),
+                          onPressed: () async {
+                            context.pushNamed(AddPayment.routeName,
+                                queryParameters: {
+                                  "partyCode": jsonEncode(data)
+                                });
+                          },
+                          child: const Text(
+                            'Make Payment',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.white),
+                          ),
                         ),
                       )),
+                      const DataCell(SizedBox()),
                     ]);
                   }).toList(),
                 ),
@@ -130,7 +180,9 @@ class _BillPendingReportState extends State<BillPendingReport> {
                       return DataRow(cells: [
                         DataCell(Text('${data['transId'] ?? "-"}')),
                         DataCell(Text('${data['vtype'] ?? "-"}')),
-                        DataCell(Align(alignment: Alignment.centerRight,child: Text('${data['amount'] ?? "-"}'))),
+                        DataCell(Align(
+                            alignment: Alignment.centerRight,
+                            child: Text('${data['amount'] ?? "-"}'))),
                         DataCell(Text('${data['clnaration'] ?? "-"}')),
                       ]);
                     }).toList(),

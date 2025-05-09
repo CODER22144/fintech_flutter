@@ -29,15 +29,16 @@ class CrNoteDetailsState extends State<CrNoteDetails>
   List<List<String>> tableRows = [];
   var formKey = GlobalKey<FormState>();
   late TabController tabController;
+  late CrnoteProvider provider;
 
   @override
   void initState() {
     super.initState();
-    CrnoteProvider provider =
+    provider =
     Provider.of<CrnoteProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
-    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
     tabController = TabController(length: 2, vsync: this);
     provider.getDiscountType();
   }
@@ -51,8 +52,9 @@ class CrNoteDetailsState extends State<CrNoteDetails>
   // Function to add a new row
   void addRow() {
     setState(() {
-      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
     });
+    provider.addRowController();
   }
 
   // Function to delete a row
@@ -60,6 +62,7 @@ class CrNoteDetailsState extends State<CrNoteDetails>
     setState(() {
       tableRows.removeAt(index);
     });
+    provider.deleteRowController(index);
   }
 
   @override
@@ -155,9 +158,11 @@ class CrNoteDetailsState extends State<CrNoteDetails>
                                   const SizedBox(height: 10),
                                   for (int i = 0; i < tableRows.length; i++)
                                     CrnoteRowFields(
+                                      controllers: provider.rowControllers,
                                         index: i,
                                         tableRows: tableRows,
                                         discountType: provider.discountType,
+                                        materialUnit: provider.materialUnit,
                                         deleteRow: deleteRow),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment

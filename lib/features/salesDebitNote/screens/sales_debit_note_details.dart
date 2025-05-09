@@ -37,7 +37,7 @@ class SalesDebitNoteDetailsState extends State<SalesDebitNoteDetails>
     Provider.of<SalesDebitNoteProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
-    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
     tabController = TabController(length: 2, vsync: this);
     provider.getDiscountType();
   }
@@ -51,7 +51,7 @@ class SalesDebitNoteDetailsState extends State<SalesDebitNoteDetails>
   // Function to add a new row
   void addRow() {
     setState(() {
-      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
     });
   }
 
@@ -153,6 +153,7 @@ class SalesDebitNoteDetailsState extends State<SalesDebitNoteDetails>
                                         index: i,
                                         tableRows: tableRows,
                                         discountType: provider.discountType,
+                                        materialUnit: provider.materialUnit,
                                         deleteRow: deleteRow),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment

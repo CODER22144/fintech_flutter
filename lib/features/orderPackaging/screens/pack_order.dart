@@ -11,7 +11,9 @@ import 'package:provider/provider.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../common/widgets/pop_ups.dart';
+import '../../network/service/network_service.dart';
 import '../../utility/global_variables.dart';
+import '../../utility/services/common_utility.dart';
 
 class PackOrder extends StatefulWidget {
   static String routeName = "packOrder";
@@ -94,6 +96,40 @@ class _PackOrderState extends State<PackOrder> {
                             },
                             child: const Text(
                               'Packed Order',
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Visibility(
+                        visible: provider.widgetList.isNotEmpty,
+                        child: Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 10),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: HexColor("#0B6EFE"),
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(5)))),
+                            onPressed: () async {
+                              NetworkService networkService = NetworkService();
+                              http.StreamedResponse response = await networkService
+                                  .post("/order-clear-value/",
+                                  {"orderId": widget.orderId});
+                              if (response.statusCode == 200) {
+                                orderClearTablePopup(
+                                    context,
+                                    jsonDecode(
+                                        await response.stream.bytesToString()));
+                            }
+                            },
+                            child: const Text(
+                              'Order Clear Value',
                               style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -373,6 +409,108 @@ class _PackOrderState extends State<PackOrder> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: HexColor("#e0e0e0"),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 2,
+                          offset: Offset(
+                            2,
+                            3,
+                          ),
+                        )
+                      ],
+                    ),
+                    child: const Text("CLOSE",
+                        style: TextStyle(fontSize: 11, color: Colors.black)),
+                  ),
+                ),
+              ],
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void orderClearTablePopup(BuildContext context, List<dynamic> orderData) {
+    List<double> sums = [0, 0, 0, 0];
+    List<DataRow> rows = [];
+    for (var data in orderData) {
+      sums[0] += parseEmptyStringToDouble(data['ordQty']);
+      sums[1] += parseEmptyStringToDouble(data['ordTamount']);
+      sums[2] += parseEmptyStringToDouble(data['pkdQty']);
+      sums[3] += parseEmptyStringToDouble(data['pkdTamount']);
+
+      rows.add(DataRow(cells: [
+        DataCell(Text('${data['orderId'] ?? "-"}')),
+        DataCell(Text('${data['icode'] ?? "-"}')),
+        DataCell(Text('${data['ordQty'] ?? "-"}')),
+        DataCell(Text('${data['ordTamount'] ?? "-"}')),
+        DataCell(Text('${data['pkdQty'] ?? "-"}')),
+        DataCell(Text('${data['pkdTamount'] ?? "-"}')),
+      ]));
+    }
+
+    rows.add(DataRow(cells: [
+      const DataCell(Text('')),
+      const DataCell(
+          Text('Total', style: TextStyle(fontWeight: FontWeight.bold))),
+      DataCell(Text(parseDoubleUpto2Decimal(sums[0].toString()),
+          style: const TextStyle(fontWeight: FontWeight.bold))),
+      DataCell(Text(parseDoubleUpto2Decimal(sums[1].toString()),
+          style: const TextStyle(fontWeight: FontWeight.bold))),
+      DataCell(Text(parseDoubleUpto2Decimal(sums[2].toString()),
+          style: const TextStyle(fontWeight: FontWeight.bold))),
+      DataCell(Text(parseDoubleUpto2Decimal(sums[3].toString()),
+          style: const TextStyle(fontWeight: FontWeight.bold))),
+    ]));
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('ORDER CLEAR VALUE',
+              style: TextStyle(fontWeight: FontWeight.w500)),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Order ID')),
+                      DataColumn(label: Text('Material No.')),
+                      DataColumn(label: Text('Ord Qty')),
+                      DataColumn(label: Text('Ord Amount')),
+                      DataColumn(label: Text('Pkd Qty')),
+                      DataColumn(label: Text('Pkd Amount')),
+                    ],
+                    rows: rows,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    // Navigator.pop(context, false);
+                    Navigator.of(context, rootNavigator: true).pop(false);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 5),
+                    width: GlobalVariables.deviceWidth * 0.15,
+                    height: GlobalVariables.deviceHeight * 0.05,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
                         BoxShadow(

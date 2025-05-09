@@ -39,9 +39,11 @@ class _ReqIssuePendingState extends State<ReqIssuePending> {
                   ? DataTable(
                       columns: const [
                         DataColumn(label: Text("Material No.")),
-                        DataColumn(label: Text("Quantity")),
-                        DataColumn(label: Text("Issue Quantity")),
-                        DataColumn(label: Text("Balance Quantity"))
+                        DataColumn(label: Text("Req. Qty")),
+                        DataColumn(label: Text("I Qty")),
+                        DataColumn(label: Text("B Qty")),
+                        DataColumn(label: Text("Stock")),
+                        DataColumn(label: Text(""))
                       ],
                       rows: provider.rows
                     )

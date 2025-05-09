@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:fintech_new_web/features/common/widgets/pop_ups.dart';
 import 'package:flutter/foundation.dart';
@@ -7,14 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:file_saver/file_saver.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../network/service/network_service.dart';
 import '../../utility/global_variables.dart';
-import 'package:universal_html/html.dart' as fhtml; // Web-specific import
+import '../../utility/services/common_utility.dart';
 
 class ExportEwayBillSale extends StatefulWidget {
   static String routeName = '/ExportEwayBillSale';
@@ -84,32 +80,42 @@ class _ExportEwayBillSaleState extends State<ExportEwayBillSale> {
                     ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Adjust alignment
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceEvenly, // Adjust alignment
                     children: [
-                      Expanded( // Ensures even spacing and prevents overflow
+                      Expanded(
+                        // Ensures even spacing and prevents overflow
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 10, right: 5),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: HexColor("#0B6EFE"),
                               shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
                               ),
                             ),
                             onPressed: () async {
                               NetworkService networkService = NetworkService();
-                              http.StreamedResponse response = await networkService
-                                  .post("/export-eway-bill-sale/", {"docno": docnoController.text});
+                              http.StreamedResponse response =
+                                  await networkService.post(
+                                      "/export-eway-bill-sale/",
+                                      {"docno": docnoController.text});
                               if (response.statusCode == 200) {
-                                var data = jsonDecode(await response.stream.bytesToString());
-                                String fileName = 'eway_bill_${docnoController.text}.json';
-                                String jsonString = const JsonEncoder.withIndent("  ").convert(data);
+                                var data = jsonDecode(
+                                    await response.stream.bytesToString());
+                                String fileName =
+                                    'eway_bill_${docnoController.text}.json';
+                                String jsonString =
+                                    const JsonEncoder.withIndent("  ")
+                                        .convert(data);
 
                                 if (data['billLists'] != null) {
                                   if (kIsWeb) {
-                                    _downloadJsonWeb(jsonString, fileName);
+                                    downloadJsonWeb(jsonString, fileName);
                                   } else {
-                                    _downloadForAndroid(jsonString, fileName, context);
+                                    downloadForAndroid(
+                                        jsonString, fileName, context);
                                   }
                                 } else {
                                   showAlertDialog(
@@ -123,35 +129,46 @@ class _ExportEwayBillSaleState extends State<ExportEwayBillSale> {
                             },
                             child: const Text(
                               'Eway Bill',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             ),
                           ),
                         ),
                       ),
-                      Expanded( // Ensures even spacing and prevents overflow
+                      Expanded(
+                        // Ensures even spacing and prevents overflow
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 10, left: 5),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: HexColor("#0B6EFE"),
                               shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
                               ),
                             ),
                             onPressed: () async {
                               NetworkService networkService = NetworkService();
-                              http.StreamedResponse response = await networkService
-                                  .post("/export-einvoice/", {"docno": docnoController.text});
+                              http.StreamedResponse response =
+                                  await networkService.post("/export-einvoice/",
+                                      {"docno": docnoController.text});
                               if (response.statusCode == 200) {
-                                var data = jsonDecode(await response.stream.bytesToString());
-                                String fileName = 'EInvoice_${docnoController.text}.json';
-                                String jsonString = const JsonEncoder.withIndent("  ").convert(data);
+                                var data = jsonDecode(
+                                    await response.stream.bytesToString());
+                                String fileName =
+                                    'EInvoice_${docnoController.text}.json';
+                                String jsonString =
+                                    const JsonEncoder.withIndent("  ")
+                                        .convert(data);
 
                                 if (data[0] != null) {
                                   if (kIsWeb) {
-                                    _downloadJsonWeb(jsonString, fileName);
+                                    downloadJsonWeb(jsonString, fileName);
                                   } else {
-                                    _downloadForAndroid(jsonString, fileName, context);
+                                    downloadForAndroid(
+                                        jsonString, fileName, context);
                                   }
                                 } else {
                                   showAlertDialog(
@@ -165,14 +182,16 @@ class _ExportEwayBillSaleState extends State<ExportEwayBillSale> {
                             },
                             child: const Text(
                               'E-Invoice',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             ),
                           ),
                         ),
                       ),
                     ],
                   )
-
                 ],
               ),
             ),
@@ -180,49 +199,5 @@ class _ExportEwayBillSaleState extends State<ExportEwayBillSale> {
         ),
       ),
     );
-  }
-
-  void _downloadJsonWeb(String jsonString, String fileName) {
-    final bytes = utf8.encode(jsonString);
-    final blob = fhtml.Blob([bytes]);
-    final url = fhtml.Url.createObjectUrlFromBlob(blob);
-    final anchor = fhtml.AnchorElement(href: url)
-      ..setAttribute("download", fileName)
-      ..click();
-
-    fhtml.Url.revokeObjectUrl(url);
-  }
-
-  void _downloadForAndroid(
-      String jsonString, String fileName, BuildContext context) async {
-    try {
-      if (await Permission.storage.request().isGranted) {
-        Directory? directory = await getExternalStorageDirectory();
-        String path = "${directory!.path}/$fileName";
-
-        // Write JSON data to file
-        File file = File(path);
-        await file.writeAsString(jsonString);
-
-        // Save the file using FileSaver
-        await FileSaver.instance.saveFile(
-          name: fileName,
-          bytes: file.readAsBytesSync(),
-          ext: "json",
-          mimeType: MimeType.json,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("JSON file downloaded: $path")),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Storage permission denied!")),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
-    }
   }
 }

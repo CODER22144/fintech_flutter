@@ -37,7 +37,7 @@ class _BillPendingReportFormState extends State<BillPendingReportForm> {
             appBar: PreferredSize(
                 preferredSize:
                 Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-                child: const CommonAppbar(title: 'Pending Bill Report')),
+                child: const CommonAppbar(title: 'Bill Pending')),
             body: SingleChildScrollView(
               child: Center(
                 child: Container(

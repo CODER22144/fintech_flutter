@@ -27,16 +27,18 @@ class AddJobWorkOutDetailsState extends State<AddJobWorkOutDetails>
   List<List<String>> tableRows = [];
   var formKey = GlobalKey<FormState>();
   late TabController tabController;
+  late JobWorkOutProvider provider;
 
   @override
   void initState() {
     super.initState();
-    JobWorkOutProvider provider =
+    provider =
     Provider.of<JobWorkOutProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
     tableRows.add(['', '']);
     tabController = TabController(length: 2, vsync: this);
+    provider.initDetailsTab(tableRows);
   }
 
   @override
@@ -50,6 +52,7 @@ class AddJobWorkOutDetailsState extends State<AddJobWorkOutDetails>
     setState(() {
       tableRows.add(['', '']);
     });
+    provider.addRowController();
   }
 
   // Function to delete a row
@@ -57,6 +60,7 @@ class AddJobWorkOutDetailsState extends State<AddJobWorkOutDetails>
     setState(() {
       tableRows.removeAt(index);
     });
+    provider.deleteRowController(index);
   }
 
   @override
@@ -149,7 +153,7 @@ class AddJobWorkOutDetailsState extends State<AddJobWorkOutDetails>
                                     SalesOrderDetailsRowField(
                                         index: i,
                                         tableRows: tableRows,
-                                        discountType: [],
+                                        controllers: provider.rowControllers,
                                         deleteRow: deleteRow),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment

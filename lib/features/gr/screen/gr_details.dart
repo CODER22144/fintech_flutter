@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:fintech_new_web/features/gr/screen/gr_details_row_field.dart';
+import 'package:fintech_new_web/features/network/service/network_service.dart';
 import 'package:fintech_new_web/features/utility/global_variables.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +12,20 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../../billReceipt/provider/bill_receipt_provider.dart';
-import '../../billReceipt/screen/bill_receipt.dart';
 import '../../common/widgets/comman_appbar.dart';
 import '../../common/widgets/pop_ups.dart';
-import '../../home.dart';
 import '../../utility/services/common_utility.dart';
 import '../provider/gr_provider.dart';
+import 'dart:ui_web' as ui;
+import 'dart:html';
+
 
 class GrDetails extends StatefulWidget {
   static String routeName = "/grDetails";
   final dynamic brDetails;
 
   const GrDetails({super.key, required this.brDetails});
+
   @override
   GrDetailsState createState() => GrDetailsState();
 }
@@ -33,10 +36,12 @@ class GrDetailsState extends State<GrDetails>
   var formKey = GlobalKey<FormState>();
   late TabController tabController;
 
+  late GrProvider provider;
+
   @override
   void initState() {
     super.initState();
-    GrProvider provider = Provider.of<GrProvider>(context, listen: false);
+    provider = Provider.of<GrProvider>(context, listen: false);
     provider.initWidget(widget.brDetails);
     // Add one empty row at the beginning
     tableRows.add(['', '', '', '', '', '']);
@@ -54,6 +59,7 @@ class GrDetailsState extends State<GrDetails>
     setState(() {
       tableRows.add(['', '', '', '', '', '']);
     });
+    provider.addRowController();
   }
 
   // Function to delete a row
@@ -61,6 +67,23 @@ class GrDetailsState extends State<GrDetails>
     setState(() {
       tableRows.removeAt(index);
     });
+    provider.deleteRowController(index);
+  }
+
+  Widget pdfIframeView(String pdfUrl) {
+    final viewType = 'pdf-iframe-${pdfUrl.hashCode}';
+
+    // ignore: undefined_prefixed_name
+    ui.platformViewRegistry.registerViewFactory(
+      viewType,
+          (int viewId) => IFrameElement()
+        ..src = pdfUrl
+        ..style.border = 'none'
+        ..style.width = '100%'
+        ..style.height = '100%',
+    );
+
+    return HtmlElementView(viewType: viewType);
   }
 
   @override
@@ -69,129 +92,143 @@ class GrDetailsState extends State<GrDetails>
       return Scaffold(
         appBar: PreferredSize(
             preferredSize:
-                Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
             child: const CommonAppbar(title: 'Goods Receipt')),
-        body: Center(
-          child: Column(
-            children: [
-              TabBar(controller: tabController, tabs: const [
-                Tab(text: "GR"),
-                Tab(text: "Details"),
-              ]),
-              Expanded(
-                  child: TabBarView(controller: tabController, children: [
-                SingleChildScrollView(
-                  child: Center(
-                    child: Container(
-                      width: kIsWeb
-                          ? GlobalVariables.deviceWidth / 2
-                          : GlobalVariables.deviceWidth,
-                      padding: const EdgeInsets.all(10),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5, bottom: 5),
-                              child: ListView.builder(
-                                itemCount: provider.widgetList.length,
-                                physics: const ClampingScrollPhysics(),
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  return provider.widgetList[index];
-                                },
-                              ),
-                            ),
-                            Visibility(
-                              visible: provider.widgetList.isNotEmpty,
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: HexColor("#1abc9c"),
-                                      shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5)))),
-                                  onPressed: () {
-                                    if (formKey.currentState!.validate()) {
-                                      tabController.animateTo(1);
-                                    }
-                                  },
-                                  child: const Text('Next ->',
-                                      style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white)),
+        body: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                child: Column(
+                  children: [
+                    TabBar(controller: tabController, tabs: const [
+                      Tab(text: "GR"),
+                      Tab(text: "Details"),
+                    ]),
+                    Expanded(
+                        child: TabBarView(controller: tabController, children: [
+                          SingleChildScrollView(
+                            child: Center(
+                              child: Container(
+                                width: kIsWeb
+                                    ? GlobalVariables.deviceWidth / 2
+                                    : GlobalVariables.deviceWidth,
+                                padding: const EdgeInsets.all(10),
+                                child: Form(
+                                  key: formKey,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                                        child: ListView.builder(
+                                          itemCount: provider.widgetList.length,
+                                          physics: const ClampingScrollPhysics(),
+                                          scrollDirection: Axis.vertical,
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) {
+                                            return provider.widgetList[index];
+                                          },
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: provider.widgetList.isNotEmpty,
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: HexColor("#1abc9c"),
+                                                shape: const RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(5)))),
+                                            onPressed: () {
+                                              if (formKey.currentState!.validate()) {
+                                                tabController.animateTo(1);
+                                              }
+                                            },
+                                            child: const Text('Next ->',
+                                                style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white)),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SingleChildScrollView(
-                  child: Center(
-                    child: SizedBox(
-                      width: kIsWeb
-                          ? GlobalVariables.deviceWidth / 2
-                          : GlobalVariables.deviceWidth,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 10),
-                          for (int i = 0; i < tableRows.length; i++)
-                            GrDetailsRowField(
-                                index: i,
-                                tableRows: tableRows,
-                                validOrder: provider.dropdownItem,
-                                deleteRow: deleteRow),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceEvenly, // Space buttons evenly
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: HexColor("#0B6EFE"),
-                                    shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5)))),
-                                onPressed: () {
-                                  _showTablePopup(context, provider);
-                                },
-                                child: const Text(
-                                  'Submit',
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: HexColor("#0B6EFE"),
-                                    shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5)))),
-                                onPressed: addRow,
-                                child: const Text('Add Row',
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                            ],
                           ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
-                  ),
+                          SingleChildScrollView(
+                            child: Center(
+                              child: SizedBox(
+                                width: kIsWeb
+                                    ? GlobalVariables.deviceWidth / 2
+                                    : GlobalVariables.deviceWidth,
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 10),
+                                    for (int i = 0; i < tableRows.length; i++)
+                                      GrDetailsRowField(
+                                          controllers: provider.rowControllers,
+                                          index: i,
+                                          tableRows: tableRows,
+                                          validOrder: provider.dropdownItem,
+                                          deleteRow: deleteRow),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceEvenly, // Space buttons evenly
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: HexColor("#0B6EFE"),
+                                              shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(5)))),
+                                          onPressed: () {
+                                            _showTablePopup(context, provider);
+                                          },
+                                          child: const Text(
+                                            'Submit',
+                                            style: TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: HexColor("#0B6EFE"),
+                                              shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(5)))),
+                                          onPressed: addRow,
+                                          child: const Text('Add Row',
+                                              style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white)),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]))
+                  ],
                 ),
-              ]))
-            ],
-          ),
+              ),
+            ),
+            Expanded(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 2,
+                child: pdfIframeView('${NetworkService.baseUrl}${jsonDecode(widget.brDetails)['docImage']}'),
+              ),
+            ),
+          ],
         ),
       );
     });
@@ -253,37 +290,6 @@ class GrDetailsState extends State<GrDetails>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InkWell(
-                  onTap: () {
-                    // Navigator.pop(context, false);
-                    Navigator.of(context, rootNavigator: true).pop(false);
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 5),
-                    width: GlobalVariables.deviceWidth * 0.15,
-                    height: GlobalVariables.deviceHeight * 0.05,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: HexColor("#e0e0e0"),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 2,
-                          offset: Offset(
-                            2,
-                            3,
-                          ),
-                        )
-                      ],
-                    ),
-                    child: const Text("CLOSE",
-                        style: TextStyle(fontSize: 11, color: Colors.black)),
-                  ),
-                ),
-                SizedBox(
-                  width: GlobalVariables.deviceWidth * 0.01,
-                ),
-                InkWell(
                   onTap: () async {
                     {
                       http.StreamedResponse result =
@@ -331,6 +337,37 @@ class GrDetailsState extends State<GrDetails>
                       "SUBMIT",
                       style: TextStyle(color: Colors.white, fontSize: 11),
                     ),
+                  ),
+                ),
+                SizedBox(
+                  width: GlobalVariables.deviceWidth * 0.01,
+                ),
+                InkWell(
+                  onTap: () {
+                    // Navigator.pop(context, false);
+                    Navigator.of(context, rootNavigator: true).pop(false);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 5),
+                    width: GlobalVariables.deviceWidth * 0.15,
+                    height: GlobalVariables.deviceHeight * 0.05,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: HexColor("#e0e0e0"),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 2,
+                          offset: Offset(
+                            2,
+                            3,
+                          ),
+                        )
+                      ],
+                    ),
+                    child: const Text("CLOSE",
+                        style: TextStyle(fontSize: 11, color: Colors.black)),
                   ),
                 ),
               ],

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:fintech_new_web/features/utility/global_variables.dart';
 import 'package:fintech_new_web/features/utility/models/forms_UI.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../common/widgets/custom_dropdown_field.dart';
@@ -15,12 +16,17 @@ import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart
 class PaymentInwardProvider with ChangeNotifier {
   static const String featureName = "PaymentInward";
   static const String clearFeature = "CrNoteClear";
+  static const String reportFeature = "PaymentInwardReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
+  List<Widget> reportWidgetList = [];
   List<SearchableDropdownMenuItem<String>> partyCodes = [];
 
   List<dynamic> unadjPaymentInward = [];
+  List<dynamic> paymentInwardReport = [];
+
+  List<DataRow> rows = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -164,4 +170,100 @@ class PaymentInwardProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void initReport() async {
+    GlobalVariables.requestBody[reportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"lcode","name":"Party Code","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"},{"id":"fdate","name":"From Date","isMandatory":false,"inputType":"datetime"},{"id":"tdate","name":"To Date","isMandatory":false,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, reportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getPaymentInwardReport() async {
+    paymentInwardReport.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/payment-inward-report/",
+        GlobalVariables.requestBody[reportFeature]);
+    if (response.statusCode == 200) {
+      paymentInwardReport = jsonDecode(await response.stream.bytesToString());
+    }
+    getRows();
+  }
+
+  void getRows() {
+    List<double> totals = [0, 0, 0];
+    rows.clear();
+
+    for (var data in paymentInwardReport) {
+      totals[0] = totals[0] + parseEmptyStringToDouble('${data['amount']}');
+      totals[1] = totals[1] + parseEmptyStringToDouble('${data['adjusted']}');
+      totals[2] = totals[2] + parseEmptyStringToDouble('${data['unadjusted']}');
+
+      rows.add(DataRow(cells: [
+        DataCell(Text('${data['payId'] ?? "-"}')),
+        DataCell(Text('${data['tdate'] ?? "-"}')),
+        DataCell(Text('${data['mop'] ?? "-"}')),
+        DataCell(Text('${data['lcode'] ?? "-"}')),
+        DataCell(Text('${data['lname'] ?? "-"}')),
+        DataCell(Text('${data['crdrCode'] ?? "-"}')),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['amount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['adjusted']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['unadjusted']}')))),
+        DataCell(Text('${data['naration'] ?? "-"}')),
+      ]));
+    }
+
+    rows.add(DataRow(cells: [
+      const DataCell(SizedBox()),
+      const DataCell(SizedBox()),
+      const DataCell(SizedBox()),
+      const DataCell(SizedBox()),
+      const DataCell(Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold))),
+      const DataCell(SizedBox()),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[0]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[1]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[2]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      const DataCell(SizedBox()),
+    ]));
+
+    notifyListeners();
+  }
+
+  Future<http.StreamedResponse> postPaymentInward(String date) async {
+    http.StreamedResponse response = await networkService
+        .post("/post-payment-inward/", {"fromDate" : date});
+    return response;
+  }
+
+  Future<List<dynamic>> getBankStatementByDate(String date) async {
+    http.StreamedResponse response = await networkService
+        .post("/bank-statement-transDate/", {"fromDate" : date});
+    if(response.statusCode == 200) {
+      return jsonDecode(await response.stream.bytesToString());
+    }
+    return [];
+  }
+
+  Future<http.StreamedResponse> addPaymentInwardClear(Map<String, dynamic> requestBody) async {
+    http.StreamedResponse response = await networkService
+        .post("/add-payment-inward-clear/", [requestBody]);
+    return response;
+  }
+
+
 }

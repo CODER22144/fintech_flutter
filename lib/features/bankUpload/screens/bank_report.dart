@@ -19,7 +19,7 @@ class _BankReportState extends State<BankReport> {
     super.initState();
     BankProvider provider =
     Provider.of<BankProvider>(context, listen: false);
-    provider.getBankStatements();
+    provider.getBankStatements(context);
   }
 
   @override
@@ -41,6 +41,7 @@ class _BankReportState extends State<BankReport> {
                     child: DataTable(
                       columns: const [
                         DataColumn(label: Text("Trans. ID")),
+                        DataColumn(label: Text("")),
                         DataColumn(label: Text("Trans. Date")),
                         DataColumn(label: Text("Description")),
                         DataColumn(label: Text("Reference Number")),

@@ -4,11 +4,12 @@ class ReqIssueRowField extends StatefulWidget {
   final int index;
   final List<List<String>> tableRows;
   final Function deleteRow;
+  final List<List<TextEditingController>> controllers;
   const ReqIssueRowField(
       {super.key,
         required this.index,
         required this.tableRows,
-        required this.deleteRow});
+        required this.deleteRow, required this.controllers});
 
   @override
   State<ReqIssueRowField> createState() => _ReqIssueRowFieldState();
@@ -93,10 +94,13 @@ class _ReqIssueRowFieldState extends State<ReqIssueRowField> {
                 return 'This field is Mandatory';
               }
             },
-            initialValue: widget.tableRows[widget.index][1],
+            // initialValue: widget.tableRows[widget.index][1],
+            controller: widget.controllers[widget.index][0],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][1] = value;
+                widget.controllers[widget.index][0].selection = TextSelection.fromPosition(
+                    TextPosition(offset: widget.controllers[widget.index][0].text.length));
               });
             },
             decoration: InputDecoration(
@@ -132,10 +136,14 @@ class _ReqIssueRowFieldState extends State<ReqIssueRowField> {
                 return 'This field is Mandatory';
               }
             },
-            initialValue: widget.tableRows[widget.index][2],
+            // initialValue: widget.tableRows[widget.index][2],
+            controller: widget.controllers[widget.index][1],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][2] = value;
+
+                widget.controllers[widget.index][1].selection = TextSelection.fromPosition(
+                    TextPosition(offset: widget.controllers[widget.index][1].text.length));
               });
             },
             decoration: InputDecoration(

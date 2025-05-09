@@ -145,7 +145,7 @@ class _GetMaterialSourceState extends State<GetMaterialSource> {
                               },
                               inputFormatters: <TextInputFormatter>[
                                 // FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9#\$&*!₹%.@_ ]')),
-                                LengthLimitingTextInputFormatter(10)
+                                LengthLimitingTextInputFormatter(15)
                               ],
                             ),
                           ),

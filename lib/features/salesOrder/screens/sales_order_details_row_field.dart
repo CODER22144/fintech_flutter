@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
 
 
 class SalesOrderDetailsRowField extends StatefulWidget {
   final int index;
   final List<List<String>> tableRows;
-  final List<SearchableDropdownMenuItem<String>> discountType;
   final Function deleteRow;
+  final List<List<TextEditingController>> controllers;
   const SalesOrderDetailsRowField(
       {super.key,
         required this.index,
         required this.tableRows,
-        required this.discountType,
-        required this.deleteRow});
+        required this.deleteRow,
+        required this.controllers});
 
   @override
   State<SalesOrderDetailsRowField> createState() => _SalesOrderDetailsRowFieldState();
@@ -52,7 +51,7 @@ class _SalesOrderDetailsRowFieldState extends State<SalesOrderDetailsRowField> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            initialValue: widget.tableRows[widget.index][0],
+            controller: widget.controllers[widget.index][0],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][0] = value;
@@ -96,7 +95,7 @@ class _SalesOrderDetailsRowFieldState extends State<SalesOrderDetailsRowField> {
                 return 'This field is Mandatory';
               }
             },
-            initialValue: widget.tableRows[widget.index][1],
+            controller: widget.controllers[widget.index][1],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][1] = value;

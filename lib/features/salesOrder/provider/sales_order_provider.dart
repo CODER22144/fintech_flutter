@@ -17,6 +17,7 @@ class SalesOrderProvider with ChangeNotifier {
   static const String featureName = "salesOrder";
   static const String reportFeature = "salesOrderReport";
   static const String saleReportFeature = "salesReport";
+  static const String orderBalanceReportFeature = "orderBalanceReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
@@ -26,6 +27,8 @@ class SalesOrderProvider with ChangeNotifier {
   List<dynamic> orderMaterial = [];
   List<dynamic> orderReport = [];
   List<dynamic> salesReport = [];
+  List<dynamic> shortQty = [];
+  List<dynamic> orderBalance = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -34,12 +37,19 @@ class SalesOrderProvider with ChangeNotifier {
 
   List<DataRow> rows = [];
 
+  List<List<TextEditingController>> rowControllers = [];
+  List<SearchableDropdownMenuItem<String>> bpCodes = [];
+  Map<String, List<SearchableDropdownMenuItem<String>>> shipCodes = {};
+
   void initWidget() async {
     GlobalVariables.requestBody[featureName] = {};
     formFieldDetails.clear();
     widgetList.clear();
+    bpCodes.clear();
     String jsonData =
-        '[{"id":"custCode","name":"Business Partner","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-business-partner/"},{"id":"shipCode","name":"Shipping","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-shipping/"},{"id":"carId","name":"Carrier","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-carrier/"},{"id":"poNo","name":"PO No.","isMandatory":false,"inputType":"text","maxCharacter":8},{"id":"poDate","name":"PO Date","isMandatory":false,"inputType":"datetime"},{"id":"transmode","name":"Mode Of Transport","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-trans-mode/"},{"id":"privateMark","name":"Private Mark","isMandatory":false,"inputType":"text","maxCharacter":20},{"id":"mop","name":"Mode Of Payemnt","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-mop/"},{"id":"mof","name":"Freight Mode","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-mof/"}]';
+        '[{"id":"carId","name":"Carrier","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-carrier/"},{"id":"poNo","name":"PO No.","isMandatory":false,"inputType":"text","maxCharacter":30},{"id":"poDate","name":"PO Date","isMandatory":false,"inputType":"datetime"},{"id":"transmode","name":"Mode Of Transport","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-trans-mode/"},{"id":"privateMark","name":"Private Mark","isMandatory":false,"inputType":"text","maxCharacter":20},{"id":"mop","name":"Mode Of Payemnt","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-mop/"},{"id":"mof","name":"Freight Mode","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-mof/"}]';
+
+    bpCodes = await formService.getDropdownMenuItem("/get-business-partner/");
 
     for (var element in jsonDecode(jsonData)) {
       TextEditingController controller = TextEditingController();
@@ -57,7 +67,8 @@ class SalesOrderProvider with ChangeNotifier {
     List<Widget> widgets =
         await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
-    notifyListeners();
+    initDetailsTab();
+    getShippingByBpCode();
   }
 
   Future<http.StreamedResponse> processFormInfo(
@@ -257,15 +268,105 @@ class SalesOrderProvider with ChangeNotifier {
       const DataCell(SizedBox()),
       DataCell(Align(
           alignment: Alignment.centerRight,
-          child: Text(parseDoubleUpto2Decimal('${totals[0]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
+          child: Text(parseDoubleUpto2Decimal('${totals[0]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
       DataCell(Align(
           alignment: Alignment.centerRight,
-          child: Text(parseDoubleUpto2Decimal('${totals[1]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
+          child: Text(parseDoubleUpto2Decimal('${totals[1]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
       DataCell(Align(
           alignment: Alignment.centerRight,
-          child: Text(parseDoubleUpto2Decimal('${totals[2]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
+          child: Text(parseDoubleUpto2Decimal('${totals[2]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
     ]));
 
+    notifyListeners();
+  }
+
+  void initDetailsTab() {
+    List<List<String>> tableRows = [
+      ['', '']
+    ];
+    rowControllers = tableRows
+        .map((row) =>
+            row.map((field) => TextEditingController(text: field)).toList())
+        .toList();
+  }
+
+  void deleteRowController(int index) {
+    rowControllers.removeAt(index);
+    notifyListeners();
+  }
+
+  void addRowController() {
+    rowControllers.add([
+      TextEditingController(),
+      TextEditingController(),
+    ]);
+    notifyListeners();
+  }
+
+  void getShippingByBpCode() async {
+    shipCodes.clear();
+    http.StreamedResponse response = await networkService.get("/get-shipping/");
+    if (response.statusCode == 200) {
+      var respData = jsonDecode(await response.stream.bytesToString());
+      for (var data in respData) {
+        if (shipCodes.containsKey(data['bpCode'])) {
+          shipCodes[data['bpCode']]?.add(SearchableDropdownMenuItem(
+              label: data['shipName'],
+              child: Text(data['shipName']),
+              value: data['shipCode'].toString()));
+        } else {
+          shipCodes[data['bpCode']] = [];
+          shipCodes[data['bpCode']]?.add(SearchableDropdownMenuItem(
+              label: data['shipName'],
+              child: Text(data['shipName']),
+              value: data['shipCode'].toString()));
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+  void getShortQty() async {
+    shortQty.clear();
+    http.StreamedResponse response = await networkService.get("/short-qty/");
+    if (response.statusCode == 200) {
+      shortQty = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
+  }
+
+  void initOrderBalanceReport() async {
+    GlobalVariables.requestBody[orderBalanceReportFeature] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
+    String jsonData =
+        '[{"id":"orderId","name":"Order Id","isMandatory":false,"inputType":"number"},{"id":"bpCode","name":"Business Partner","isMandatory":false,"inputType":"dropdown", "dropdownMenuItem" : "/get-business-partner/"},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets = await formService.generateDynamicForm(
+        formFieldDetails, orderBalanceReportFeature);
+    widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getOrderBalance() async {
+    orderBalance.clear();
+    http.StreamedResponse response = await networkService.post("/order-balance/", GlobalVariables.requestBody[orderBalanceReportFeature]);
+    if (response.statusCode == 200) {
+      orderBalance = jsonDecode(await response.stream.bytesToString());
+    }
     notifyListeners();
   }
 }

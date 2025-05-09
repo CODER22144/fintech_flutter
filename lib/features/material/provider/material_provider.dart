@@ -32,7 +32,7 @@ class MaterialProvider with ChangeNotifier {
   GenerateFormService formService = GenerateFormService();
 
   String jsonData =
-      '[{"id": "matno","name": "Material Code","isMandatory": true,"inputType": "text","maxCharacter": 15  },  {"id": "skuno","name": "SKU Code","isMandatory": false,"inputType": "text","maxCharacter": 15  },  {"id": "matDescription","name": "Material Description","isMandatory": true,"inputType": "text","maxCharacter": 100  },  {"id": "inentoryitem","name": "Inventory Item","isMandatory": false,"inputType": "dropdown", "dropdownMenuItem" : "/get-tf/"},{"id": "saleitem","name": "Sale Item","isMandatory": false,"inputType": "dropdown", "dropdownMenuItem" : "/get-tf/"},  {"id": "purchaseitem","name": "Purchase Item","isMandatory": false, "inputType": "dropdown", "dropdownMenuItem" : "/get-tf/"},  {"id": "hsnCode","name": "HSN Code","isMandatory": true,"inputType": "text"},  {"id": "prate","name": "Purchase Rate","isMandatory": true,"inputType": "number"  },  {"id": "puUnit","name": "PU Unit","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-material-unit/"  },  {"id": "skUnit","name": "SK Unit","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-material-unit/"  },  {"id": "conFactor","name": "Con. Factor","inputType": "number","isMandatory": true  },{"id": "skrate","name": "SK Rate","inputType": "number","isMandatory": false  } ,{"id": "spq","name": "SPQ","inputType": "number","isMandatory": false  },  {"id": "saleDescription","name": "Sale Description","isMandatory": false,"inputType": "text","maxCharacter": 50  },  {"id": "mrp","name": "MRP","isMandatory": false,"inputType": "number"  },  {"id": "listPrice","name": "List Price","isMandatory": false,"inputType": "number"  }, {"id" : "discType" , "name" : "Discount Type", "isMandatory" : true, "inputType" : "dropdown", "dropdownMenuItem" : "/get-material-discount-type/"} ,{"id": "discRate","name": "Discount Rate","isMandatory": false,"inputType": "number"  },{"id": "fixedPrice","name": "Fixed Price","isMandatory": false,"inputType": "number"  },  {"id": "isQc","name": "Is Qc?","isMandatory": true,"inputType": "dropdown","dropdownMenuItem" : "/get-yesno/"  }, {"id" : "isStockKeeping", "name" : "Stock Keeping", "isMandatory" : true, "inputType":"dropdown", "dropdownMenuItem": "/get-yesno/"}, {"id": "materialType","name": "Material Type","isMandatory": true,"inputType": "dropdown","dropdownMenuItem" : "/get-material-type/"  },  {"id": "materialGroup","name": "Material Group","isMandatory": true,"inputType": "dropdown","dropdownMenuItem" : "/get-material-group/"  },  {"id": "materialSubGroup","name": "Material Sub Group","isMandatory": false,"inputType": "dropdown","dropdownMenuItem" : "/get-material-subgroup/"  },  {"id": "weight","name": "Weight","isMandatory": false,"inputType": "number"  },  {"id": "location","name": "Location","isMandatory": false,"inputType": "text","maxCharacter":20  },  {"id": "minLevel","name": "Min Level","isMandatory": true,"inputType": "number"  },  {"id": "maxLevel","name": "Max Level","isMandatory": true,"inputType": "number"  },  {"id": "reqLevel","name": "Required Level","isMandatory": true,"inputType": "number"  },  {"id" : "mst","name" : "Material Status","isMandatory": true,"inputType" : "dropdown","dropdownMenuItem" : "/get-material-status/"},{"id": "doclosing","name": "Closing Date","isMandatory": false,"inputType": "datetime"}]';
+      '[{"id": "matno","name": "Material Code","isMandatory": true,"inputType": "text","maxCharacter": 15  },  {"id": "skuno","name": "SKU Code","isMandatory": false,"inputType": "text","maxCharacter": 15  },  {"id": "matDescription","name": "Material Description","isMandatory": true,"inputType": "text","maxCharacter": 100  },  {"id": "inentoryitem","name": "Inventory Item","isMandatory": false,"inputType": "dropdown", "dropdownMenuItem" : "/get-tf/"},{"id": "saleitem","name": "Sale Item","isMandatory": false,"inputType": "dropdown", "dropdownMenuItem" : "/get-tf/"},  {"id": "purchaseitem","name": "Purchase Item","isMandatory": false, "inputType": "dropdown", "dropdownMenuItem" : "/get-tf/"},  {"id": "hsnCode","name": "HSN Code","isMandatory": true,"inputType": "text"},  {"id": "prate","name": "Purchase Rate","isMandatory": true,"inputType": "number"  },  {"id": "puUnit","name": "Unit","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-material-unit/"  },  {"id": "skUnit","name": "SK Unit","isMandatory": true,"inputType": "dropdown","dropdownMenuItem": "/get-material-unit/"  },  {"id": "conFactor","name": "Con. Factor","inputType": "number","isMandatory": true  },{"id": "skrate","name": "SK Rate","inputType": "number","isMandatory": false  } ,{"id": "spq","name": "SPQ","inputType": "number","isMandatory": false  },  {"id": "saleDescription","name": "Sale Description","isMandatory": false,"inputType": "text","maxCharacter": 50  },  {"id": "mrp","name": "MRP","isMandatory": false,"inputType": "number"  },  {"id": "listPrice","name": "List Price","isMandatory": false,"inputType": "number"  }, {"id" : "discType" , "name" : "Discount Type", "isMandatory" : true, "inputType" : "dropdown", "dropdownMenuItem" : "/get-material-discount-type/"} ,{"id": "discRate","name": "Discount Rate","isMandatory": false,"inputType": "number"  },{"id": "fixedPrice","name": "Fixed Price","isMandatory": false,"inputType": "number"  },  {"id": "isQc","name": "Is Qc?","isMandatory": true,"inputType": "dropdown","dropdownMenuItem" : "/get-yesno/"  }, {"id" : "isStockKeeping", "name" : "Stock Keeping", "isMandatory" : true, "inputType":"dropdown", "dropdownMenuItem": "/get-yesno/"}, {"id": "materialType","name": "Material Type","isMandatory": true,"inputType": "dropdown","dropdownMenuItem" : "/get-material-type/"  },  {"id": "materialGroup","name": "Material Group","isMandatory": true,"inputType": "dropdown","dropdownMenuItem" : "/get-material-group/"  },  {"id": "materialSubGroup","name": "Material Sub Group","isMandatory": false,"inputType": "dropdown","dropdownMenuItem" : "/get-material-subgroup/"  },  {"id": "weight","name": "Weight","isMandatory": false,"inputType": "number"  },  {"id": "location","name": "Location","isMandatory": false,"inputType": "text","maxCharacter":20  },  {"id": "minLevel","name": "Min Level","isMandatory": true,"inputType": "number"  },  {"id": "maxLevel","name": "Max Level","isMandatory": true,"inputType": "number"  },  {"id": "reqLevel","name": "Required Level","isMandatory": true,"inputType": "number"  },  {"id" : "mst","name" : "Material Status","isMandatory": true,"inputType" : "dropdown","dropdownMenuItem" : "/get-material-status/"},{"id": "doclosing","name": "Closing Date","isMandatory": false,"inputType": "datetime"}]';
 
   void reset() {
     GlobalVariables.requestBody[featureName] = {};
@@ -170,6 +170,7 @@ class MaterialProvider with ChangeNotifier {
   }
 
   void getMaterialReport() async {
+    materialReportList.clear();
     http.StreamedResponse response = await networkService.post(
         "/get-material-report/", GlobalVariables.requestBody[reportFeature]);
     if (response.statusCode == 200) {
@@ -224,6 +225,11 @@ class MaterialProvider with ChangeNotifier {
       totals[3] = totals[3] + parseEmptyStringToDouble('${data['qtyinstock']}');
       rows.add(DataRow(cells: [
         DataCell(Text('${data['matno'] ?? "-"}')),
+        DataCell(Text('${data['matDescription'] ?? "-"}')),
+        DataCell(Text('${data['hsnCode'] ?? "-"}')),
+        DataCell(Text('${data['minLevel'] ?? "-"}')),
+        DataCell(Text('${data['maxLevel'] ?? "-"}')),
+        DataCell(Text('${data['reqLevel'] ?? "-"}')),
         DataCell(Align(
             alignment: Alignment.centerRight,
             child: Text(parseDoubleUpto2Decimal('${data['opening']}')))),
@@ -236,12 +242,18 @@ class MaterialProvider with ChangeNotifier {
         DataCell(Align(
             alignment: Alignment.centerRight,
             child: Text(parseDoubleUpto2Decimal('${data['qtyinstock']}')))),
+
       ]));
     }
 
     rows.add(DataRow(cells: [
+      const DataCell(Text("")),
+      const DataCell(Text("")),
+      const DataCell(Text("")),
       const DataCell(
           Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold))),
+      const DataCell(Text("")),
+      const DataCell(Text("")),
       DataCell(Align(
           alignment: Alignment.centerRight,
           child: Text(parseDoubleUpto2Decimal('${totals[0]}'),
@@ -258,6 +270,7 @@ class MaterialProvider with ChangeNotifier {
           alignment: Alignment.centerRight,
           child: Text(parseDoubleUpto2Decimal('${totals[3]}'),
               style: const TextStyle(fontWeight: FontWeight.bold)))),
+
     ]));
 
     notifyListeners();

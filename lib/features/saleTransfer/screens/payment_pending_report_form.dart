@@ -28,7 +28,7 @@ class _PaymentPendingReportFormState extends State<PaymentPendingReportForm> {
     super.initState();
     SaleTransferProvider provider =
     Provider.of<SaleTransferProvider>(context, listen: false);
-    provider.initReport();
+    provider.initPaymentPendingReport();
   }
 
   @override
@@ -40,7 +40,7 @@ class _PaymentPendingReportFormState extends State<PaymentPendingReportForm> {
             appBar: PreferredSize(
                 preferredSize:
                 Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-                child: const CommonAppbar(title: 'Get Payment Pending')),
+                child: const CommonAppbar(title: 'Payment Pending')),
             body: SingleChildScrollView(
               child: Center(
                 child: Container(

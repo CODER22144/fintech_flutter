@@ -23,6 +23,7 @@ class SaleTransferProvider with ChangeNotifier {
   List<Widget> clearWidgetList = [];
 
   List<dynamic> paymentPending = [];
+  List<dynamic> paymentPendingExport = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -164,12 +165,38 @@ class SaleTransferProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void initPaymentPendingReport() async {
+    GlobalVariables.requestBody[reportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"lcode","name":"Party Code","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}, {"id" : "bpState","name" : "States", "isMandatory": false, "inputType" : "dropdown", "dropdownMenuItem" : "/get-states/"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, reportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
   void getBillPendingReport() async {
+    paymentPending.clear();
     http.StreamedResponse response = await networkService.post(
         "/payment-pending/",
         GlobalVariables.requestBody[reportFeature]);
     if (response.statusCode == 200) {
       paymentPending = jsonDecode(await response.stream.bytesToString());
+      paymentPendingExport = paymentPending;
+      paymentPending = flattenGroupedWithTotals(paymentPending);
     }
     notifyListeners();
   }
@@ -189,4 +216,58 @@ class SaleTransferProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  List<Map<String, dynamic>> flattenGroupedWithTotals(List<dynamic> data) {
+    final Map<String, List<Map<String, dynamic>>> grouped = {};
+
+    // Group by lcode
+    for (var item in data) {
+      final lcode = item['lcode'];
+      grouped.putIfAbsent(lcode, () => []).add(item);
+    }
+
+    final List<Map<String, dynamic>> finalList = [];
+
+    List<double> sums = [0,0,0];
+
+    grouped.forEach((lcode, entries) {
+      double amountSum = 0;
+      double payAmountSum = 0;
+      double bAmountSum = 0;
+
+      entries.insert(0, {"transId" : lcode, "dDate" : entries[0]['lName']});
+      for (var item in entries) {
+        double amount = parseEmptyStringToDouble(item['amount'].toString());
+        double payamount = parseEmptyStringToDouble(item['payamount'].toString());
+        double bamount = parseEmptyStringToDouble(item['bamount'].toString());
+
+        amountSum += amount;
+        payAmountSum += payamount;
+        bAmountSum += bamount;
+
+        finalList.add(item);
+      }
+
+      finalList.add({
+        'vtype': 'Total',
+        'amount': amountSum.toStringAsFixed(2),
+        'payamount': payAmountSum.toStringAsFixed(2),
+        'bamount': bAmountSum.toStringAsFixed(2),
+      });
+      sums[0] += amountSum;
+      sums[1] += payAmountSum;
+      sums[2] += bAmountSum;
+      finalList.add({});
+    });
+
+    finalList.add({
+      'vtype': 'Grand Total',
+      'amount': sums[0].toStringAsFixed(2),
+      'payamount': sums[1].toStringAsFixed(2),
+      'bamount': sums[2].toStringAsFixed(2),
+    });
+
+    return finalList;
+  }
+
 }

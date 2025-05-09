@@ -14,11 +14,12 @@ class PurchaseOrderRowFields extends StatefulWidget {
   final Function deleteRow;
   final List<SearchableDropdownMenuItem<String>> priority;
   final List<SearchableDropdownMenuItem<String>> poType;
+  final List<List<TextEditingController>> controllers;
   const PurchaseOrderRowFields(
       {super.key,
       required this.index,
       required this.tableRows,
-      required this.deleteRow, required this.priority, required this.poType});
+      required this.deleteRow, required this.priority, required this.poType, required this.controllers});
 
   @override
   State<PurchaseOrderRowFields> createState() => _PurchaseOrderRowFieldsState();
@@ -26,8 +27,7 @@ class PurchaseOrderRowFields extends StatefulWidget {
 
 class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
   TextEditingController dateController = TextEditingController();
-  TextEditingController hsnController = TextEditingController();
-  TextEditingController rateController = TextEditingController();
+
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context, int index) async {
@@ -87,8 +87,8 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
               if (response.statusCode == 200) {
                 var data = jsonDecode(await response.stream.bytesToString())[0];
                 setState(() {
-                  rateController.text = data['bpRate'];
-                  hsnController.text = data['hsnCode'];
+                  widget.controllers[widget.index][2].text = data['bpRate'];
+                  widget.controllers[widget.index][3].text = data['hsnCode'];
                 });
               }
             }
@@ -96,7 +96,7 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
-              initialValue: widget.tableRows[widget.index][0],
+              controller: widget.controllers[widget.index][0],
               onChanged: (value) async {
                 setState(() {
                   widget.tableRows[widget.index][0] = value;
@@ -135,7 +135,7 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
                 return 'Quantity is Mandatory';
               }
             },
-            initialValue: widget.tableRows[widget.index][1],
+            controller: widget.controllers[widget.index][1],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][1] = value;
@@ -167,7 +167,7 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
             readOnly: true,
-            controller: rateController,
+            controller: widget.controllers[widget.index][2],
             decoration: InputDecoration(
               label: RichText(
                 text: const TextSpan(
@@ -191,7 +191,7 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
             readOnly: true,
-            controller: hsnController,
+            controller: widget.controllers[widget.index][3],
             decoration: InputDecoration(
               label: RichText(
                 text: const TextSpan(

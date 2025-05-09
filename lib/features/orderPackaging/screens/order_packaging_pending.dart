@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../common/widgets/comman_appbar.dart';
+import '../../network/service/network_service.dart';
 
 class OrderPackagingPending extends StatefulWidget {
   static String routeName = "/orderPackagingPending";
@@ -52,7 +55,21 @@ class _OrderPackagingPendingState extends State<OrderPackagingPending> {
                     ],
                     rows: provider.orderPackagingPending.map((data) {
                       return DataRow(cells: [
-                        DataCell(Text('${data['orderId'] ?? "-"}')),
+                        DataCell(InkWell(
+                            onTap: () async {
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              var cid = prefs.getString("currentLoginCid");
+                              final Uri uri = Uri.parse(
+                                  "${NetworkService.baseUrl}/order-slip/${data['orderId']}/$cid/");
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+                              } else {
+                                throw 'Could not launch';
+                              }
+                            },
+                            child: Text('${data['orderId'] ?? "-"}',
+                                style: const TextStyle(
+                                    color: Colors.blueAccent, fontWeight: FontWeight.w500)))),
                         DataCell(Text('${data['orderDate'] ?? "-"}')),
                         DataCell(Text('${data['custName'] ?? "-"}')),
                         DataCell(Text('${data['custCity'] ?? "-"}')),

@@ -28,6 +28,8 @@ class GrProvider with ChangeNotifier {
   List<dynamic> grRejectionPending = [];
   List<dynamic> grRateApprovalPending = [];
 
+  List<List<TextEditingController>> rowControllers = [];
+
   DataTable table =
       DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
 
@@ -65,6 +67,12 @@ class GrProvider with ChangeNotifier {
         await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
 
+    List<List<String>> tabRows = [['', '', '']];
+
+    rowControllers = tabRows
+        .map((row) => row.map((field) => TextEditingController(text: field)).toList())
+        .toList();
+
     initCustomObject();
   }
 
@@ -73,7 +81,7 @@ class GrProvider with ChangeNotifier {
     formFieldDetails.clear();
     widgetList.clear();
     String jsonData =
-        '[{"id":"grno","name":"GR No.","isMandatory":false,"inputType":"text"},{"id":"fromDate","name":"From Date","isMandatory":false,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":false,"inputType":"datetime"}]';
+        '[{"id":"grno","name":"GR No.","isMandatory":false,"inputType":"text"},{"id":"brid","name":"BR Id","isMandatory":false,"inputType":"text"},{"id":"fromDate","name":"From Date","isMandatory":false,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":false,"inputType":"datetime"}]';
 
     for (var element in jsonDecode(jsonData)) {
       formFieldDetails.add(FormUI(
@@ -500,5 +508,19 @@ class GrProvider with ChangeNotifier {
           "View Br",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ));
+  }
+
+  void deleteRowController(int index) {
+    rowControllers.removeAt(index);
+    notifyListeners();
+  }
+
+  void addRowController() {
+    rowControllers.add([
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+    ]);
+    notifyListeners();
   }
 }

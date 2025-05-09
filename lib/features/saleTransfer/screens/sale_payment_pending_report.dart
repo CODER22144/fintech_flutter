@@ -39,7 +39,7 @@ class _SalePaymentPendingReportState extends State<SalePaymentPendingReport> {
               appBar: PreferredSize(
                   preferredSize:
                   Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-                  child: const CommonAppbar(title: 'Payment Pending Report')),
+                  child: const CommonAppbar(title: 'Payment Pending')),
               body: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Padding(

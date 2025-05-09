@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../common/widgets/pop_ups.dart';
 import '../../home.dart';
 import '../../utility/global_variables.dart';
+import 'forget_password.dart';
 
 class LoginScreen extends StatefulWidget {
   static String routeName = "/login";
@@ -89,11 +90,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           return null;
                         }),
                     const SizedBox(height: 5),
-                    const Align(
-                      alignment: Alignment.centerRight,
+                    Align(
+                      alignment: Alignment.centerLeft,
                       child: InkWell(
-                        child: Text(
-                          "Forget Password ?",
+                        onTap: () {
+                          context.pushNamed(ForgetPassword.routeName);
+                        },
+                        child: const Text(
+                          "Forget Password",
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,

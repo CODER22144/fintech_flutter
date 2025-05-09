@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../common/widgets/pop_ups.dart';
@@ -27,20 +28,36 @@ class AddReqIssue extends StatefulWidget {
 class AddReqIssueState extends State<AddReqIssue> {
   List<List<String>> tableRows = [];
   var formKey = GlobalKey<FormState>();
+  late ReqIssueProvider provider;
+  bool loading = false;
 
   @override
   void initState() {
     super.initState();
-    ReqIssueProvider provider =
+    provider =
         Provider.of<ReqIssueProvider>(context, listen: false);
+    setState(() {
+      loading = true;
+    });
     provider.initWidget(widget.reqId);
     tableRows = provider.rowFields;
+    setState(() {
+      loading = false;
+    });
   }
 
   // Function to delete a row
   void deleteRow(int index) {
     setState(() {
       tableRows.removeAt(index);
+    });
+    setState(() {
+      loading = true;
+    });
+    provider.initAfterDelete(widget.reqId, index);
+    tableRows = provider.rowFields;
+    setState(() {
+      loading = false;
     });
   }
 
@@ -54,7 +71,7 @@ class AddReqIssueState extends State<AddReqIssue> {
             child: const CommonAppbar(title: 'Add Issue Req.')),
         body: SingleChildScrollView(
           child: Center(
-            child: Container(
+            child: !loading ? Container(
               decoration: BoxDecoration(
                   border: Border.all(width: 2, color: Colors.white54)),
               padding: const EdgeInsets.only(
@@ -66,7 +83,7 @@ class AddReqIssueState extends State<AddReqIssue> {
                 children: [
                   for (int i = 0; i < tableRows.length; i++)
                     ReqIssueRowField(
-                        index: i, tableRows: tableRows, deleteRow: deleteRow),
+                        index: i, tableRows: tableRows, deleteRow: deleteRow, controllers: provider.rowControllers),
                   Visibility(
                     visible: provider.rowFields.isNotEmpty,
                     child: Container(
@@ -120,6 +137,9 @@ class AddReqIssueState extends State<AddReqIssue> {
                   ),
                 ],
               ),
+            ) : const SpinKitFadingCircle(
+              color: Colors.white,
+              size: 25,
             ),
           ),
         ),

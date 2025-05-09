@@ -58,6 +58,7 @@ class _CustomDatetimeFieldState extends State<CustomDatetimeField> {
         dateController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
         GlobalVariables.requestBody[widget.feature][widget.field.id] =
             DateFormat('MM-dd-yyyy').format(pickedDate);
+        print(GlobalVariables.requestBody[widget.feature][widget.field.id]);
       });
     }
   }

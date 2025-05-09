@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../common/widgets/comman_appbar.dart';
+import '../../utility/services/common_utility.dart';
 import '../provider/material_provider.dart';
 
 class MatStockReport extends StatefulWidget {
@@ -40,15 +41,42 @@ class _MatStockReportState extends State<MatStockReport> {
                     padding: const EdgeInsets.all(10),
                     child: Visibility(
                       visible: provider.materialStockReport.isNotEmpty,
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(label: Text("Material No.")),
-                          DataColumn(label: Text("Opening")),
-                          DataColumn(label: Text("Received")),
-                          DataColumn(label: Text("Released")),
-                          DataColumn(label: Text("Qty In Stock")),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 5),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                              ),
+                            ),
+                            onPressed: () async {
+                              downloadJsonToExcel(provider.materialStockReport, "mat_stock_export");
+                            },
+                            child: const Text(
+                              'Export Stock',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          DataTable(
+                            columns: const [
+                              DataColumn(label: Text("Material No.")),
+                              DataColumn(label: Text("Description")),
+                              DataColumn(label: Text("Hsn Code")),
+                              DataColumn(label: Text("Min Level")),
+                              DataColumn(label: Text("Max Level")),
+                              DataColumn(label: Text("Req. Level")),
+                              DataColumn(label: Text("Opening")),
+                              DataColumn(label: Text("Received")),
+                              DataColumn(label: Text("Released")),
+                              DataColumn(label: Text("Qty In Stock"))
+                            ],
+                            rows: provider.rows,
+                          ),
                         ],
-                        rows: provider.rows,
                       ),
                     ),
                   ),

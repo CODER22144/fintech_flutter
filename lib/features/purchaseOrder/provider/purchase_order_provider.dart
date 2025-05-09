@@ -23,6 +23,8 @@ class PurchaseOrderProvider with ChangeNotifier {
   List<SearchableDropdownMenuItem<String>> priorities = [];
   List<SearchableDropdownMenuItem<String>> poType = [];
 
+  List<List<TextEditingController>> rowControllers = [];
+
   DataTable table =
       DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
 
@@ -49,6 +51,11 @@ class PurchaseOrderProvider with ChangeNotifier {
     List<Widget> widgets =
         await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
+
+    List<List<String>> tableRows = [['', '', '', '','']];
+    rowControllers = tableRows
+        .map((row) => row.map((field) => TextEditingController(text: field)).toList())
+        .toList();
     notifyListeners();
   }
 
@@ -78,7 +85,7 @@ class PurchaseOrderProvider with ChangeNotifier {
     formFieldDetails.clear();
     widgetList.clear();
     String jsonData =
-        '[{"id":"poId","name":"Purchase Order Id","isMandatory":false,"inputType":"text"},{"id":"fromDate","name":"From Date","isMandatory":false,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":false,"inputType":"datetime"}]';
+        '[{"id":"poId","name":"Purchase Order Id","isMandatory":false,"inputType":"text"},{"id":"fmatno","name":"From Material No.","isMandatory":false,"inputType":"text", "maxCharacter" : 15},{"id":"tmatno","name":"To Material No.","isMandatory":false,"inputType":"text", "maxCharacter" : 15},{"id":"bpCode","name":"Business Partner","isMandatory":false,"inputType":"dropdown", "dropdownMenuItem" : "/get-business-partner/"},{"id":"fromDate","name":"From Date","isMandatory":false,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":false,"inputType":"datetime"}]';
 
     for (var element in jsonDecode(jsonData)) {
       formFieldDetails.add(FormUI(
@@ -106,6 +113,7 @@ class PurchaseOrderProvider with ChangeNotifier {
   }
 
   void nestedTable() async {
+    table = DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
     var purchaseOrderReport = await getPurchaseOrderReport();
     List<DataRow> rows = [];
     int counter = 0;
@@ -259,6 +267,22 @@ class PurchaseOrderProvider with ChangeNotifier {
 
   void getAllPoType() async {
     poType = await formService.getDropdownMenuItem("/get-po-type/");
+    notifyListeners();
+  }
+
+  void deleteRowController(int index) {
+    rowControllers.removeAt(index);
+    notifyListeners();
+  }
+
+  void addRowController() {
+    rowControllers.add([
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+    ]);
     notifyListeners();
   }
 }

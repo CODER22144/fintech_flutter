@@ -13,9 +13,11 @@ import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart
 
 class PartSubAssemblyProvider with ChangeNotifier {
   static const String featureName = "partSubAssembly";
+  static const String reportFeature = "partSubAssemblyReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
+  List<Widget> reportWidgetList = [];
   List<SearchableDropdownMenuItem<String>> workProcess = [];
   List<SearchableDropdownMenuItem<String>> rmType = [];
   List<SearchableDropdownMenuItem<String>> resources = [];
@@ -25,6 +27,7 @@ class PartSubAssemblyProvider with ChangeNotifier {
   dynamic partSubAssemblyMap = {};
   List<dynamic> partSubAssemblyDetailsList = [];
   List<dynamic> partSubAssemblyProcessingList = [];
+  List<dynamic> partSubAssemblyReport = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -237,4 +240,41 @@ class PartSubAssemblyProvider with ChangeNotifier {
     units = await formService.getDropdownMenuItem("/get-material-unit/");
     notifyListeners();
   }
+
+  void initReport() async {
+    String jsonData =
+        '[{"id":"matno","name":"Material No.","isMandatory":true,"inputType":"text","maxCharacter":15}]';
+    GlobalVariables.requestBody[reportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          controller: controller,
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, reportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getProductBreakupReport() async {
+    partSubAssemblyReport.clear();
+    http.StreamedResponse response =
+    await networkService.post(
+        "/part-sub-assembly-report/", GlobalVariables.requestBody[reportFeature]);
+    if (response.statusCode == 200) {
+      String respData = jsonDecode(await response.stream.bytesToString());
+      partSubAssemblyReport = jsonDecode(respData);
+    }
+    notifyListeners();
+  }
+
 }

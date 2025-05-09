@@ -13,6 +13,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
+import '../../billReceipt/screen/hyperlink.dart';
 import '../../camera/service/camera_service.dart';
 import '../../network/service/network_service.dart';
 import '../../payment/provider/payment_provider.dart';
@@ -22,6 +23,7 @@ import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart
 class InwardProvider with ChangeNotifier {
   static const String featureName = "inward";
   static const String reportFeature = "inwardReport";
+  static const String tdsReportFeature = "tdsReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
@@ -29,6 +31,8 @@ class InwardProvider with ChangeNotifier {
 
   DataTable table =
       DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
+
+  List<DataRow> rows = [];
 
   List<SearchableDropdownMenuItem<String>> discountType = [];
   List<SearchableDropdownMenuItem<String>> tcsItems = [];
@@ -39,6 +43,8 @@ class InwardProvider with ChangeNotifier {
 
   List<List<String>> rowField = [];
   String storedGrDetails = "";
+
+  List<dynamic> tdsReport = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -432,25 +438,32 @@ class InwardProvider with ChangeNotifier {
             child: Text(parseDoubleUpto2Decimal('${data['amount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['discountAmount'] ?? ""}')))),
+            child: Text(
+                parseDoubleUpto2Decimal('${data['discountAmount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['taxAmount'] ?? ""}')))),
+            child:
+                Text(parseDoubleUpto2Decimal('${data['taxAmount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['cessAmount'] ?? ""}')))),
+            child:
+                Text(parseDoubleUpto2Decimal('${data['cessAmount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['igstAmount'] ?? ""}')))),
+            child:
+                Text(parseDoubleUpto2Decimal('${data['igstAmount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['cgstAmount'] ?? ""}')))),
+            child:
+                Text(parseDoubleUpto2Decimal('${data['cgstAmount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['sgstAmount'] ?? ""}')))),
+            child:
+                Text(parseDoubleUpto2Decimal('${data['sgstAmount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['tcsAmount'] ?? ""}')))),
+            child:
+                Text(parseDoubleUpto2Decimal('${data['tcsAmount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
             child: Text(parseDoubleUpto2Decimal('${data['bcd'] ?? ""}')))),
@@ -462,7 +475,8 @@ class InwardProvider with ChangeNotifier {
             child: Text(parseDoubleUpto2Decimal('${data['tamount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
-            child: Text(parseDoubleUpto2Decimal('${data['payamount'] ?? ""}')))),
+            child:
+                Text(parseDoubleUpto2Decimal('${data['payamount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
             child: Text(parseDoubleUpto2Decimal('${data['bamount'] ?? ""}')))),
@@ -483,7 +497,8 @@ class InwardProvider with ChangeNotifier {
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
-      const DataCell(Text("Total",
+      const DataCell(Text(
+        "Total",
         style: TextStyle(fontWeight: FontWeight.bold),
       )),
       const DataCell(SizedBox()),
@@ -634,7 +649,8 @@ class InwardProvider with ChangeNotifier {
                         DataCell(Text('${data['vtype'] ?? "-"}')),
                         DataCell(Align(
                             alignment: Alignment.centerRight,
-                            child: Text(parseDoubleUpto2Decimal('${data['amount'] ?? "-"}')))),
+                            child: Text(parseDoubleUpto2Decimal(
+                                '${data['amount'] ?? "-"}')))),
                         DataCell(Text('${data['clnaration'] ?? "-"}')),
                       ]);
                     }).toList(),
@@ -682,4 +698,105 @@ class InwardProvider with ChangeNotifier {
       },
     );
   }
+
+  void initTdsReport() async {
+    GlobalVariables.requestBody[tdsReportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"lcode","name":"Party Code","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"},{"id": "tdsCode","name": "TDS Code","isMandatory": false,"inputType": "dropdown","dropdownMenuItem": "/get-tds/"},{"id":"fdate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"tdate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets = await formService.generateDynamicForm(
+        formFieldDetails, tdsReportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getTdsReport() async {
+    tdsReport.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/get-tds-report/", GlobalVariables.requestBody[tdsReportFeature]);
+    if (response.statusCode == 200) {
+      tdsReport = jsonDecode(await response.stream.bytesToString());
+      getRowsForTds();
+    }
+  }
+
+  void getRowsForTds() {
+    rows.clear();
+
+    List<double> sums = [0,0,0,0,0,0,0,0,0,0];
+
+    for(var data in tdsReport) {
+
+      sums[0] += parseEmptyStringToDouble('${data['amount']}');
+      sums[1] += parseEmptyStringToDouble('${data['discountAmount']}');
+      sums[2] += parseEmptyStringToDouble('${data['taxAmount']}');
+      sums[3] += parseEmptyStringToDouble('${data['cessAmount']}');
+      sums[4] += parseEmptyStringToDouble('${data['igstAmount']}');
+      sums[5] += parseEmptyStringToDouble('${data['cgstAmount']}');
+      sums[6] += parseEmptyStringToDouble('${data['sgstAmount']}');
+      sums[7] += parseEmptyStringToDouble('${data['roff']}');
+      sums[8] += parseEmptyStringToDouble('${data['tamount']}');
+      sums[9] += parseEmptyStringToDouble('${data['tdsAmount']}');
+
+
+      rows.add(DataRow(cells: [
+        DataCell(Hyperlink(text: '${data['transId']}', url: "${NetworkService.baseUrl}${data['DocProof']}")),
+        DataCell(Text('${data['dtDate'] ?? "-"}')),
+        DataCell(Text('${data['lcode'] ?? "-"} - ${data['lName'] ?? "-"}')),
+        DataCell(Text('${data['billNo'] ?? "-"}')),
+        DataCell(Text('${data['dbillDate'] ?? "-"}')),
+        DataCell(Text('${data['section'] ?? "-"}')),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['amount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['discountAmount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['taxAmount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['cessAmount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['igstAmount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['cgstAmount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['sgstAmount']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['roff']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['tamount']}')))),
+        DataCell(Text('${data['tdsCode'] ?? "-"}')),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['rtds']}')))),
+        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['tdsAmount']}')))),
+      ]));
+    }
+
+    rows.add(DataRow(cells: [
+      const DataCell(SizedBox()),
+      const DataCell(SizedBox()),
+      const DataCell(Text("GRAND TOTAL", style: TextStyle(fontWeight: FontWeight.bold))),
+      const DataCell(SizedBox()),
+      const DataCell(SizedBox()),
+      const DataCell(SizedBox()),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[0].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[1].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[2].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[3].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[4].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[5].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[6].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[7].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[8].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      const DataCell(SizedBox()),
+      const DataCell(SizedBox()),
+      DataCell(Align(alignment: Alignment.centerRight, child: Text(sums[9].toStringAsFixed(2), style: const TextStyle(fontWeight: FontWeight.bold)))),
+    ]));
+
+    notifyListeners();
+  }
+
+
+
 }

@@ -11,15 +11,18 @@ import '../../utility/services/generate_form_service.dart';
 
 class BillReceiptProvider with ChangeNotifier {
   static const String featureName = "billReceipt";
-  static const String reportFeature = "billReceipt";
+  static const String pendingReportFeature = "billReceiptPending";
+  static const String reportFeature = "billReceiptPending";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
+  List<Widget> reportWidgetList = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
 
   List<dynamic> billReceiptList = [];
+  List<dynamic> brReport = [];
   TextEditingController editBrController = TextEditingController();
 
   String jsonData =
@@ -75,8 +78,8 @@ class BillReceiptProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void initReport() async {
-    GlobalVariables.requestBody[reportFeature] = {};
+  void initPendingReport() async {
+    GlobalVariables.requestBody[pendingReportFeature] = {};
     formFieldDetails.clear();
     widgetList.clear();
     String jsonData =
@@ -92,8 +95,8 @@ class BillReceiptProvider with ChangeNotifier {
           maxCharacter: element['maxCharacter'] ?? 255));
     }
 
-    List<Widget> widgets =
-    await formService.generateDynamicForm(formFieldDetails, reportFeature);
+    List<Widget> widgets = await formService.generateDynamicForm(
+        formFieldDetails, pendingReportFeature);
     widgetList.addAll(widgets);
     notifyListeners();
   }
@@ -115,7 +118,9 @@ class BillReceiptProvider with ChangeNotifier {
   }
 
   void getPostedBillReceipt() async {
-    http.StreamedResponse response = await networkService.get("/get-bt-br/${GlobalVariables.requestBody[reportFeature]['bt']}/");
+    billReceiptList.clear();
+    http.StreamedResponse response = await networkService.get(
+        "/get-bt-br/${GlobalVariables.requestBody[pendingReportFeature]['bt']}/");
     if (response.statusCode == 200) {
       billReceiptList = jsonDecode(await response.stream.bytesToString());
       notifyListeners();
@@ -138,5 +143,38 @@ class BillReceiptProvider with ChangeNotifier {
       return true;
     }
     return false;
+  }
+
+  void initReport() async {
+    GlobalVariables.requestBody[reportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"brid","name":"BR ID","isMandatory":false,"inputType":"number"},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"}, {"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets =
+        await formService.generateDynamicForm(formFieldDetails, reportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getBrReport() async {
+    brReport.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/br-report/", GlobalVariables.requestBody[reportFeature]);
+    if (response.statusCode == 200) {
+      brReport = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
   }
 }

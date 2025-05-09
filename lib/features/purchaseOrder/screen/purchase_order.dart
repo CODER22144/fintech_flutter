@@ -38,11 +38,12 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
   bool isFileUploaded = false;
 
   List<Map<String, dynamic>> jsonData = [];
+  late PurchaseOrderProvider provider;
 
   @override
   void initState() {
     super.initState();
-    PurchaseOrderProvider provider =
+    provider =
         Provider.of<PurchaseOrderProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
@@ -61,8 +62,9 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
   // Function to add a new row
   void addRow() {
     setState(() {
-      tableRows.add(['', '', '', '','']);
+      tableRows.add(['', '','','','']);
     });
+    provider.addRowController();
   }
 
   // Function to delete a row
@@ -70,6 +72,7 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
     setState(() {
       tableRows.removeAt(index);
     });
+    provider.deleteRowController(index);
   }
 
   Future<void> _importExcel() async {
@@ -327,6 +330,7 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
                                 Visibility(
                                   visible: manualOrder,
                                   child: PurchaseOrderRowFields(
+                                    controllers: provider.rowControllers,
                                     poType: provider.poType,
                                     priority: provider.priorities,
                                       index: i,

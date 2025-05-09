@@ -1,5 +1,6 @@
 import 'package:fintech_new_web/features/JVoucher/provider/journal_voucher_provider.dart';
 import 'package:fintech_new_web/features/additionalOrder/provider/additional_order_provider.dart';
+import 'package:fintech_new_web/features/advanceRequirement/provider/advance_requirement_provider.dart';
 import 'package:fintech_new_web/features/attendence/provider/attendance_provider.dart';
 import 'package:fintech_new_web/features/auth/provider/auth_provider.dart';
 import 'package:fintech_new_web/features/auth/screen/login.dart';
@@ -22,6 +23,7 @@ import 'package:fintech_new_web/features/gr/provider/gr_provider.dart';
 import 'package:fintech_new_web/features/grIqsRep/provider/gr_iqs_rep_provider.dart';
 import 'package:fintech_new_web/features/grOtherCharges/provider/gr_other_charges_provider.dart';
 import 'package:fintech_new_web/features/grQtyClear/provider/gr_qty_clear_provider.dart';
+import 'package:fintech_new_web/features/gstReturn/provider/gst_return_provider.dart';
 import 'package:fintech_new_web/features/hsn/provider/hsn_provider.dart';
 import 'package:fintech_new_web/features/invenReq/provider/inven_req_provider.dart';
 import 'package:fintech_new_web/features/inward/provider/inward_provider.dart';
@@ -52,6 +54,7 @@ import 'package:fintech_new_web/features/partSubAssembly/provider/part_sub_assem
 import 'package:fintech_new_web/features/payment/provider/payment_provider.dart';
 import 'package:fintech_new_web/features/paymentClear/provider/payment_clear_provider.dart';
 import 'package:fintech_new_web/features/paymentInward/provider/payment_inward_provider.dart';
+import 'package:fintech_new_web/features/paymentInwardClear/provider/payment_inward_clear_provider.dart';
 import 'package:fintech_new_web/features/paymentVoucher/provider/payment_voucher_provider.dart';
 import 'package:fintech_new_web/features/prTaxInvoice/provider/pr_tax_invoice_provider.dart';
 import 'package:fintech_new_web/features/prTaxInvoiceDispatch/provider/pr_tax_invoice_dispatch_provider.dart';
@@ -60,6 +63,7 @@ import 'package:fintech_new_web/features/productBreakupTechDetails/provider/prod
 import 'package:fintech_new_web/features/productFinalStandard/provider/product_final_standard_provider.dart';
 import 'package:fintech_new_web/features/productionPlan/provider/production_plan_provider.dart';
 import 'package:fintech_new_web/features/purchaseTransfer/provider/purchase_transfer_provider.dart';
+import 'package:fintech_new_web/features/reOrderBalanceMaterial/provider/re_order_balance_material_provider.dart';
 import 'package:fintech_new_web/features/receiptVoucher/provider/receipt_voucher_provider.dart';
 import 'package:fintech_new_web/features/reqIssue/provider/req_issue_provider.dart';
 import 'package:fintech_new_web/features/reqPacked/provider/req_packed_provider.dart';
@@ -69,6 +73,7 @@ import 'package:fintech_new_web/features/resources/provider/resource_provider.da
 import 'package:fintech_new_web/features/saleTransfer/provider/sale_transfer_provider.dart';
 import 'package:fintech_new_web/features/salesDebitNote/provider/sales_debit_note_provider.dart';
 import 'package:fintech_new_web/features/salesOrder/provider/sales_order_provider.dart';
+import 'package:fintech_new_web/features/salesOrderAdvance/provider/sales_order_advance_provider.dart';
 import 'package:fintech_new_web/features/taClaim/provider/ta_claim_provider.dart';
 import 'package:fintech_new_web/features/visitInfo/provider/visit_info_provider.dart';
 import 'package:fintech_new_web/features/wireSize/provider/wire_size_provider.dart';
@@ -271,6 +276,16 @@ class MyApp extends StatelessWidget {
             create: (BuildContext context) => MaterialReturnProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => BankProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => SalesOrderAdvanceProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => PaymentInwardClearProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => AdvanceRequirementProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => ReOrderBalanceMaterialProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => GstReturnProvider()),
       ],
       child: MaterialApp.router(
         title: 'Open Office',

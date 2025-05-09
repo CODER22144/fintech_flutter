@@ -17,7 +17,7 @@ class OrderCancelProvider with ChangeNotifier {
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
   String jsonData =
-      '[{"id":"orderId","name":"Order Id","isMandatory":true,"inputType":"number"},{"id":"cancelledDate","name":"Date Of Cancellation","isMandatory":true,"inputType":"datetime"},{"id":"cancelledReason","name":"Cancellation Reason","isMandatory":true,"inputType":"text","maxCharacter":100}]';
+      '[{"id":"orderid","name":"Order Id","isMandatory":true,"inputType":"number"},{"id":"cancelledDate","name":"Date Of Cancellation","isMandatory":true,"inputType":"datetime"},{"id":"cancelledReason","name":"Cancellation Reason","isMandatory":true,"inputType":"text","maxCharacter":100}]';
 
   void initWidget() async {
     GlobalVariables.requestBody[featureName] = {};
