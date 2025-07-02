@@ -54,7 +54,7 @@ class _CustomDropdownFieldState extends State<CustomDropdownField> {
               isEnabled: !widget.field.readOnly,
               controller: (widget.field.controller is SearchableDropdownController) ? widget.field.controller : controller,
               backgroundDecoration: (child) => Container(
-                height: 40,
+                height: 48,
                 margin: EdgeInsets.zero,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),

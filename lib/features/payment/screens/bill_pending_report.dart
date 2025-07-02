@@ -55,9 +55,9 @@ class _BillPendingReportState extends State<BillPendingReport> {
                     const DataColumn(label: Text("Bill Date")),
                     const DataColumn(label: Text("Total Days")),
                     const DataColumn(label: Text("Amount")),
-                    const DataColumn(label: Text("Pay Amount")),
-                    const DataColumn(label: Text("Balance Amount")),
-                    const DataColumn(label: Text("")),
+                    const DataColumn(label: Text("Pay\nAmount")),
+                    const DataColumn(label: Text("Balance\nAmount")),
+                    const DataColumn(label: Text("Balance\nTotal")),
                     DataColumn(label: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
@@ -102,21 +102,37 @@ class _BillPendingReportState extends State<BillPendingReport> {
                               : null)),
                       DataCell(Text('${data['billDate'] ?? ""}')),
                       DataCell(Text('${data['tdays'] ?? ""}')),
-                      DataCell(Text('${data['amount'] ?? ""}',
-                          style: data['billNo'] == 'Total' ||
-                                  data['billNo'] == 'Grand Total'
-                              ? const TextStyle(fontWeight: FontWeight.bold)
-                              : null)),
-                      DataCell(Text('${data['payamount'] ?? ""}',
-                          style: data['billNo'] == 'Total' ||
-                                  data['billNo'] == 'Grand Total'
-                              ? const TextStyle(fontWeight: FontWeight.bold)
-                              : null)),
-                      DataCell(Text('${data['bamount'] ?? ""}',
-                          style: data['billNo'] == 'Total' ||
-                                  data['billNo'] == 'Grand Total'
-                              ? const TextStyle(fontWeight: FontWeight.bold)
-                              : null)),
+                      DataCell(Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('${data['amount'] ?? ""}',
+                            style: data['billNo'] == 'Total' ||
+                                    data['billNo'] == 'Grand Total'
+                                ? const TextStyle(fontWeight: FontWeight.bold)
+                                : null),
+                      )),
+                      DataCell(Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('${data['payamount'] ?? ""}',
+                            style: data['billNo'] == 'Total' ||
+                                    data['billNo'] == 'Grand Total'
+                                ? const TextStyle(fontWeight: FontWeight.bold)
+                                : null),
+                      )),
+                      DataCell(Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('${data['bamount'] ?? ""}',
+                            style: data['billNo'] == 'Total' ||
+                                    data['billNo'] == 'Grand Total'
+                                ? const TextStyle(fontWeight: FontWeight.bold)
+                                : null),
+                      )),
+                      DataCell(SizedBox(
+                        width: 100,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('${data['run'] ?? ""}'),
+                        ),
+                      )),
                       DataCell(Visibility(
                         visible: data['bamount'] != null &&
                             data['billNo'] != 'Total' &&
@@ -142,7 +158,6 @@ class _BillPendingReportState extends State<BillPendingReport> {
                           ),
                         ),
                       )),
-                      const DataCell(SizedBox()),
                     ]);
                   }).toList(),
                 ),

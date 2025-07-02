@@ -8,10 +8,14 @@ import 'package:fintech_new_web/features/bankUpload/provider/bank_provider.dart'
 import 'package:fintech_new_web/features/billPayable/provider/bill_payable_provider.dart';
 import 'package:fintech_new_web/features/billReceipt/provider/bill_receipt_provider.dart';
 import 'package:fintech_new_web/features/billReceivable/provider/bill_receivable_provider.dart';
+import 'package:fintech_new_web/features/bpBreakup/provider/bp_breakup_provider.dart';
 import 'package:fintech_new_web/features/bpShipping/provider/bp_shipping_provider.dart';
 import 'package:fintech_new_web/features/businessPartner/provider/business_partner_provider.dart';
 import 'package:fintech_new_web/features/businessPartner/provider/business_partner_search_provider.dart';
+import 'package:fintech_new_web/features/businessPartnerOnBoard/provider/business_partner_on_board_provider.dart';
+import 'package:fintech_new_web/features/businessPartnerProcessing/provider/bp_processing_provider.dart';
 import 'package:fintech_new_web/features/carrier/provider/carrier_provider.dart';
+import 'package:fintech_new_web/features/colorCode/provider/color_provider.dart';
 import 'package:fintech_new_web/features/costResource/provider/cost_resource_provider.dart';
 import 'package:fintech_new_web/features/crNote/provider/cr_note_provider.dart';
 import 'package:fintech_new_web/features/debitNoteAgainstCreditNote/provider/db_note_against_cr_note_provider.dart';
@@ -30,16 +34,21 @@ import 'package:fintech_new_web/features/inward/provider/inward_provider.dart';
 import 'package:fintech_new_web/features/inwardVoucher/provider/inward_voucher_provider.dart';
 import 'package:fintech_new_web/features/jobWorkOut/provider/job_work_out_provider.dart';
 import 'package:fintech_new_web/features/jobWorkOutChallanClear/provider/job_work_out_challan_clear_provider.dart';
+import 'package:fintech_new_web/features/ledger/provider/ledger_provider.dart';
 import 'package:fintech_new_web/features/ledgerCodes/provider/ledger_codes_provider.dart';
 import 'package:fintech_new_web/features/lineRejection/provider/line_rejection_provider.dart';
 import 'package:fintech_new_web/features/manufacturing/provider/manufacturing_provider.dart';
 import 'package:fintech_new_web/features/material/provider/material_provider.dart';
 import 'package:fintech_new_web/features/material/provider/material_rep_provider.dart';
+import 'package:fintech_new_web/features/materialAssembly/provider/material_assembly_provider.dart';
+import 'package:fintech_new_web/features/materialAssemblyTechDetails/provider/material_assembly_tech_details_provider.dart';
 import 'package:fintech_new_web/features/materialIQS/provider/material_iqs_provider.dart';
 import 'package:fintech_new_web/features/materialIncomingStandard/provider/material_incoming_standard_provider.dart';
 import 'package:fintech_new_web/features/materialReturn/provider/material_return_provider.dart';
 import 'package:fintech_new_web/features/materialSource/provider/material_source_provider.dart';
+import 'package:fintech_new_web/features/materialTechDetails/provider/material_tech_details_provider.dart';
 import 'package:fintech_new_web/features/network/service/network_service.dart';
+import 'package:fintech_new_web/features/obMaterial/provider/ob_material_provider.dart';
 import 'package:fintech_new_web/features/obalance/provider/oblance_provider.dart';
 import 'package:fintech_new_web/features/orderApRequest/provider/order_ap_request_provider.dart';
 import 'package:fintech_new_web/features/orderApproval/provider/order_approval_provider.dart';
@@ -54,6 +63,7 @@ import 'package:fintech_new_web/features/partSubAssembly/provider/part_sub_assem
 import 'package:fintech_new_web/features/payment/provider/payment_provider.dart';
 import 'package:fintech_new_web/features/paymentClear/provider/payment_clear_provider.dart';
 import 'package:fintech_new_web/features/paymentInward/provider/payment_inward_provider.dart';
+import 'package:fintech_new_web/features/paymentInward/provider/unadjusted_payment_inward_provider.dart';
 import 'package:fintech_new_web/features/paymentInwardClear/provider/payment_inward_clear_provider.dart';
 import 'package:fintech_new_web/features/paymentVoucher/provider/payment_voucher_provider.dart';
 import 'package:fintech_new_web/features/prTaxInvoice/provider/pr_tax_invoice_provider.dart';
@@ -70,11 +80,13 @@ import 'package:fintech_new_web/features/reqPacked/provider/req_packed_provider.
 import 'package:fintech_new_web/features/reqPacking/provider/req_packing_provider.dart';
 import 'package:fintech_new_web/features/reqProduction/provider/req_production_provider.dart';
 import 'package:fintech_new_web/features/resources/provider/resource_provider.dart';
+import 'package:fintech_new_web/features/reverseCharge/provider/reverse_charge_provider.dart';
 import 'package:fintech_new_web/features/saleTransfer/provider/sale_transfer_provider.dart';
 import 'package:fintech_new_web/features/salesDebitNote/provider/sales_debit_note_provider.dart';
 import 'package:fintech_new_web/features/salesOrder/provider/sales_order_provider.dart';
 import 'package:fintech_new_web/features/salesOrderAdvance/provider/sales_order_advance_provider.dart';
 import 'package:fintech_new_web/features/taClaim/provider/ta_claim_provider.dart';
+import 'package:fintech_new_web/features/tod/provider/tod_provider.dart';
 import 'package:fintech_new_web/features/visitInfo/provider/visit_info_provider.dart';
 import 'package:fintech_new_web/features/wireSize/provider/wire_size_provider.dart';
 import 'package:fintech_new_web/features/workProcess/provider/work_process_provider.dart';
@@ -88,6 +100,7 @@ import 'features/bpDocument/provider/bp_document_provider.dart';
 import 'features/bpPayNTaxInfo/provider/bpTaxInfoProvider.dart';
 import 'features/businessPartnerAddress/provider/business_partner_address_provider.dart';
 import 'features/businessPartnerContact/provider/business_partner_contact_provider.dart';
+import 'features/businessPartnerObMaterial/provider/bp_ob_material_provider.dart';
 import 'features/company/provider/add_company_provider.dart';
 import 'features/dbNote/provider/dbnote_provider.dart';
 import 'features/home.dart';
@@ -286,6 +299,34 @@ class MyApp extends StatelessWidget {
             create: (BuildContext context) => ReOrderBalanceMaterialProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => GstReturnProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => ReverseChargeProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => LedgerProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => ObMaterialProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => MaterialAssemblyProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => BusinessPartnerOnBoardProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => BpBreakupProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => MaterialAssemblyProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => BpObMaterialProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => MaterialAssemblyTechDetailsProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => BpProcessingProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => TodProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => UnadjustedPaymentInwardProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => MaterialTechDetailsProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => ColorProvider()),
       ],
       child: MaterialApp.router(
         title: 'Open Office',
@@ -371,11 +412,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'Outfit',
                           color: Colors.white,
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: screenHeight * 0.12),
+                        margin: EdgeInsets.only(top: screenHeight * 0.10),
                         width: screenWidth,
                         height: 55,
                         child: ElevatedButton(

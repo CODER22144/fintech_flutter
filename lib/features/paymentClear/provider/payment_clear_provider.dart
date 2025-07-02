@@ -14,6 +14,7 @@ import '../../utility/services/generate_form_service.dart';
 
 class PaymentClearProvider with ChangeNotifier {
   static const String featureName = "paymentClear";
+  static const String clearFeature = "UnadjustedPaymentClear";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
@@ -26,7 +27,12 @@ class PaymentClearProvider with ChangeNotifier {
   List<SearchableDropdownMenuItem<String>> voucherType = [];
   SearchableDropdownController<String> voucherTypeController =
       SearchableDropdownController<String>();
+
+
   TextEditingController bamountController = TextEditingController();
+
+  TextEditingController vtypeController = TextEditingController();
+  TextEditingController amountController = TextEditingController();
 
   void initWidget(String details) async {
     voucherTypeController.clear();
@@ -152,4 +158,97 @@ class PaymentClearProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // UNADJUSTED PAYMENT PENDING CLEAR
+
+  void initClearWidget(String details) async {
+    var data = jsonDecode(details);
+    String jsonData =
+        '[{"id":"payTransId","name":"Payment Transaction ID","isMandatory":true,"inputType":"number", "default" : "${data['docno']}"},{"id":"payVtype","name":"Payment Voucher Type","isMandatory":true,"inputType":"text", "default" : "${data['ptype']}"},{"id":"amount","name":"Amount","isMandatory":true,"inputType":"number", "default" : "${data['bamount']}"},{"id":"clnaration","name":"Naration","isMandatory":false,"inputType":"text","maxCharacter":100}]';
+
+    GlobalVariables.requestBody[clearFeature] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          defaultValue: element['default'],
+          controller: controller,
+          readOnly: element['readOnly'] ?? false));
+    }
+
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, clearFeature);
+    widgetList.addAll(widgets);
+    customWidget(data['lcode']);
+
+  }
+
+  void customWidget(String lcode) async {
+
+    var transIdDropdown = await formService.getDropdownMenuItem("/get-bill-pending-by-lcode/$lcode/");
+
+    widgetList.addAll([
+      CustomDropdownField(
+          field: FormUI(
+              id: "transId",
+              name: "Transaction ID",
+              isMandatory: true,
+              inputType: "dropdown"),
+          customFunction: getVoucherType,
+          dropdownMenuItems: transIdDropdown,
+          feature: clearFeature),
+      CustomTextField(
+          field: FormUI(
+              id: "vtype",
+              name: "Voucher Type",
+              isMandatory: true,
+              inputType: "text",
+              controller: vtypeController,
+              readOnly: true),
+          feature: clearFeature, inputType: TextInputType.text),
+      CustomTextField(
+          field: FormUI(
+              id: "disp",
+              name: "Balance Amount",
+              isMandatory: false,
+              inputType: "number",
+              controller: amountController,
+              readOnly: true),
+          feature: clearFeature, inputType: TextInputType.number),
+    ]);
+
+    notifyListeners();
+  }
+
+  void getVoucherType() async {
+    String transId = GlobalVariables.requestBody[clearFeature]['transId'];
+    if(transId!= "" && transId != null) {
+      http.StreamedResponse response =
+      await networkService.get("/get-bill-pending-by-transId/$transId/");
+      var details = jsonDecode(await response.stream.bytesToString())[0];
+      amountController.text = details['bamount'];
+      vtypeController.text = details['vtype'];
+
+      GlobalVariables.requestBody[clearFeature]['transId'] = details['transId'];
+      GlobalVariables.requestBody[clearFeature]['vtype'] = details['vtype'];
+    }
+    notifyListeners();
+  }
+
+  Future<http.StreamedResponse> addUnadjustedPaymentClear() async {
+    http.StreamedResponse response = await networkService
+        .post("/add-unadj-payment-clear/", GlobalVariables.requestBody[clearFeature]);
+    return response;
+  }
+
+
+
 }

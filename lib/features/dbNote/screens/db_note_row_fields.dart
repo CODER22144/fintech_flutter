@@ -5,9 +5,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../common/widgets/pop_ups.dart';
 import '../../network/service/network_service.dart';
+import '../../utility/global_variables.dart';
+import '../provider/dbnote_provider.dart';
 
 class DbnoteRowFields extends StatefulWidget {
   final int index;
@@ -15,12 +18,15 @@ class DbnoteRowFields extends StatefulWidget {
   final List<SearchableDropdownMenuItem<String>> discountType;
   final List<SearchableDropdownMenuItem<String>> materialUnit;
   final Function deleteRow;
+  final List<List<TextEditingController>> controllers;
   const DbnoteRowFields(
       {super.key,
-        required this.index,
-        required this.tableRows,
-        required this.discountType,
-        required this.deleteRow, required this.materialUnit});
+      required this.index,
+      required this.tableRows,
+      required this.discountType,
+      required this.deleteRow,
+      required this.materialUnit,
+      required this.controllers});
 
   @override
   State<DbnoteRowFields> createState() => _DbnoteRowFieldsState();
@@ -36,18 +42,13 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
   double gstAmount = 0;
   double totalAmount = 0;
 
-  TextEditingController discAmountController = TextEditingController(text: '0');
-  TextEditingController discRateController = TextEditingController(text: '0');
-  TextEditingController hsnController = TextEditingController();
-  TextEditingController materialController = TextEditingController();
-  TextEditingController rateController = TextEditingController();
-
-  SearchableDropdownController<String> unitController = SearchableDropdownController();
+  SearchableDropdownController<String> unitController =
+      SearchableDropdownController();
 
   @override
   void initState() {
     super.initState();
-    rateController.text = widget.tableRows[widget.index][6];
+    widget.controllers[widget.index][6].text = widget.tableRows[widget.index][6];
   }
 
   @override
@@ -82,7 +83,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            initialValue: widget.tableRows[widget.index][0],
+            controller: widget.controllers[widget.index][0],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][0] = value;
@@ -110,131 +111,51 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Focus(
-            onFocusChange: (hasFocus) async {
-              if(!hasFocus && materialController.text == "") {
-                hsnController.text = "";
-                setState(() {
-                  widget.tableRows[widget.index][6] = "0";
-                  rateController.text = "0";
-                  widget.tableRows[widget.index][2] = hsnController.text;
-                  widget.tableRows[widget.index][15] = "0";
-                });
-              }
-              if(!hasFocus && materialController.text!= null && materialController.text != "") {
-                setState(() {
-                  widget.tableRows[widget.index][1] = materialController.text;
-                });
-
-                NetworkService networkService = NetworkService();
-                http.StreamedResponse response = await networkService.get("/get-mat-details/${materialController.text}/");
-                var matDetails = jsonDecode(await response.stream.bytesToString())[0];
-                if(response.statusCode == 200){
-
-                  hsnController.text = matDetails['hsnCode'] ?? "";
-                  setState(() {
-                    widget.tableRows[widget.index][6] = matDetails['prate'] ?? "0";
-                    rateController.text = matDetails['prate'] ?? "0";
-                    widget.tableRows[widget.index][2] = hsnController.text;
-                    widget.tableRows[widget.index][15] = matDetails['gstTaxRate'] ?? "0";
-                  });
-                } else {
-                  hsnController.text = "";
-                  setState(() {
-                    widget.tableRows[widget.index][6] = "0";
-                    rateController.text = "0";
-                    widget.tableRows[widget.index][2] = hsnController.text;
-                    widget.tableRows[widget.index][15] = "0";
-                  });
-                  showAlertDialog(context, "Invalid Material no.", "Continue", false);
-                }
-              }
-              calculateTotalAmount(widget.index);
-            },
-            child: TextFormField(
-              controller: materialController,
-              decoration: InputDecoration(
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                label: RichText(
-                  text: const TextSpan(
-                    text: "Material No.",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w300,
+          child: TextFormField(
+            controller: widget.controllers[widget.index][1],
+            decoration: InputDecoration(
+              suffix: ElevatedButton(
+                  onPressed: () async {
+                    NetworkService networkService = NetworkService();
+                    http.StreamedResponse response =
+                        await networkService.post("/get-mat-wh/", {
+                      "bpCode": GlobalVariables
+                          .requestBody[DbnoteProvider.featureName]['lcode'],
+                      "matno": widget.controllers[widget.index][1].text
+                    });
+                    if (response.statusCode == 200) {
+                      getMaterialTab(context,
+                          jsonDecode(await response.stream.bytesToString()));
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3), // Square shape
                     ),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
                   ),
-                ),
-                border: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey)),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 0),
+                  child: const Text(
+                    "List",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  )),
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              label: RichText(
+                text: const TextSpan(
+                  text: "Material No.",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Focus(
-            onFocusChange: (hasFocus) async {
-              if (!hasFocus) {
-                setState(() {
-                  widget.tableRows[widget.index][2] = hsnController.text;
-                });
-                NetworkService networkService = NetworkService();
-                dynamic hsnDetails;
-                if (hsnController.text != null && hsnController.text != "") {
-                  http.StreamedResponse response = await networkService
-                      .get("/get-hsn/${hsnController.text}/");
-                  if (response.statusCode == 200) {
-                    hsnDetails =
-                        jsonDecode(await response.stream.bytesToString())[0]
-                        ['gstTaxRate'] ??
-                            "0";
-                    setState(() {
-                      widget.tableRows[widget.index][15] = hsnDetails;
-                    });
-                  } else {
-                    setState(() {
-                      widget.tableRows[widget.index][15] = "0";
-                    });
-                    showAlertDialog(context, "Invalid Hsn Code", "Okay", false);
-                  }
-                  calculateTotalAmount(widget.index);
-                }
-              }
-            },
-            child: TextFormField(
-              validator: (String? val) {
-                if (val == null || val.isEmpty) {
-                  return 'This field is Mandatory';
-                }
-              },
-              controller: hsnController,
-              decoration: InputDecoration(
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                label: RichText(
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "*",
-                        style: TextStyle(color: Colors.red),
-                      )
-                    ],
-                    text: "HSN Code",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                ),
-                border: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey)),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 0),
-                ),
+              border: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black, width: 0),
               ),
             ),
           ),
@@ -242,7 +163,47 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            initialValue: widget.tableRows[widget.index][3],
+            validator: (String? val) {
+              if (val == null || val.isEmpty) {
+                return 'This field is Mandatory';
+              }
+            },
+            controller: widget.controllers[widget.index][2],
+            onChanged: (value) {
+              setState(() {
+                widget.tableRows[widget.index][2] = value;
+              });
+            },
+            decoration: InputDecoration(
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              label: RichText(
+                text: const TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "*",
+                      style: TextStyle(color: Colors.red),
+                    )
+                  ],
+                  text: "HSN Code",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ),
+              border: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black, width: 0),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            controller: widget.controllers[widget.index][3],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][3] = value;
@@ -271,7 +232,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            initialValue: widget.tableRows[widget.index][4],
+            controller: widget.controllers[widget.index][4],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][4] = value;
@@ -305,7 +266,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            initialValue: widget.tableRows[widget.index][5],
+            controller: widget.controllers[widget.index][5],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][5] = value;
@@ -396,13 +357,14 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            controller: rateController,
+            controller: widget.controllers[widget.index][6],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][6] = value;
-                rateController.text = value;
-                rateController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: rateController.text.length));
+                widget.controllers[widget.index][6].text = value;
+
+                widget.controllers[widget.index][6].selection = TextSelection.fromPosition(
+                    TextPosition(offset: widget.controllers[widget.index][6].text.length));
               });
               calculateTotalAmount(widget.index);
             },
@@ -435,8 +397,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            controller:
-            TextEditingController(text: widget.tableRows[widget.index][7]),
+            controller: widget.controllers[widget.index][7],
             validator: (String? val) {
               if (val == null || val.isEmpty) {
                 return 'This field is Mandatory';
@@ -480,9 +441,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 child: SearchableDropdown<String>(
                   controller: SearchableDropdownController<String>(
                       initialItem: const SearchableDropdownMenuItem(
-                          value: "N",
-                          label: "None",
-                          child: Text("None"))),
+                          value: "N", label: "None", child: Text("None"))),
                   isEnabled: true,
                   backgroundDecoration: (child) => Container(
                     height: 40,
@@ -499,24 +458,26 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                       widget.tableRows[widget.index][8] = value!;
                       if (value == "N") {
                         widget.tableRows[widget.index][9] = "0"; // disc Rate
+                        widget.controllers[widget.index][9].text = "0";
+
+                        widget.controllers[widget.index][10].text = "0";
                         widget.tableRows[widget.index][10] = "0"; // disc Amount
-                        discAmountController.text = "0";
-                        discRateController.text = "0";
                         discAmount = 0;
                         checkRatePercentage = true;
                         checkDiscAmount = true;
                       }
                       if (value == "F") {
                         widget.tableRows[widget.index][9] = "0"; // disc Rate
+                        widget.controllers[widget.index][9].text = "0";
+
                         widget.tableRows[widget.index][10] = "0"; // disc Amount
-                        discAmountController.text = "0";
-                        discRateController.text = "0";
+                        widget.controllers[widget.index][10].text = "0";
                         discAmount = 0;
                         checkRatePercentage = true;
                         checkDiscAmount = false;
                       }
                       if (value == "P") {
-                        discAmountController.text = "0";
+                        widget.controllers[widget.index][10].text = "0";
                         checkRatePercentage = false;
                         checkDiscAmount = false;
                       }
@@ -560,59 +521,77 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
               }
             },
             readOnly: checkRatePercentage,
-            controller: discRateController,
+            controller: widget.controllers[widget.index][9],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][9] = value;
                 if (widget.tableRows[widget.index][8] == "P") {
-                  discAmount =
-                      parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][6]) *
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][9]) *
-                          0.01;
+                  discAmount = parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][5]) *
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][6]) *
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][9]) *
+                      0.01;
 
                   widget.tableRows[widget.index][10] =
                       discAmount.toStringAsFixed(2);
-                  discAmountController.text = discAmount.toStringAsFixed(2);
+                  widget.controllers[widget.index][10].text = discAmount.toStringAsFixed(2);
 
-                  setState(() {
-                    gstAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                            parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
+
+                    gstAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             discAmount) *
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][15]) *
-                            0.01;
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][15]) *
+                        0.01;
+
                     widget.tableRows[widget.index][16] =
                         gstAmount.toStringAsFixed(2);
-                  });
+                  widget.controllers[widget.index][16].text =
+                      gstAmount.toStringAsFixed(2);
 
-                  setState(() {
-                    cessAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
+
+
+                    cessAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
-                            parseEmptyStringToDouble(discAmountController.text)) *
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][13]) *
-                            0.01;
+                                widget.controllers[widget.index][10].text)) *
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][13]) *
+                        0.01;
+
                     widget.tableRows[widget.index][14] =
                         cessAmount.toStringAsFixed(2);
-                    totalAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                            parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
+                  widget.controllers[widget.index][14].text =
+                      cessAmount.toStringAsFixed(2);
+
+                    totalAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             discAmount) +
-                            cessAmount +
-                            gstAmount +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][17]) +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][11]) +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][12]);
+                        cessAmount +
+                        gstAmount +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][17]) +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][11]) +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][12]);
+
                     widget.tableRows[widget.index][18] =
                         totalAmount.toStringAsFixed(2);
-                  });
+                  widget.controllers[widget.index][18].text =
+                      totalAmount.toStringAsFixed(2);
+
                 }
-                discRateController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: discRateController.text.length));
+                widget.controllers[widget.index][9].selection = TextSelection.fromPosition(
+                    TextPosition(offset: widget.controllers[widget.index][9].text.length));
               });
             },
             decoration: InputDecoration(
@@ -648,54 +627,72 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            controller: discAmountController,
+            controller: widget.controllers[widget.index][10],
             readOnly: checkDiscAmount,
             onChanged: (value) {
               setState(() {
                 if (widget.tableRows[widget.index][8] == "F") {
                   widget.tableRows[widget.index][10] = value;
-                  widget.tableRows[widget.index][9] = "0";
-                  discAmount = parseEmptyStringToDouble(value);
-                  discAmountController.text = value;
+                  widget.controllers[widget.index][10].text = value;
 
-                  setState(() {
-                    gstAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                            parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
+                  widget.tableRows[widget.index][9] = "0";
+                  widget.controllers[widget.index][9].text = "0";
+
+                  discAmount = parseEmptyStringToDouble(value);
+                    gstAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             discAmount) *
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][15]) *
-                            0.01;
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][15]) *
+                        0.01;
+
                     widget.tableRows[widget.index][16] =
                         gstAmount.toStringAsFixed(2);
-                  });
+                  widget.controllers[widget.index][16].text =
+                      gstAmount.toStringAsFixed(2);
 
-                  setState(() {
-                    cessAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
+
+
+                    cessAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
-                            parseEmptyStringToDouble(discAmountController.text)) *
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][13]) *
-                            0.01;
+                                widget.controllers[widget.index][10].text)) *
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][13]) *
+                        0.01;
+
                     widget.tableRows[widget.index][14] =
                         cessAmount.toStringAsFixed(2);
-                    totalAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                            parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
+                  widget.controllers[widget.index][14].text =
+                      cessAmount.toStringAsFixed(2);
+
+
+                    totalAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             discAmount) +
-                            cessAmount +
-                            gstAmount +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][17]) +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][11]) +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][12]);
+                        cessAmount +
+                        gstAmount +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][17]) +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][11]) +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][12]);
+
                     widget.tableRows[widget.index][18] =
                         totalAmount.toStringAsFixed(2);
-                  });
+                  widget.controllers[widget.index][18].text =
+                      totalAmount.toStringAsFixed(2);
+
                 }
-                discAmountController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: discAmountController.text.length));
+                widget.controllers[widget.index][10].selection = TextSelection.fromPosition(
+                    TextPosition(offset: widget.controllers[widget.index][10].text.length));
               });
             },
             decoration: InputDecoration(
@@ -728,46 +725,58 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
-              initialValue: widget.tableRows[widget.index][11],
+              controller: widget.controllers[widget.index][11],
               onChanged: (value) {
                 setState(() {
                   widget.tableRows[widget.index][11] = value;
 
-                  setState(() {
-                    gstAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                            parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
+                    gstAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             discAmount) *
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][15]) *
-                            0.01;
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][15]) *
+                        0.01;
                     widget.tableRows[widget.index][16] =
                         gstAmount.toStringAsFixed(2);
-                  });
+                  widget.controllers[widget.index][16].text =
+                      gstAmount.toStringAsFixed(2);
 
-                  setState(() {
-                    cessAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
+
+
+                    cessAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
-                            parseEmptyStringToDouble(discAmountController.text)) *
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][13]) *
-                            0.01;
+                                widget.controllers[widget.index][10].text)) *
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][13]) *
+                        0.01;
                     widget.tableRows[widget.index][14] =
                         cessAmount.toStringAsFixed(2);
-                    totalAmount =
-                        ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                            parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][6])) -
+                  widget.controllers[widget.index][14].text =
+                      cessAmount.toStringAsFixed(2);
+
+                    totalAmount = ((parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][5]) *
+                                parseEmptyStringToDouble(
+                                    widget.tableRows[widget.index][6])) -
                             discAmount) +
-                            cessAmount +
-                            gstAmount +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][17]) +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][11]) +
-                            parseEmptyStringToDouble(widget.tableRows[widget.index][12]);
+                        cessAmount +
+                        gstAmount +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][17]) +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][11]) +
+                        parseEmptyStringToDouble(
+                            widget.tableRows[widget.index][12]);
                     widget.tableRows[widget.index][18] =
                         totalAmount.toStringAsFixed(2);
-                  });
+                  widget.controllers[widget.index][18].text =
+                      totalAmount.toStringAsFixed(2);
+
                 });
               },
               decoration: InputDecoration(
@@ -798,21 +807,26 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            initialValue: widget.tableRows[widget.index][12],
+            controller: widget.controllers[widget.index][12],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][12] = value;
-                totalAmount =
-                    ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                        parseEmptyStringToDouble(
-                            widget.tableRows[widget.index][6])) -
+                totalAmount = ((parseEmptyStringToDouble(
+                                widget.tableRows[widget.index][5]) *
+                            parseEmptyStringToDouble(
+                                widget.tableRows[widget.index][6])) -
                         discAmount) +
-                        cessAmount +
-                        gstAmount +
-                        parseEmptyStringToDouble(widget.tableRows[widget.index][17]) +
-                        parseEmptyStringToDouble(widget.tableRows[widget.index][11]) +
-                        parseEmptyStringToDouble(value);
+                    cessAmount +
+                    gstAmount +
+                    parseEmptyStringToDouble(
+                        widget.tableRows[widget.index][17]) +
+                    parseEmptyStringToDouble(
+                        widget.tableRows[widget.index][11]) +
+                    parseEmptyStringToDouble(value);
+
                 widget.tableRows[widget.index][18] =
+                    totalAmount.toStringAsFixed(2);
+                widget.controllers[widget.index][18].text =
                     totalAmount.toStringAsFixed(2);
               });
             },
@@ -849,46 +863,56 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            initialValue: widget.tableRows[widget.index][13],
+            controller: widget.controllers[widget.index][13],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][13] = value;
 
-                setState(() {
-                  gstAmount =
-                      ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                          parseEmptyStringToDouble(
-                              widget.tableRows[widget.index][6])) -
+
+                  gstAmount = ((parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][5]) *
+                              parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][6])) -
                           discAmount) *
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][15]) *
-                          0.01;
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][15]) *
+                      0.01;
                   widget.tableRows[widget.index][16] =
                       gstAmount.toStringAsFixed(2);
-                });
+                  widget.controllers[widget.index][16].text =
+                      gstAmount.toStringAsFixed(2);
 
-                setState(() {
-                  cessAmount =
-                      ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                          parseEmptyStringToDouble(
-                              widget.tableRows[widget.index][6])) -
-                          parseEmptyStringToDouble(discAmountController.text)) *
-                          parseEmptyStringToDouble(value) *
-                          0.01;
+                  cessAmount = ((parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][5]) *
+                              parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][6])) -
+                          parseEmptyStringToDouble(widget.controllers[widget.index][10].text)) *
+                      parseEmptyStringToDouble(value) *
+                      0.01;
                   widget.tableRows[widget.index][14] =
                       cessAmount.toStringAsFixed(2);
-                  totalAmount =
-                      ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                          parseEmptyStringToDouble(
-                              widget.tableRows[widget.index][6])) -
+                widget.controllers[widget.index][14].text =
+                    cessAmount.toStringAsFixed(2);
+
+
+                  totalAmount = ((parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][5]) *
+                              parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][6])) -
                           discAmount) +
-                          cessAmount +
-                          gstAmount +
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][17]) +
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][11]) +
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][12]);
+                      cessAmount +
+                      gstAmount +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][17]) +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][11]) +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][12]);
                   widget.tableRows[widget.index][18] =
                       totalAmount.toStringAsFixed(2);
-                });
+                widget.controllers[widget.index][18].text =
+                    totalAmount.toStringAsFixed(2);
+
               });
             },
             decoration: InputDecoration(
@@ -924,8 +948,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            controller:
-            TextEditingController(text: widget.tableRows[widget.index][14]),
+            controller: widget.controllers[widget.index][14],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][14] = value;
@@ -965,8 +988,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            controller:
-            TextEditingController(text: widget.tableRows[widget.index][15]),
+            controller: widget.controllers[widget.index][15],
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][15] = value;
@@ -1006,8 +1028,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            controller:
-            TextEditingController(text: widget.tableRows[widget.index][16]),
+            controller: widget.controllers[widget.index][16],
             readOnly: true,
             onChanged: (value) {
               setState(() {
@@ -1049,21 +1070,26 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                   return 'This field is Mandatory';
                 }
               },
-              initialValue: widget.tableRows[widget.index][17],
+              controller: widget.controllers[widget.index][17],
               onChanged: (value) {
                 setState(() {
                   widget.tableRows[widget.index][17] = value;
-                  totalAmount =
-                      ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-                          parseEmptyStringToDouble(
-                              widget.tableRows[widget.index][6])) -
+                  totalAmount = ((parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][5]) *
+                              parseEmptyStringToDouble(
+                                  widget.tableRows[widget.index][6])) -
                           discAmount) +
-                          cessAmount +
-                          gstAmount +
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][17]) +
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][11]) +
-                          parseEmptyStringToDouble(widget.tableRows[widget.index][12]);
+                      cessAmount +
+                      gstAmount +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][17]) +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][11]) +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][12]);
                   widget.tableRows[widget.index][18] =
+                      totalAmount.toStringAsFixed(2);
+                  widget.controllers[widget.index][18].text =
                       totalAmount.toStringAsFixed(2);
                 });
               },
@@ -1101,8 +1127,7 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
                 return 'This field is Mandatory';
               }
             },
-            controller:
-            TextEditingController(text: widget.tableRows[widget.index][18]),
+            controller: widget.controllers[widget.index][18],
             readOnly: true,
             onChanged: (value) {
               setState(() {
@@ -1143,40 +1168,183 @@ class _DbnoteRowFieldsState extends State<DbnoteRowFields> {
       amount = parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
           parseEmptyStringToDouble(widget.tableRows[widget.index][6]);
       widget.tableRows[widget.index][7] = amount.toStringAsFixed(2);
+      widget.controllers[widget.index][7].text = amount.toStringAsFixed(2);
 
       if (widget.tableRows[widget.index][8] == "P") {
-        discAmount =
-        (amount * parseEmptyStringToDouble(widget.tableRows[widget.index][9]) * 0.01);
-        discAmountController.text = discAmount.toStringAsFixed(2);
+        discAmount = (amount *
+            parseEmptyStringToDouble(widget.tableRows[widget.index][9]) *
+            0.01);
+        widget.controllers[widget.index][10].text = discAmount.toStringAsFixed(2);
       }
     });
     // GST TAX AMOUNT
     setState(() {
-      gstAmount = ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-          parseEmptyStringToDouble(widget.tableRows[widget.index][6])) -
-          discAmount) *
+      gstAmount = ((parseEmptyStringToDouble(
+                      widget.tableRows[widget.index][5]) *
+                  parseEmptyStringToDouble(widget.tableRows[widget.index][6])) -
+              discAmount) *
           parseEmptyStringToDouble(widget.tableRows[widget.index][15]) *
           0.01;
       widget.tableRows[widget.index][16] = gstAmount.toStringAsFixed(2);
+      widget.controllers[widget.index][16].text = gstAmount.toStringAsFixed(2);
+
     });
 
     // CESS AMOUNT AND TOTAL AMOUNT
     setState(() {
-      cessAmount = ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-          parseEmptyStringToDouble(widget.tableRows[widget.index][6])) -
-          parseEmptyStringToDouble(discAmountController.text)) *
+      cessAmount = ((parseEmptyStringToDouble(
+                      widget.tableRows[widget.index][5]) *
+                  parseEmptyStringToDouble(widget.tableRows[widget.index][6])) -
+              parseEmptyStringToDouble(widget.controllers[widget.index][10].text)) *
           parseEmptyStringToDouble(widget.tableRows[widget.index][13]) *
           0.01;
       widget.tableRows[widget.index][14] = cessAmount.toStringAsFixed(2);
-      totalAmount = ((parseEmptyStringToDouble(widget.tableRows[widget.index][5]) *
-          parseEmptyStringToDouble(widget.tableRows[widget.index][6])) -
-          discAmount) +
+      widget.controllers[widget.index][14].text = cessAmount.toStringAsFixed(2);
+
+      totalAmount = ((parseEmptyStringToDouble(
+                      widget.tableRows[widget.index][5]) *
+                  parseEmptyStringToDouble(widget.tableRows[widget.index][6])) -
+              discAmount) +
           cessAmount +
           gstAmount +
           parseEmptyStringToDouble(widget.tableRows[widget.index][17]) +
           parseEmptyStringToDouble(widget.tableRows[widget.index][11]) +
           parseEmptyStringToDouble(widget.tableRows[widget.index][12]);
       widget.tableRows[widget.index][18] = totalAmount.toStringAsFixed(2);
+      widget.controllers[widget.index][18].text = totalAmount.toStringAsFixed(2);
     });
+  }
+
+  void getMaterialTab(BuildContext context, List<dynamic> orderData) {
+    List<DataRow> rows = [];
+    for (var data in orderData) {
+      rows.add(DataRow(cells: [
+        DataCell(Text('${data['vtype'] ?? "-"}')),
+        DataCell(Text('${data['wdocno'] ?? "-"}')),
+        DataCell(Text('${data['bpCode'] ?? "-"}')),
+        DataCell(Text('${data['matno'] ?? "-"}')),
+        DataCell(Text('${data['billNo'] ?? "-"}')),
+        DataCell(Text('${data['billDate'] ?? "-"}')),
+        DataCell(Text('${data['hsnCode'] ?? "-"}')),
+        DataCell(Text('${data['rgst'] ?? "-"}')),
+        DataCell(Text('${data['prate'] ?? "-"}')),
+        DataCell(Text('${data['bqty'] ?? "-"}')),
+        DataCell(ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(3), // Square shape
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+            ),
+            onPressed: () {
+              setState(() {
+                widget.tableRows[widget.index][1] = widget.controllers[widget.index][1].text;
+
+                widget.tableRows[widget.index][2] = data['hsnCode'] ?? "";
+                widget.controllers[widget.index][2].text = data['hsnCode'] ?? "";
+
+                widget.tableRows[widget.index][6] = data['prate'] ?? "0";
+                widget.controllers[widget.index][6].text = data['prate'] ?? "0";
+
+                widget.tableRows[widget.index][15] = data['rgst'] ?? "0";
+                widget.controllers[widget.index][15].text = data['rgst'] ?? "0";
+
+                widget.controllers[widget.index][3].text = '${data['billNo'] ?? ""}';
+                widget.tableRows[widget.index][3] = '${data['billNo'] ?? ""}';
+
+                widget.controllers[widget.index][4].text = '${data['billDate'] ?? ""}';
+                widget.tableRows[widget.index][4] = '${data['billDate'] ?? ""}';
+
+                widget.controllers[widget.index][5].text = '${data['bqty'] ?? ""}';
+                widget.tableRows[widget.index][5] = '${data['bqty'] ?? ""}';
+
+                // set vtype and docno
+                widget.tableRows[widget.index][20] = '${data['vtype'] ?? ""}';
+                widget.tableRows[widget.index][21] = '${data['wdocno'] ?? ""}';
+              });
+              calculateTotalAmount(widget.index);
+              context.pop();
+            },
+            child: const Text(
+              "Select",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ))),
+      ]));
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Materials',
+              style: TextStyle(fontWeight: FontWeight.w500)),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DataTable(
+                    columns: const [
+                      DataColumn(label: Text('VType')),
+                      DataColumn(label: Text('Docno.')),
+                      DataColumn(label: Text('BpCode')),
+                      DataColumn(label: Text('Material No.')),
+                      DataColumn(label: Text('Bill no.')),
+                      DataColumn(label: Text('Bill Date')),
+                      DataColumn(label: Text('HSN Code')),
+                      DataColumn(label: Text('Gst Rate')),
+                      DataColumn(label: Text('Price Rate')),
+                      DataColumn(label: Text('Qty')),
+                      DataColumn(label: Text('')),
+                    ],
+                    rows: rows,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    // Navigator.pop(context, false);
+                    Navigator.of(context, rootNavigator: true).pop(false);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 5),
+                    width: GlobalVariables.deviceWidth * 0.15,
+                    height: GlobalVariables.deviceHeight * 0.05,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 2,
+                          offset: Offset(
+                            2,
+                            3,
+                          ),
+                        )
+                      ],
+                    ),
+                    child: const Text("CLOSE",
+                        style: TextStyle(fontSize: 11, color: Colors.black)),
+                  ),
+                ),
+              ],
+            )
+          ],
+        );
+      },
+    );
   }
 }

@@ -29,6 +29,7 @@ class SalesOrderProvider with ChangeNotifier {
   List<dynamic> salesReport = [];
   List<dynamic> shortQty = [];
   List<dynamic> orderBalance = [];
+  List<dynamic> invoicePending = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -363,10 +364,23 @@ class SalesOrderProvider with ChangeNotifier {
 
   void getOrderBalance() async {
     orderBalance.clear();
-    http.StreamedResponse response = await networkService.post("/order-balance/", GlobalVariables.requestBody[orderBalanceReportFeature]);
+    http.StreamedResponse response = await networkService.post(
+        "/order-balance/",
+        GlobalVariables.requestBody[orderBalanceReportFeature]);
     if (response.statusCode == 200) {
       orderBalance = jsonDecode(await response.stream.bytesToString());
     }
     notifyListeners();
   }
+
+  void getEInvoicePending() async {
+    invoicePending.clear();
+    http.StreamedResponse response =
+        await networkService.get("/einvoice-pending/");
+    if (response.statusCode == 200) {
+      invoicePending = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
+  }
+
 }

@@ -829,20 +829,47 @@ class _InwardRowFieldsState extends State<InwardRowFields> {
             onChanged: (value) {
               setState(() {
                 widget.tableRows[widget.index][10] = value;
-                totalAmount = ((parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][3]) *
-                            parseEmptyStringToDouble(
-                                widget.tableRows[widget.index][4])) -
-                        discAmount) +
-                    cessAmount +
-                    gstAmount +
-                    parseEmptyStringToDouble(
-                        widget.tableRows[widget.index][15]) +
-                    parseEmptyStringToDouble(
-                        widget.tableRows[widget.index][9]) +
-                    parseEmptyStringToDouble(value);
-                widget.tableRows[widget.index][16] =
-                    totalAmount.toStringAsFixed(2);
+
+                setState(() {
+                  gstAmount = ((parseEmptyStringToDouble(
+                      widget.tableRows[widget.index][3]) *
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][4])) -
+                      discAmount) *
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][13]) *
+                      0.01;
+                  widget.tableRows[widget.index][14] =
+                      gstAmount.toStringAsFixed(2);
+                });
+
+                setState(() {
+                  cessAmount = ((parseEmptyStringToDouble(
+                      widget.tableRows[widget.index][3]) *
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][4])) -
+                      parseEmptyStringToDouble(discAmountController.text)) *
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][11]) *
+                      0.01;
+                  widget.tableRows[widget.index][12] =
+                      cessAmount.toStringAsFixed(2);
+                  totalAmount = ((parseEmptyStringToDouble(
+                      widget.tableRows[widget.index][3]) *
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][4])) -
+                      discAmount) +
+                      cessAmount +
+                      gstAmount +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][15]) +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][9]) +
+                      parseEmptyStringToDouble(
+                          widget.tableRows[widget.index][10]);
+                  widget.tableRows[widget.index][16] =
+                      totalAmount.toStringAsFixed(2);
+                });
               });
             },
             decoration: InputDecoration(

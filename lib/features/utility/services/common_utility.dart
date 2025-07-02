@@ -118,12 +118,11 @@ Future<void> downloadJsonToExcel(List<dynamic> jsonData, String title) async {
     File(path)
       ..createSync(recursive: true)
       ..writeAsBytesSync(fileBytes!);
-
-
   }
 }
 
-Future<void> downloadJsonToCsv(List<dynamic> jsonList, {String fileName = 'data.csv', String delimiter = ','}) async {
+Future<void> downloadJsonToCsv(List<dynamic> jsonList,
+    {String fileName = 'data.csv', String delimiter = ','}) async {
   // Convert JSON to CSV
   List<List<String>> csvData = [];
 
@@ -134,7 +133,7 @@ Future<void> downloadJsonToCsv(List<dynamic> jsonList, {String fileName = 'data.
   for (var row in jsonList) {
     List<String> stringRow = [];
     for (var value in row.values) {
-      if(value != null) {
+      if (value != null) {
         stringRow.add('$value');
       } else {
         stringRow.add('');
@@ -142,7 +141,6 @@ Future<void> downloadJsonToCsv(List<dynamic> jsonList, {String fileName = 'data.
     }
     rows.add(stringRow);
   }
-
 
   String csv = ListToCsvConverter(fieldDelimiter: delimiter).convert([...rows]);
 
@@ -165,18 +163,10 @@ Future<void> downloadJsonToCsv(List<dynamic> jsonList, {String fileName = 'data.
   }
 }
 
-// void openPdfRightSide(String url) {
-//   final screenWidth = html.window.screen!.width!;
-//   final screenHeight = html.window.screen!.height!;
-//
-//   final width = (screenWidth / 2).round();
-//   final height = screenHeight;
-//   final left = (screenWidth / 2).round();
-//   const top = 0;
-//
-//   html.window.open(
-//       url,
-//       'pdfWindow',
-//       'width=$width,height=$height,top=$top,left=$left'
-//   );
-// }
+String decodeBase64(String data) {
+  int missingPadding = data.length % 4;
+  if (missingPadding != 0) {
+    data += '=' * (4 - missingPadding);
+  }
+  return utf8.decode(base64.decode(data));
+}

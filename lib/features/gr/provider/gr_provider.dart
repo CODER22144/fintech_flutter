@@ -1,13 +1,16 @@
 import 'dart:convert';
 
+import 'package:fintech_new_web/features/additionalOrder/screen/additional_order.dart';
 import 'package:fintech_new_web/features/common/widgets/custom_dropdown_field.dart';
 import 'package:fintech_new_web/features/common/widgets/pop_ups.dart';
+import 'package:fintech_new_web/features/gr/screen/gr_mat_edit.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:fintech_new_web/features/utility/global_variables.dart';
 import 'package:fintech_new_web/features/utility/models/forms_UI.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
@@ -18,15 +21,26 @@ import '../../utility/services/generate_form_service.dart';
 class GrProvider with ChangeNotifier {
   static const String featureName = "gr";
   static const String reportFeature = "grReport";
+  static const String editFeature = "grMatEdit";
+  static const String grItemReportFeature = "grItemReport";
+  static const String saleItemReportFeature = "saleItemReport";
+  static const String grDetailReportFeature = "grDetailReport";
+
 
   List<FormUI> formFieldDetails = [];
+  List<FormUI> editFormFieldDetails = [];
   List<Widget> widgetList = [];
+  List<Widget> editWidgetList = [];
+  List<Widget> reportWidgetList = [];
   List<Widget> rateDiffWidgetList = [];
 
   List<dynamic> grPending = [];
   List<dynamic> grShortagePending = [];
   List<dynamic> grRejectionPending = [];
   List<dynamic> grRateApprovalPending = [];
+
+  List<dynamic> grItemReport = [];
+  List<dynamic> saleItemReport = [];
 
   List<List<TextEditingController>> rowControllers = [];
 
@@ -67,10 +81,13 @@ class GrProvider with ChangeNotifier {
         await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
 
-    List<List<String>> tabRows = [['', '', '']];
+    List<List<String>> tabRows = [
+      ['', '', '']
+    ];
 
     rowControllers = tabRows
-        .map((row) => row.map((field) => TextEditingController(text: field)).toList())
+        .map((row) =>
+            row.map((field) => TextEditingController(text: field)).toList())
         .toList();
 
     initCustomObject();
@@ -81,7 +98,7 @@ class GrProvider with ChangeNotifier {
     formFieldDetails.clear();
     widgetList.clear();
     String jsonData =
-        '[{"id":"grno","name":"GR No.","isMandatory":false,"inputType":"text"},{"id":"brid","name":"BR Id","isMandatory":false,"inputType":"text"},{"id":"fromDate","name":"From Date","isMandatory":false,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":false,"inputType":"datetime"}]';
+        '[{"id":"grno","name":"GR No.","isMandatory":false,"inputType":"text"},{"id":"brid","name":"BR Id","isMandatory":false,"inputType":"text"},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
 
     for (var element in jsonDecode(jsonData)) {
       formFieldDetails.add(FormUI(
@@ -93,9 +110,8 @@ class GrProvider with ChangeNotifier {
           maxCharacter: element['maxCharacter'] ?? 255));
     }
 
-    List<Widget> widgets = await formService.generateDynamicForm(
-        formFieldDetails, reportFeature,
-        disableDefault: true);
+    List<Widget> widgets =
+        await formService.generateDynamicForm(formFieldDetails, reportFeature);
     widgetList.addAll(widgets);
     notifyListeners();
   }
@@ -130,15 +146,17 @@ class GrProvider with ChangeNotifier {
   void initCustomObject() async {
     List<SearchableDropdownMenuItem<String>> bp =
         await formService.getDropdownMenuItem("/get-business-partner/");
-    widgetList.add(CustomDropdownField(
-        field: FormUI(
-            id: "bpCode",
-            name: "Business Partner Code",
-            isMandatory: true,
-            inputType: "dropdown"),
-        dropdownMenuItems: bp,
-        feature: featureName,
-        customFunction: getValidPurchaseOrderDropdown));
+    widgetList.insert(
+        2,
+        CustomDropdownField(
+            field: FormUI(
+                id: "bpCode",
+                name: "Business Partner Code",
+                isMandatory: true,
+                inputType: "dropdown"),
+            dropdownMenuItems: bp,
+            feature: featureName,
+            customFunction: getValidPurchaseOrderDropdown));
     notifyListeners();
   }
 
@@ -217,7 +235,7 @@ class GrProvider with ChangeNotifier {
   void getGrRateApprovalPending() async {
     grRateApprovalPending.clear();
     http.StreamedResponse response =
-    await networkService.get("/get-gr-rate-approval-pending/");
+        await networkService.get("/get-gr-rate-approval-pending/");
     if (response.statusCode == 200) {
       var data = jsonDecode(await response.stream.bytesToString());
       grRateApprovalPending = data;
@@ -228,7 +246,7 @@ class GrProvider with ChangeNotifier {
   void getGrShortagePending() async {
     grShortagePending.clear();
     http.StreamedResponse response =
-    await networkService.get("/get-gr-shortage-pending/");
+        await networkService.get("/get-gr-shortage-pending/");
     if (response.statusCode == 200) {
       var data = jsonDecode(await response.stream.bytesToString());
       grShortagePending = data;
@@ -239,7 +257,7 @@ class GrProvider with ChangeNotifier {
   void getGrRejectionPending() async {
     grRejectionPending.clear();
     http.StreamedResponse response =
-    await networkService.get("/get-gr-rejection-pending/");
+        await networkService.get("/get-gr-rejection-pending/");
     if (response.statusCode == 200) {
       var data = jsonDecode(await response.stream.bytesToString());
       grRejectionPending = data;
@@ -292,8 +310,7 @@ class GrProvider with ChangeNotifier {
               Text("Amount", style: TextStyle(fontWeight: FontWeight.bold)))),
       DataCell(Align(
           alignment: Alignment.centerRight,
-          child: Text("Gst Tax Rate",
-              style: TextStyle(fontWeight: FontWeight.bold)))),
+          child: Text("Tax", style: TextStyle(fontWeight: FontWeight.bold)))),
       DataCell(Align(
           alignment: Alignment.centerRight,
           child: Text("Gst Amount",
@@ -307,17 +324,15 @@ class GrProvider with ChangeNotifier {
     DataRow columnHeader = const DataRow(cells: [
       DataCell(Text("GR No.", style: TextStyle(fontWeight: FontWeight.bold))),
       DataCell(Text("GR Date", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataCell(Text("Business Partner",
-          style: TextStyle(fontWeight: FontWeight.bold))),
       DataCell(Text("Address", style: TextStyle(fontWeight: FontWeight.bold))),
+      DataCell(Text("Bill No.", style: TextStyle(fontWeight: FontWeight.bold))),
       DataCell(
-          Text("Contact No.", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataCell(Text("Email", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataCell(Text("Bill Receipt ID",
-          style: TextStyle(fontWeight: FontWeight.bold))),
-      DataCell(Text("", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataCell(Text("", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataCell(Text("", style: TextStyle(fontWeight: FontWeight.bold))),
+          Text("Bill Date", style: TextStyle(fontWeight: FontWeight.bold))),
+      DataCell(Text("")),
+      DataCell(Text("")),
+      DataCell(Text("")),
+      DataCell(Text("")),
+      DataCell(Text("")),
     ]);
 
     for (var data in report) {
@@ -334,16 +349,31 @@ class GrProvider with ChangeNotifier {
                 throw 'Could not launch';
               }
             },
-            child: Text('${data['grno'] ?? "-"}',
-                style: const TextStyle(
-                    color: Colors.blueAccent, fontWeight: FontWeight.w500)))),
-        DataCell(Text('${data['dDate'] ?? "-"}')),
-        DataCell(Text('${data['bpName'] ?? "-"}')),
-        DataCell(Text(
-            '${data['bpAdd'] ?? "-"} ${data['bpAdd1'] ?? ""}\n${data['bpCity'] ?? "-"} - ${data['stateName'] ?? "-"}, ${data['bpZipCode'] ?? "-"}')),
-        DataCell(Text('${data['bpPhone'] ?? "-"}')),
-        DataCell(Text('${data['bpEmail'] ?? "-"}')),
-        DataCell(Text('${data['brid'] ?? "-"}')),
+            child: RichText(
+                text: TextSpan(
+                    text: 'GR: ${data['grno'] ?? ""}',
+                    style: const TextStyle(
+                        color: Colors.blueAccent, fontWeight: FontWeight.w500),
+                    children: [
+                  TextSpan(
+                      text: "\nBR: ${data['brid'] ?? ''}",
+                      style: const TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.w500))
+                ])))),
+        DataCell(SizedBox(
+            width: 300,
+            child: Text(
+              '${data['dDate'] ?? "-"}\n${data['bpName'] ?? "-"}\nPh: ${data['bpPhone'] ?? "-"}',
+              maxLines: 3,
+            ))),
+        DataCell(SizedBox(
+            width: 300,
+            child: Text(
+              '${data['bpAdd'] ?? "-"} ${data['bpAdd1'] ?? ""}\n${data['bpCity'] ?? "-"} - ${data['stateName'] ?? "-"}, ${data['bpZipCode'] ?? "-"}',
+              maxLines: 3,
+            ))),
+        DataCell(Text('${data['billNo'] ?? "-"}')),
+        DataCell(Text('${data['dbillDate'] ?? "-"}')),
         const DataCell(Text('')),
         DataCell(ElevatedButton(
             onPressed: () async {
@@ -377,8 +407,8 @@ class GrProvider with ChangeNotifier {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5), // Square shape
               ),
-              padding: EdgeInsets
-                  .zero, // Remove internal padding to make it square
+              padding:
+                  EdgeInsets.zero, // Remove internal padding to make it square
               minimumSize:
                   const Size(80, 50), // Width and height for the button
             ),
@@ -387,12 +417,30 @@ class GrProvider with ChangeNotifier {
               style: TextStyle(color: Colors.white),
             ))),
         const DataCell(Text('')),
+        const DataCell(Text('')),
+        const DataCell(Text('')),
       ]));
       rows.add(headerRow);
       for (var poData in data['grd']) {
         rows.add(DataRow(cells: [
-          DataCell(Text('${poData['matno'] ?? "-"}')),
-          DataCell(Text('${poData['matDescription'] ?? "-"}')),
+          DataCell(Row(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    context.pushNamed(GrMatEdit.routeName,
+                        queryParameters: {"grdId": '${poData['grdId']}'});
+                  },
+                  icon: const Icon(Icons.edit_outlined,
+                      color: Colors.blueAccent)),
+              Text('${poData['matno'] ?? "-"}')
+            ],
+          )),
+          DataCell(SizedBox(
+              width: 200,
+              child: Text(
+                '${poData['matDescription'] ?? "-"}',
+                maxLines: 2,
+              ))),
           DataCell(Text('${poData['hsnCode'] ?? "-"}')),
           DataCell(Align(
               alignment: Alignment.centerRight,
@@ -424,13 +472,13 @@ class GrProvider with ChangeNotifier {
             alignment: Alignment.centerRight,
             child: Text('${data['sumgrQty'] ?? "-"}',
                 style: const TextStyle(fontWeight: FontWeight.bold)))),
-        const DataCell(Text('')),
-        const DataCell(Text('')),
+        const DataCell(Text('', style: TextStyle(fontWeight: FontWeight.bold))),
+        const DataCell(Text('', style: TextStyle(fontWeight: FontWeight.bold))),
         DataCell(Align(
             alignment: Alignment.centerRight,
             child: Text('${data['sumgrAmount'] ?? "-"}',
                 style: const TextStyle(fontWeight: FontWeight.bold)))),
-        const DataCell(Text('')),
+        const DataCell(Text('', style: TextStyle(fontWeight: FontWeight.bold))),
         DataCell(Align(
             alignment: Alignment.centerRight,
             child: Text('${data['sumgstAmount'] ?? "-"}',
@@ -447,33 +495,32 @@ class GrProvider with ChangeNotifier {
       }
     }
 
-    table = DataTable(columns: const [
-      DataColumn(
-          label: Text("GR No.", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label:
-              Text("GR Date", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label: Text("Business Partner",
-              style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label:
-              Text("Address", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label: Text("Contact No.",
-              style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label: Text("Email", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label: Text("Bill Receipt ID",
-              style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label: Text("", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label: Text("", style: TextStyle(fontWeight: FontWeight.bold))),
-      DataColumn(
-          label: Text("", style: TextStyle(fontWeight: FontWeight.bold))),
-    ], rows: rows);
+    table = DataTable(
+        columnSpacing: 30,
+        dataRowMaxHeight: 60,
+        columns: const [
+          DataColumn(
+              label: Text("GR/BR No.",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("GR Date & Party Name",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Address",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Bill No.",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Bill Date",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(label: Text("")),
+          DataColumn(label: Text("")),
+          DataColumn(label: Text("")),
+          DataColumn(label: Text("")),
+          DataColumn(label: Text("")),
+        ],
+        rows: rows);
 
     notifyListeners();
   }
@@ -523,4 +570,145 @@ class GrProvider with ChangeNotifier {
     ]);
     notifyListeners();
   }
+
+  Future<Map<String, dynamic>> getByIdGrDetails(String grdId) async {
+    http.StreamedResponse response =
+        await networkService.post("/gr-detail-byId/", {"grdId": grdId});
+    if (response.statusCode == 200) {
+      return jsonDecode(await response.stream.bytesToString())[0];
+    }
+    return {};
+  }
+
+  void editRest() {
+    GlobalVariables.requestBody[editFeature] = {};
+    editFormFieldDetails.clear();
+    editWidgetList.clear();
+    notifyListeners();
+  }
+
+  void initEdit(String grdId) async {
+    Map<String, dynamic> editMapData = await getByIdGrDetails(grdId);
+    GlobalVariables.requestBody[editFeature] = editMapData;
+    editFormFieldDetails.clear();
+    editWidgetList.clear();
+
+    String jsonData =
+        '[{"id":"matno","name":"Material No.","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"grQty","name":"Qty","isMandatory":true,"inputType":"number"},{"id":"grRate","name":"Rate","isMandatory":true,"inputType":"number"},{"id":"hsnCode","name":"HSN Code","isMandatory":true,"inputType":"text","maxCharacter":10}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController editController = TextEditingController();
+      editFormFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          controller: editController,
+          defaultValue: editMapData[element['id']]));
+    }
+
+    List<Widget> widgets = await formService.generateDynamicForm(
+        editFormFieldDetails, editFeature);
+    editWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  Future<http.StreamedResponse> updateGr() async {
+    http.StreamedResponse response = await networkService.post(
+        "/update-gr/", GlobalVariables.requestBody[editFeature]);
+    return response;
+  }
+
+  void initGrItemReport() async {
+    GlobalVariables.requestBody[grItemReportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"bpCode","name":"Business Partner","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-business-partner/"},{"id":"billno","name":"Bill No.","isMandatory":false,"inputType":"text","maxCharacter":16},{"id":"frommatno","name":"From Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"tomatno","name":"To Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets = await formService.generateDynamicForm(
+        formFieldDetails, grItemReportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getGrItemReport() async {
+    grItemReport.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/gr-item-report/", GlobalVariables.requestBody[grItemReportFeature]);
+    if (response.statusCode == 200) {
+      grItemReport = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
+  }
+
+  void initSaleItemReport() async {
+    GlobalVariables.requestBody[saleItemReportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"bpCode","name":"Business Partner","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-business-partner/"},{"id":"billno","name":"Bill No.","isMandatory":false,"inputType":"text","maxCharacter":16},{"id":"frommatno","name":"From Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"tomatno","name":"To Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets = await formService.generateDynamicForm(
+        formFieldDetails, saleItemReportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getSaleItemReport() async {
+    saleItemReport.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/sale-item-report/", GlobalVariables.requestBody[saleItemReportFeature]);
+    if (response.statusCode == 200) {
+      saleItemReport = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
+  }
+
+  void initGrDetailsReport() async {
+    GlobalVariables.requestBody[grDetailReportFeature] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
+    String jsonData =
+        '[{"id":"carId","name":"Carrier","isMandatory":false,"inputType":"dropdown", "dropdownMenuItem" : "/get-carrier/"},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, grDetailReportFeature);
+    widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+
 }

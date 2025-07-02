@@ -47,7 +47,7 @@ class SalesDebitNoteProvider with ChangeNotifier {
     formFieldDetails.clear();
     widgetList.clear();
     String jsonData =
-        '[{"id":"docno","name":"Document No.","isMandatory":true,"inputType":"number"},{"id":"docDate","name":"Document Date","isMandatory":true,"inputType":"datetime"},{"id":"lcode","name":"Party Code","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}, {"id":"invoiceType","name":"Invoice Type","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-invoice-type/", "default" : "B2B"}  ,{"id":"drId","name":"Documnet Reason","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-reason/"},{"id":"daId","name":"Document Against","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-against/"}]';
+        '[{"id":"docDate","name":"Document Date","isMandatory":true,"inputType":"datetime"},{"id":"lcode","name":"Party Code","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}, {"id":"invoiceType","name":"Invoice Type","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-invoice-type/", "default" : "B2B"}  ,{"id":"drId","name":"Documnet Reason","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-reason/"},{"id":"daId","name":"Document Against","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-against/"}]';
 
     for (var element in jsonDecode(jsonData)) {
       TextEditingController controller = TextEditingController();

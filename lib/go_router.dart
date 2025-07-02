@@ -25,18 +25,36 @@ import 'package:fintech_new_web/features/billReceipt/screen/br_report.dart';
 import 'package:fintech_new_web/features/billReceipt/screen/br_report_form.dart';
 import 'package:fintech_new_web/features/billReceipt/screen/create_bill_receipt.dart';
 import 'package:fintech_new_web/features/billReceivable/screens/add_bill_receivable.dart';
+import 'package:fintech_new_web/features/bpBreakup/screens/bp_breakup.dart';
+import 'package:fintech_new_web/features/bpBreakup/screens/bp_breakup_processing.dart';
+import 'package:fintech_new_web/features/bpBreakup/screens/bp_breakup_report_form.dart';
+import 'package:fintech_new_web/features/bpBreakup/screens/delete_bp_breakup.dart';
+import 'package:fintech_new_web/features/bpBreakup/screens/delete_bp_breakup_details.dart';
+import 'package:fintech_new_web/features/bpBreakup/screens/get_bp_breakup.dart';
 import 'package:fintech_new_web/features/bpPayNTaxInfo/screen/edit_bp_tax_info.dart';
 import 'package:fintech_new_web/features/bpPayNTaxInfo/screen/get_bp_tax_info.dart';
 import 'package:fintech_new_web/features/bpShipping/screens/bp_shipping.dart';
 import 'package:fintech_new_web/features/bpShipping/screens/get_bp_shipping.dart';
 import 'package:fintech_new_web/features/bpShipping/screens/shipping_report.dart';
 import 'package:fintech_new_web/features/bpShipping/screens/shipping_report_form.dart';
+import 'package:fintech_new_web/features/businessPartner/screen/bp_payment_info_report.dart';
+import 'package:fintech_new_web/features/businessPartner/screen/bp_payment_info_report_form.dart';
 import 'package:fintech_new_web/features/businessPartner/screen/bp_report.dart';
 import 'package:fintech_new_web/features/businessPartner/screen/bp_report_form.dart';
 import 'package:fintech_new_web/features/businessPartner/screen/business_partner.dart';
+import 'package:fintech_new_web/features/businessPartnerObMaterial/screens/bp_ob_material_form.dart';
+import 'package:fintech_new_web/features/businessPartnerObMaterial/screens/bp_ob_report.dart';
+import 'package:fintech_new_web/features/businessPartnerObMaterial/screens/get_bp_ob_material.dart';
+import 'package:fintech_new_web/features/businessPartnerOnBoard/screens/business_partner_on_board.dart';
+import 'package:fintech_new_web/features/businessPartnerOnBoard/screens/get_bp_on_board.dart';
+import 'package:fintech_new_web/features/businessPartnerProcessing/screens/bp_processing.dart';
+import 'package:fintech_new_web/features/businessPartnerProcessing/screens/get_bp_processing.dart';
 import 'package:fintech_new_web/features/carrier/screens/carrier.dart';
 import 'package:fintech_new_web/features/carrier/screens/carrier_report.dart';
 import 'package:fintech_new_web/features/carrier/screens/get_carrier.dart';
+import 'package:fintech_new_web/features/colorCode/screens/add_color.dart';
+import 'package:fintech_new_web/features/colorCode/screens/color_report.dart';
+import 'package:fintech_new_web/features/colorCode/screens/get_color.dart';
 import 'package:fintech_new_web/features/costResource/screens/add_cost_resource.dart';
 import 'package:fintech_new_web/features/costResource/screens/cost_resource_report.dart';
 import 'package:fintech_new_web/features/costResource/screens/get_cost_resource.dart';
@@ -56,20 +74,36 @@ import 'package:fintech_new_web/features/dlChallan/screens/dl_challan_report_for
 import 'package:fintech_new_web/features/evOrder/screen/ev_order.dart';
 import 'package:fintech_new_web/features/financialCreditNote/screens/create_financial_crnote.dart';
 import 'package:fintech_new_web/features/gr/screen/gr_details.dart';
+import 'package:fintech_new_web/features/gr/screen/gr_details_report_form.dart';
+import 'package:fintech_new_web/features/gr/screen/gr_item_report.dart';
+import 'package:fintech_new_web/features/gr/screen/gr_item_report_form.dart';
+import 'package:fintech_new_web/features/gr/screen/gr_mat_edit.dart';
 import 'package:fintech_new_web/features/gr/screen/gr_rate_approval_pending.dart';
 import 'package:fintech_new_web/features/gr/screen/gr_rejection_pending.dart';
 import 'package:fintech_new_web/features/gr/screen/gr_report_form.dart';
 import 'package:fintech_new_web/features/gr/screen/gr_report_screen.dart';
 import 'package:fintech_new_web/features/gr/screen/gr_shortage_pending.dart';
+import 'package:fintech_new_web/features/gr/screen/sale_item_report.dart';
 import 'package:fintech_new_web/features/grIqsRep/screens/gr_iqs_pending.dart';
 import 'package:fintech_new_web/features/grIqsRep/screens/add_gr_iqs_rep.dart';
 import 'package:fintech_new_web/features/grOtherCharges/screens/add_gr_charges.dart';
+import 'package:fintech_new_web/features/grOtherCharges/screens/gr_other_charges_pending_form.dart';
 import 'package:fintech_new_web/features/grQtyClear/screens/add_gr_qty_clear.dart';
 import 'package:fintech_new_web/features/grQtyClear/screens/gr_qty_clear_pending.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/b2b_no_match_report.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/b2b_not_in_report.dart';
 import 'package:fintech_new_web/features/gstReturn/screens/b2b_report_form.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/b2cl_report.dart';
 import 'package:fintech_new_web/features/gstReturn/screens/crdr_note.dart';
 import 'package:fintech_new_web/features/gstReturn/screens/doc_type_report.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/generate_irn.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/get_b2b_no_match.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/get_b2b_not_in.dart';
 import 'package:fintech_new_web/features/gstReturn/screens/gst_hsn_report.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/gst_hsn_report_form.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/gst_r2b_upload.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/post_b2b.dart';
+import 'package:fintech_new_web/features/gstReturn/screens/update_b2b.dart';
 import 'package:fintech_new_web/features/hsn/screens/add_hsn.dart';
 import 'package:fintech_new_web/features/hsn/screens/get_hsn.dart';
 import 'package:fintech_new_web/features/hsn/screens/hsn_report.dart';
@@ -85,11 +119,14 @@ import 'package:fintech_new_web/features/jobWorkOut/screens/add_job_work_out_det
 import 'package:fintech_new_web/features/jobWorkOut/screens/job_workout_report.dart';
 import 'package:fintech_new_web/features/jobWorkOut/screens/job_workout_report_form.dart';
 import 'package:fintech_new_web/features/jobWorkOutChallanClear/screens/add_job_work_out_challan_clear.dart';
+import 'package:fintech_new_web/features/ledger/screens/trail.dart';
 import 'package:fintech_new_web/features/ledgerCodes/screen/get_ledger_codes.dart';
 import 'package:fintech_new_web/features/ledgerCodes/screen/ledger_code_report.dart';
 import 'package:fintech_new_web/features/ledgerCodes/screen/ledger_code_report_form.dart';
 import 'package:fintech_new_web/features/ledgerCodes/screen/ledger_codes.dart';
 import 'package:fintech_new_web/features/lineRejection/screens/add_line_rejection.dart';
+import 'package:fintech_new_web/features/lineRejection/screens/get_line_rejection.dart';
+import 'package:fintech_new_web/features/lineRejection/screens/line_rejection_pending.dart';
 import 'package:fintech_new_web/features/manufacturing/screens/add_manufacturing.dart';
 import 'package:fintech_new_web/features/manufacturing/screens/manufacturing_report.dart';
 import 'package:fintech_new_web/features/manufacturing/screens/manufacturing_report_form.dart';
@@ -103,6 +140,18 @@ import 'package:fintech_new_web/features/material/screen/material_rep_report.dar
 import 'package:fintech_new_web/features/material/screen/material_report.dart';
 import 'package:fintech_new_web/features/material/screen/material_report_form.dart';
 import 'package:fintech_new_web/features/material/screen/material_type_report.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/delete_material_assembly.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/delete_material_assembly_details.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/delete_material_assembly_processing.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/get_material_assembly.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/material_assembly.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/material_assembly_costing_report.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/material_assembly_costing_report_form.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/material_assembly_details.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/material_assembly_processing.dart';
+import 'package:fintech_new_web/features/materialAssembly/screens/material_assembly_report_form.dart';
+import 'package:fintech_new_web/features/materialAssemblyTechDetails/screens/get_mat_assembly_tech_details.dart';
+import 'package:fintech_new_web/features/materialAssemblyTechDetails/screens/material_assembly_tech_details.dart';
 import 'package:fintech_new_web/features/materialIQS/screens/create_material_iqs.dart';
 import 'package:fintech_new_web/features/materialIQS/screens/get-material-iqs.dart';
 import 'package:fintech_new_web/features/materialIncomingStandard/screens/add_material_incoming_standard.dart';
@@ -113,6 +162,14 @@ import 'package:fintech_new_web/features/materialSource/screen/get_material_sour
 import 'package:fintech_new_web/features/materialSource/screen/material_source.dart';
 import 'package:fintech_new_web/features/materialSource/screen/material_source_report.dart';
 import 'package:fintech_new_web/features/materialSource/screen/material_source_report_form.dart';
+import 'package:fintech_new_web/features/materialTechDetails/screens/add_material_tech_details.dart';
+import 'package:fintech_new_web/features/materialTechDetails/screens/get_material_tech_details.dart';
+import 'package:fintech_new_web/features/materialTechDetails/screens/material_tech_detail_report_form.dart';
+import 'package:fintech_new_web/features/materialTechDetails/screens/material_tech_details_report.dart';
+import 'package:fintech_new_web/features/obMaterial/screens/get_ob_material.dart';
+import 'package:fintech_new_web/features/obMaterial/screens/ob_material_report.dart';
+import 'package:fintech_new_web/features/obMaterial/screens/ob_material_report_form.dart';
+import 'package:fintech_new_web/features/obMaterial/screens/ob_material_screen.dart';
 import 'package:fintech_new_web/features/obalance/screens/create-obalance.dart';
 import 'package:fintech_new_web/features/obalance/screens/get-obalance.dart';
 import 'package:fintech_new_web/features/obalance/screens/obalance_report.dart';
@@ -120,6 +177,8 @@ import 'package:fintech_new_web/features/obalance/screens/obalance_report_form.d
 import 'package:fintech_new_web/features/orderApRequest/screens/add_order_ap_request.dart';
 import 'package:fintech_new_web/features/orderApRequest/screens/get_pending_ap_request.dart';
 import 'package:fintech_new_web/features/orderApproval/screens/add_order_approval.dart';
+import 'package:fintech_new_web/features/orderBilled/screens/edit_order_billed.dart';
+import 'package:fintech_new_web/features/orderBilled/screens/get_billed_order.dart';
 import 'package:fintech_new_web/features/orderBilled/screens/get_order_billed_pending.dart';
 import 'package:fintech_new_web/features/orderBilled/screens/upload_order_bill.dart';
 import 'package:fintech_new_web/features/orderCancel/screens/add_order_cancel.dart';
@@ -134,22 +193,35 @@ import 'package:fintech_new_web/features/orderTransport/screens/add_order_transp
 import 'package:fintech_new_web/features/orderTransport/screens/get_order_transport_pending.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/create_part_assembly_details.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/create_part_assembly_processing.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/get_part_assembly.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/not_in_bill_of_material.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/not_in_bill_of_material_report.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_by_matno.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_costing_report.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_costing_report_form.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_details.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_details_master_table.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_processing_table.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_report.dart';
 import 'package:fintech_new_web/features/partAssembly/screens/part_assembly_report_form.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/part_search.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/part_search_report.dart';
+import 'package:fintech_new_web/features/partAssembly/screens/update_part_assembly.dart';
+import 'package:fintech_new_web/features/partSubAssembly/screens/get_part_sub_assembly.dart';
+import 'package:fintech_new_web/features/partSubAssembly/screens/part_sub_assembly_costing_report.dart';
+import 'package:fintech_new_web/features/partSubAssembly/screens/part_sub_assembly_costing_report_form.dart';
 import 'package:fintech_new_web/features/partSubAssembly/screens/part_sub_assembly_report_form.dart';
 import 'package:fintech_new_web/features/payment/screens/add_payment.dart';
 import 'package:fintech_new_web/features/payment/screens/payment_outward_report.dart';
 import 'package:fintech_new_web/features/payment/screens/payment_outward_report_form.dart';
 import 'package:fintech_new_web/features/paymentClear/screens/add_payment_clear.dart';
+import 'package:fintech_new_web/features/paymentClear/screens/add_unadjusted_payment_clear.dart';
 import 'package:fintech_new_web/features/paymentClear/screens/payment_advance_pending.dart';
 import 'package:fintech_new_web/features/payment/screens/bill_pending_report.dart';
 import 'package:fintech_new_web/features/paymentClear/screens/unadjusted_payment_pending.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/add_cr_note_clear.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/add_payment_inward.dart';
+import 'package:fintech_new_web/features/paymentInward/screens/add_unadjusted_payment_inward_clear.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/payment_inward_post.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/payment_inward_report_form.dart';
 import 'package:fintech_new_web/features/paymentInward/screens/unadjusted_payment_inward.dart';
@@ -158,11 +230,20 @@ import 'package:fintech_new_web/features/prTaxInvoice/screens/pr_tax_invoice_det
 import 'package:fintech_new_web/features/prTaxInvoice/screens/pr_tax_invoice_report.dart';
 import 'package:fintech_new_web/features/prTaxInvoice/screens/pr_tax_invoice_report_form.dart';
 import 'package:fintech_new_web/features/prTaxInvoiceDispatch/screens/add_pr_tax_invoice_dispatch.dart';
+import 'package:fintech_new_web/features/productBreakup/screens/get_product_breakup.dart';
+import 'package:fintech_new_web/features/productBreakup/screens/pb_costing_report.dart';
+import 'package:fintech_new_web/features/productBreakup/screens/pb_costing_report_form.dart';
 import 'package:fintech_new_web/features/productBreakup/screens/product_breakup_report_form.dart';
+import 'package:fintech_new_web/features/productBreakup/screens/update_product_breakup.dart';
 import 'package:fintech_new_web/features/productBreakupTechDetails/screens/add_product_breakup_tech_details.dart';
 import 'package:fintech_new_web/features/productFinalStandard/screens/add_product_final_standard.dart';
 import 'package:fintech_new_web/features/productionPlan/screens/add_production_plan.dart';
 import 'package:fintech_new_web/features/productionPlan/screens/delete_production_plan.dart';
+import 'package:fintech_new_web/features/productionPlan/screens/production_plan_AS.dart';
+import 'package:fintech_new_web/features/productionPlan/screens/production_plan_report_PLN.dart';
+import 'package:fintech_new_web/features/productionPlan/screens/production_plan_report_RM.dart';
+import 'package:fintech_new_web/features/productionPlan/screens/production_plan_report_form.dart';
+import 'package:fintech_new_web/features/purchaseOrder/screen/purchase_order_item_report_form.dart';
 import 'package:fintech_new_web/features/purchaseTransfer/screens/add_purchase_transfer.dart';
 import 'package:fintech_new_web/features/purchaseTransfer/screens/add_purchase_transfer_clear.dart';
 import 'package:fintech_new_web/features/purchaseTransfer/screens/purchase_bill_pending_report.dart';
@@ -171,6 +252,7 @@ import 'package:fintech_new_web/features/reOrderBalanceMaterial/screens/re_order
 import 'package:fintech_new_web/features/reOrderBalanceMaterial/screens/re_order_bal_mat_report_form.dart';
 import 'package:fintech_new_web/features/receiptVoucher/screens/create_receipt_voucher.dart';
 import 'package:fintech_new_web/features/reqIssue/screens/add_req_issue.dart';
+import 'package:fintech_new_web/features/reqIssue/screens/req_issue_mat_edit.dart';
 import 'package:fintech_new_web/features/reqIssue/screens/req_issue_pending.dart';
 import 'package:fintech_new_web/features/reqIssue/screens/req_issue_pending_form.dart';
 import 'package:fintech_new_web/features/reqIssue/screens/req_issue_summary.dart';
@@ -182,6 +264,7 @@ import 'package:fintech_new_web/features/reqProduction/screens/add_req_productio
 import 'package:fintech_new_web/features/reqProduction/screens/req_production_pending.dart';
 import 'package:fintech_new_web/features/resources/screens/resource_report.dart';
 import 'package:fintech_new_web/features/resources/screens/resources.dart';
+import 'package:fintech_new_web/features/reverseCharge/screens/add_reverse_charge.dart';
 import 'package:fintech_new_web/features/saleTransfer/screens/add_sale_transfer.dart';
 import 'package:fintech_new_web/features/saleTransfer/screens/add_sale_transfer_clear.dart';
 import 'package:fintech_new_web/features/saleTransfer/screens/payment_pending_report.dart';
@@ -203,11 +286,14 @@ import 'package:fintech_new_web/features/salesOrder/screens/sales_report_form.da
 import 'package:fintech_new_web/features/taClaim/screens/add_ta_claim.dart';
 import 'package:fintech_new_web/features/taClaim/screens/claim_report.dart';
 import 'package:fintech_new_web/features/taClaim/screens/get_claim_report.dart';
+import 'package:fintech_new_web/features/tod/screens/tod_report_form.dart';
 import 'package:fintech_new_web/features/visitInfo/screens/add_visit_info.dart';
 import 'package:fintech_new_web/features/visitInfo/screens/get_visit_info_report.dart';
 import 'package:fintech_new_web/features/wireSize/screens/add_wire_size_details.dart';
 import 'package:fintech_new_web/features/wireSize/screens/wire_size_by_matno.dart';
 import 'package:fintech_new_web/features/wireSize/screens/wire_size_details.dart';
+import 'package:fintech_new_web/features/wireSize/screens/wire_size_report.dart';
+import 'package:fintech_new_web/features/wireSize/screens/ws_report_form.dart';
 import 'package:fintech_new_web/features/workProcess/screens/add_work_process.dart';
 import 'package:fintech_new_web/features/workProcess/screens/get_work_process.dart';
 import 'package:fintech_new_web/features/workProcess/screens/work_process_report.dart';
@@ -216,22 +302,33 @@ import 'package:go_router/go_router.dart';
 
 import 'features/auth/screen/forget_password.dart';
 import 'features/auth/screen/login.dart';
+import 'features/bpBreakup/screens/bp_breakup_details.dart';
+import 'features/bpBreakup/screens/delete_bp_breakup_processing.dart';
 import 'features/businessPartner/screen/get-business-partner.dart';
 import 'features/businessPartner/screen/bp_search_report.dart';
 import 'features/businessPartner/screen/business_partner_search_form.dart';
 import 'features/businessPartner/screen/business_partner_tabs.dart';
+import 'features/businessPartnerObMaterial/screens/bp_ob_material.dart';
+import 'features/businessPartnerOnBoard/screens/bp_on_board_report.dart';
+import 'features/businessPartnerOnBoard/screens/bp_on_board_report_form.dart';
 import 'features/company/screens/add_company_form.dart';
 import 'features/crNote/screens/upload_cr_note_invoice.dart';
 import 'features/gr/screen/add_gr_rate_approval.dart';
 import 'features/gr/screen/gr_rate_difference_pending.dart';
 import 'features/gr/screen/pending_gr_report.dart';
+import 'features/gr/screen/sale_item_report_form.dart';
+import 'features/grOtherCharges/screens/gr_other_charges_pending.dart';
+import 'features/gstReturn/screens/b2b_match_report.dart';
 import 'features/gstReturn/screens/b2b_report.dart';
 import 'features/gstReturn/screens/b2c_report.dart';
+import 'features/gstReturn/screens/get_b2b_match.dart';
 import 'features/home.dart';
 import 'features/hsn/screens/ac_groups_report.dart';
 import 'features/inward/screens/tds_report.dart';
+import 'features/ledger/screens/ledger.dart';
 import 'features/material/screen/material_screen.dart';
 import 'features/material/screen/material_unit_report.dart';
+import 'features/materialTechDetails/screens/delete_material_tech_details.dart';
 import 'features/orderApproval/screens/get_order_approval_pending.dart';
 import 'features/orderApproval/screens/hold_denied_order_report.dart';
 import 'features/partAssembly/screens/part_assembly_details_table.dart';
@@ -244,6 +341,7 @@ import 'features/partSubAssembly/screens/part_sub_assembly_details_master_table.
 import 'features/partSubAssembly/screens/part_sub_assembly_details_table.dart';
 import 'features/partSubAssembly/screens/part_sub_assembly_processing_table.dart';
 import 'features/partSubAssembly/screens/part_sub_assembly_report.dart';
+import 'features/partSubAssembly/screens/update_part_sub_assembly.dart';
 import 'features/payment/screens/bill_pending_report_form.dart';
 import 'features/paymentInward/screens/payment_inward_report.dart';
 import 'features/paymentInwardClear/screens/add_payment_inward_clear.dart';
@@ -258,11 +356,14 @@ import 'features/productBreakup/screens/product_breakup_processing_table.dart';
 import 'features/productBreakup/screens/product_breakup_report.dart';
 import 'features/productionPlanA/screen/add_production_planA.dart';
 import 'features/purchaseOrder/screen/purchase_order.dart';
+import 'features/purchaseOrder/screen/purchase_order_item_report.dart';
 import 'features/purchaseOrder/screen/purchase_order_report_form.dart';
 import 'features/purchaseOrder/screen/purchase_order_report_screen.dart';
 import 'features/resources/screens/get_resources.dart';
+import 'features/reverseCharge/screens/reverse_charge_report_form.dart';
 import 'features/salesDebitNote/screens/sale_debit_note_report.dart';
 import 'features/salesOrder/screens/delete_order_material.dart';
+import 'features/salesOrder/screens/einvoice_pending.dart';
 import 'features/salesOrder/screens/orderBalance/order_balance_report.dart';
 import 'features/salesOrder/screens/sales_report.dart';
 import 'features/salesOrder/screens/transport_slip.dart';
@@ -272,6 +373,7 @@ import 'features/warehouse/screen/warehouse.dart';
 import 'features/wireSize/screens/edit_wire_size.dart';
 import 'features/wireSize/screens/edit_wire_size_details.dart';
 import 'features/wireSize/screens/wire_size_details_table.dart';
+import 'features/wireSize/screens/ws_report.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -284,42 +386,43 @@ class AppRouter {
             return const HomeScreen();
           }),
       GoRoute(
-        path: LoginScreen.routeName,
-        name: "/login",
-        builder: (context, state) {
-          return const LoginScreen();
-        },
-        routes: [
-          GoRoute(
-            path: OTPVerificationScreen.routeName,
-            name: OTPVerificationScreen.routeName,
-            builder: (context, state) {
-              return const OTPVerificationScreen();
-            },
-          ),
-          GoRoute(
-            path: Register2fa.routeName,
-            name: Register2fa.routeName,
-            builder: (context, state) {
-              return Register2fa(qrUrl: state.uri.queryParameters['qrUrl'] ?? "");
-            },
-          ),
-          GoRoute(
-            path: ForgetPassword.routeName,
-            name: ForgetPassword.routeName,
-            builder: (context, state) {
-              return const ForgetPassword();
-            },
-          ),
-          GoRoute(
-            path: UpdatePassword.routeName,
-            name: UpdatePassword.routeName,
-            builder: (context, state) {
-              return UpdatePassword(email: state.uri.queryParameters['email'] ?? "");
-            },
-          ),
-        ]
-      ),
+          path: LoginScreen.routeName,
+          name: "/login",
+          builder: (context, state) {
+            return const LoginScreen();
+          },
+          routes: [
+            GoRoute(
+              path: OTPVerificationScreen.routeName,
+              name: OTPVerificationScreen.routeName,
+              builder: (context, state) {
+                return const OTPVerificationScreen();
+              },
+            ),
+            GoRoute(
+              path: Register2fa.routeName,
+              name: Register2fa.routeName,
+              builder: (context, state) {
+                return Register2fa(
+                    qrUrl: state.uri.queryParameters['qrUrl'] ?? "");
+              },
+            ),
+            GoRoute(
+              path: ForgetPassword.routeName,
+              name: ForgetPassword.routeName,
+              builder: (context, state) {
+                return const ForgetPassword();
+              },
+            ),
+            GoRoute(
+              path: UpdatePassword.routeName,
+              name: UpdatePassword.routeName,
+              builder: (context, state) {
+                return UpdatePassword(
+                    email: state.uri.queryParameters['email'] ?? "");
+              },
+            ),
+          ]),
 
       GoRoute(
         path: AddCompanyForm.routeName,
@@ -353,6 +456,18 @@ class AppRouter {
                 name: BpReport.routeName,
                 builder: (context, state) {
                   return const BpReport();
+                }),
+            GoRoute(
+                path: BpPaymentInfoReportForm.routeName,
+                name: BpPaymentInfoReportForm.routeName,
+                builder: (context, state) {
+                  return const BpPaymentInfoReportForm();
+                }),
+            GoRoute(
+                path: BpPaymentInfoReport.routeName,
+                name: BpPaymentInfoReport.routeName,
+                builder: (context, state) {
+                  return const BpPaymentInfoReport();
                 })
           ]),
       GoRoute(
@@ -377,29 +492,29 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: BusinessPartner.routeName,
-        name: BusinessPartner.routeName,
-        builder: (context, state) {
-          return BusinessPartner(
-              editing: state.uri.queryParameters['editing'] ?? '');
-        },
-        routes: [
-          GoRoute(
-            path: GetBpTaxInfo.routeName,
-            name: GetBpTaxInfo.routeName,
-            builder: (context, state) {
-              return const GetBpTaxInfo();
-            },
-          ),
-          GoRoute(
-            path: EditBpTaxInfo.routeName,
-            name: EditBpTaxInfo.routeName,
-            builder: (context, state) {
-              return EditBpTaxInfo(bpCode: state.uri.queryParameters['bpCode'] ?? "");
-            },
-          ),
-        ]
-      ),
+          path: BusinessPartner.routeName,
+          name: BusinessPartner.routeName,
+          builder: (context, state) {
+            return BusinessPartner(
+                editing: state.uri.queryParameters['editing'] ?? '');
+          },
+          routes: [
+            GoRoute(
+              path: GetBpTaxInfo.routeName,
+              name: GetBpTaxInfo.routeName,
+              builder: (context, state) {
+                return const GetBpTaxInfo();
+              },
+            ),
+            GoRoute(
+              path: EditBpTaxInfo.routeName,
+              name: EditBpTaxInfo.routeName,
+              builder: (context, state) {
+                return EditBpTaxInfo(
+                    bpCode: state.uri.queryParameters['bpCode'] ?? "");
+              },
+            ),
+          ]),
       GoRoute(
           path: LedgerCodes.routeName,
           name: LedgerCodes.routeName,
@@ -561,6 +676,20 @@ class AppRouter {
                 return const PurchaseOrderReportScreen();
               },
             ),
+            GoRoute(
+              path: PurchaseOrderItemReportForm.routeName,
+              name: PurchaseOrderItemReportForm.routeName,
+              builder: (context, state) {
+                return const PurchaseOrderItemReportForm();
+              },
+            ),
+            GoRoute(
+              path: PurchaseOrderItemReport.routeName,
+              name: PurchaseOrderItemReport.routeName,
+              builder: (context, state) {
+                return const PurchaseOrderItemReport();
+              },
+            ),
           ]),
       GoRoute(
         path: BusinessPartnerTabs.routeName,
@@ -633,6 +762,43 @@ class AppRouter {
                 builder: (context, state) {
                   return const GrReportScreen();
                 }),
+            GoRoute(
+                path: GrDetailsReportForm.routeName,
+                name: GrDetailsReportForm.routeName,
+                builder: (context, state) {
+                  return const GrDetailsReportForm();
+                }),
+            GoRoute(
+                path: GrMatEdit.routeName,
+                name: GrMatEdit.routeName,
+                builder: (context, state) {
+                  return GrMatEdit(
+                      grdId: state.uri.queryParameters['grdId'] ?? "");
+                }),
+            GoRoute(
+                path: GrItemReportForm.routeName,
+                name: GrItemReportForm.routeName,
+                builder: (context, state) {
+                  return const GrItemReportForm();
+                }),
+            GoRoute(
+                path: GrItemReport.routeName,
+                name: GrItemReport.routeName,
+                builder: (context, state) {
+                  return const GrItemReport();
+                }),
+            GoRoute(
+                path: SaleItemReport.routeName,
+                name: SaleItemReport.routeName,
+                builder: (context, state) {
+                  return const SaleItemReport();
+                }),
+            GoRoute(
+                path: SaleItemReportForm.routeName,
+                name: SaleItemReportForm.routeName,
+                builder: (context, state) {
+                  return const SaleItemReportForm();
+                }),
           ]),
       GoRoute(
           path: BillReceipt.routeName,
@@ -671,20 +837,21 @@ class AppRouter {
           name: AdditionalOrder.routeName,
           builder: (context, state) {
             return const AdditionalOrder();
-          }, routes: [
-        GoRoute(
-            path: AdditionalPurchaseOrderReportForm.routeName,
-            name: AdditionalPurchaseOrderReportForm.routeName,
-            builder: (context, state) {
-              return const AdditionalPurchaseOrderReportForm();
-            }),
-        GoRoute(
-            path: AdditionalPurchaseOrderReport.routeName,
-            name: AdditionalPurchaseOrderReport.routeName,
-            builder: (context, state) {
-              return const AdditionalPurchaseOrderReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: AdditionalPurchaseOrderReportForm.routeName,
+                name: AdditionalPurchaseOrderReportForm.routeName,
+                builder: (context, state) {
+                  return const AdditionalPurchaseOrderReportForm();
+                }),
+            GoRoute(
+                path: AdditionalPurchaseOrderReport.routeName,
+                name: AdditionalPurchaseOrderReport.routeName,
+                builder: (context, state) {
+                  return const AdditionalPurchaseOrderReport();
+                }),
+          ]),
       GoRoute(
           path: CreateMaterialIqs.routeName,
           name: CreateMaterialIqs.routeName,
@@ -860,77 +1027,81 @@ class AppRouter {
           name: DbNoteDetails.routeName,
           builder: (context, state) {
             return const DbNoteDetails();
-          }, routes: [
-        GoRoute(
-            path: DbNoteReportForm.routeName,
-            name: DbNoteReportForm.routeName,
-            builder: (context, state) {
-              return const DbNoteReportForm();
-            }),
-        GoRoute(
-            path: DbNoteReport.routeName,
-            name: DbNoteReport.routeName,
-            builder: (context, state) {
-              return const DbNoteReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: DbNoteReportForm.routeName,
+                name: DbNoteReportForm.routeName,
+                builder: (context, state) {
+                  return const DbNoteReportForm();
+                }),
+            GoRoute(
+                path: DbNoteReport.routeName,
+                name: DbNoteReport.routeName,
+                builder: (context, state) {
+                  return const DbNoteReport();
+                }),
+          ]),
       GoRoute(
           path: PrTaxInvoiceDetails.routeName,
           name: PrTaxInvoiceDetails.routeName,
           builder: (context, state) {
             return const PrTaxInvoiceDetails();
-          }, routes: [
-        GoRoute(
-            path: PrTaxInvoiceReportForm.routeName,
-            name: PrTaxInvoiceReportForm.routeName,
-            builder: (context, state) {
-              return const PrTaxInvoiceReportForm();
-            }),
-        GoRoute(
-            path: PrTaxInvoiceReport.routeName,
-            name: PrTaxInvoiceReport.routeName,
-            builder: (context, state) {
-              return const PrTaxInvoiceReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: PrTaxInvoiceReportForm.routeName,
+                name: PrTaxInvoiceReportForm.routeName,
+                builder: (context, state) {
+                  return const PrTaxInvoiceReportForm();
+                }),
+            GoRoute(
+                path: PrTaxInvoiceReport.routeName,
+                name: PrTaxInvoiceReport.routeName,
+                builder: (context, state) {
+                  return const PrTaxInvoiceReport();
+                }),
+          ]),
       GoRoute(
           path: CrNoteDetails.routeName,
           name: CrNoteDetails.routeName,
           builder: (context, state) {
             return const CrNoteDetails();
-          }, routes: [
-        GoRoute(
-            path: CrNoteReportForm.routeName,
-            name: CrNoteReportForm.routeName,
-            builder: (context, state) {
-              return const CrNoteReportForm();
-            }),
-        GoRoute(
-            path: CreditNoteReport.routeName,
-            name: CreditNoteReport.routeName,
-            builder: (context, state) {
-              return const CreditNoteReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: CrNoteReportForm.routeName,
+                name: CrNoteReportForm.routeName,
+                builder: (context, state) {
+                  return const CrNoteReportForm();
+                }),
+            GoRoute(
+                path: CreditNoteReport.routeName,
+                name: CreditNoteReport.routeName,
+                builder: (context, state) {
+                  return const CreditNoteReport();
+                }),
+          ]),
       GoRoute(
           path: SalesDebitNoteDetails.routeName,
           name: SalesDebitNoteDetails.routeName,
           builder: (context, state) {
             return const SalesDebitNoteDetails();
-          }, routes: [
-        GoRoute(
-            path: SaleDebitNoteReportForm.routeName,
-            name: SaleDebitNoteReportForm.routeName,
-            builder: (context, state) {
-              return const SaleDebitNoteReportForm();
-            }),
-        GoRoute(
-            path: SaleDebitNoteReport.routeName,
-            name: SaleDebitNoteReport.routeName,
-            builder: (context, state) {
-              return const SaleDebitNoteReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: SaleDebitNoteReportForm.routeName,
+                name: SaleDebitNoteReportForm.routeName,
+                builder: (context, state) {
+                  return const SaleDebitNoteReportForm();
+                }),
+            GoRoute(
+                path: SaleDebitNoteReport.routeName,
+                name: SaleDebitNoteReport.routeName,
+                builder: (context, state) {
+                  return const SaleDebitNoteReport();
+                }),
+          ]),
       GoRoute(
           path: AddDebitNoteDispatch.routeName,
           name: AddDebitNoteDispatch.routeName,
@@ -1103,6 +1274,18 @@ class AppRouter {
                 builder: (context, state) {
                   return const GrQtyClearPending();
                 }),
+            GoRoute(
+                path: GrOtherChargesPendingForm.routeName,
+                name: GrOtherChargesPendingForm.routeName,
+                builder: (context, state) {
+                  return const GrOtherChargesPendingForm();
+                }),
+            GoRoute(
+                path: GrOtherChargesPending.routeName,
+                name: GrOtherChargesPending.routeName,
+                builder: (context, state) {
+                  return const GrOtherChargesPending();
+                }),
           ]),
       GoRoute(
           path: AddGrIqsRep.routeName,
@@ -1207,7 +1390,21 @@ class AppRouter {
           name: GetOrderBilledPending.routeName,
           builder: (context, state) {
             return const GetOrderBilledPending();
-          }),
+          },
+          routes: [
+            GoRoute(
+                path: GetBilledOrder.routeName,
+                name: GetBilledOrder.routeName,
+                builder: (context, state) {
+                  return const GetBilledOrder();
+                }),
+            GoRoute(
+                path: EditOrderBilled.routeName,
+                name: EditOrderBilled.routeName,
+                builder: (context, state) {
+                  return const EditOrderBilled();
+                }),
+          ]),
       GoRoute(
           path: OrderPackagingPending.routeName,
           name: OrderPackagingPending.routeName,
@@ -1275,6 +1472,24 @@ class AppRouter {
                   return EditWireSize(
                       editData: state.uri.queryParameters['editData'] ?? "");
                 }),
+            GoRoute(
+                path: WireSizeReport.routeName,
+                name: WireSizeReport.routeName,
+                builder: (context, state) {
+                  return const WireSizeReport();
+                }),
+            GoRoute(
+                path: WsReportForm.routeName,
+                name: WsReportForm.routeName,
+                builder: (context, state) {
+                  return const WsReportForm();
+                }),
+            GoRoute(
+                path: WsReport.routeName,
+                name: WsReport.routeName,
+                builder: (context, state) {
+                  return const WsReport();
+                }),
           ]),
       GoRoute(
           path: AddPayment.routeName,
@@ -1297,7 +1512,6 @@ class AppRouter {
                 builder: (context, state) {
                   return const BillPendingReport();
                 }),
-
             GoRoute(
                 path: PaymentOutwardReportForm.routeName,
                 name: PaymentOutwardReportForm.routeName,
@@ -1316,44 +1530,47 @@ class AppRouter {
           name: BankUpload.routeName,
           builder: (context, state) {
             return const BankUpload();
-          }, routes: [
-        GoRoute(
-            path: BankReportFormSales.routeName,
-            name: BankReportFormSales.routeName,
-            builder: (context, state) {
-              return const BankReportFormSales();
-            }),
-        GoRoute(
-            path: BankReportForm.routeName,
-            name: BankReportForm.routeName,
-            builder: (context, state) {
-              return const BankReportForm();
-            }),
-        GoRoute(
-            path: BankReport.routeName,
-            name: BankReport.routeName,
-            builder: (context, state) {
-              return const BankReport();
-            }),
-        GoRoute(
-            path: BankUpdate.routeName,
-            name: BankUpdate.routeName,
-            builder: (context, state) {
-              return BankUpdate(bankDetails: state.uri.queryParameters['bankDetails'] ?? "");
-            }),
-        GoRoute(
-            path: UploadKotak.routeName,
-            name: UploadKotak.routeName,
-            builder: (context, state) {
-              return const UploadKotak();
-            }),
-        GoRoute(
-            path: UploadHdfc.routeName,
-            name: UploadHdfc.routeName,
-            builder: (context, state) {
-              return const UploadHdfc();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: BankReportFormSales.routeName,
+                name: BankReportFormSales.routeName,
+                builder: (context, state) {
+                  return const BankReportFormSales();
+                }),
+            GoRoute(
+                path: BankReportForm.routeName,
+                name: BankReportForm.routeName,
+                builder: (context, state) {
+                  return const BankReportForm();
+                }),
+            GoRoute(
+                path: BankReport.routeName,
+                name: BankReport.routeName,
+                builder: (context, state) {
+                  return const BankReport();
+                }),
+            GoRoute(
+                path: BankUpdate.routeName,
+                name: BankUpdate.routeName,
+                builder: (context, state) {
+                  return BankUpdate(
+                      bankDetails:
+                          state.uri.queryParameters['bankDetails'] ?? "");
+                }),
+            GoRoute(
+                path: UploadKotak.routeName,
+                name: UploadKotak.routeName,
+                builder: (context, state) {
+                  return const UploadKotak();
+                }),
+            GoRoute(
+                path: UploadHdfc.routeName,
+                name: UploadHdfc.routeName,
+                builder: (context, state) {
+                  return const UploadHdfc();
+                }),
+          ]),
 
       GoRoute(
           path: PartAssemblyByMatno.routeName,
@@ -1362,6 +1579,19 @@ class AppRouter {
             return const PartAssemblyByMatno();
           },
           routes: [
+            GoRoute(
+                path: GetPartAssembly.routeName,
+                name: GetPartAssembly.routeName,
+                builder: (context, state) {
+                  return const GetPartAssembly();
+                }),
+            GoRoute(
+                path: UpdatePartAssembly.routeName,
+                name: UpdatePartAssembly.routeName,
+                builder: (context, state) {
+                  return const UpdatePartAssembly();
+                }),
+
             GoRoute(
                 path: PartAssemblyDetails.routeName,
                 name: PartAssemblyDetails.routeName,
@@ -1416,6 +1646,18 @@ class AppRouter {
                 builder: (context, state) {
                   return const WorkInProgressReport();
                 }),
+            GoRoute(
+                path: PartAssemblyCostingReportForm.routeName,
+                name: PartAssemblyCostingReportForm.routeName,
+                builder: (context, state) {
+                  return const PartAssemblyCostingReportForm();
+                }),
+            GoRoute(
+                path: PartAssemblyCostingReport.routeName,
+                name: PartAssemblyCostingReport.routeName,
+                builder: (context, state) {
+                  return const PartAssemblyCostingReport();
+                }),
           ]),
 
       GoRoute(
@@ -1425,6 +1667,20 @@ class AppRouter {
             return const PartSubAssemblyByMatno();
           },
           routes: [
+
+            GoRoute(
+                path: GetPartSubAssembly.routeName,
+                name: GetPartSubAssembly.routeName,
+                builder: (context, state) {
+                  return const GetPartSubAssembly();
+                }),
+            GoRoute(
+                path: UpdatePartSubAssembly.routeName,
+                name: UpdatePartSubAssembly.routeName,
+                builder: (context, state) {
+                  return const UpdatePartSubAssembly();
+                }),
+
             GoRoute(
                 path: PartSubAssemblyDetails.routeName,
                 name: PartSubAssemblyDetails.routeName,
@@ -1473,6 +1729,18 @@ class AppRouter {
                 builder: (context, state) {
                   return const PartSubAssemblyReport();
                 }),
+            GoRoute(
+                path: PartSubAssemblyCostingReportForm.routeName,
+                name: PartSubAssemblyCostingReportForm.routeName,
+                builder: (context, state) {
+                  return const PartSubAssemblyCostingReportForm();
+                }),
+            GoRoute(
+                path: PartSubAssemblyCostingReport.routeName,
+                name: PartSubAssemblyCostingReport.routeName,
+                builder: (context, state) {
+                  return const PartSubAssemblyCostingReport();
+                }),
           ]),
 
       // PRODUCT BREAKUP
@@ -1484,6 +1752,20 @@ class AppRouter {
             return const ProductBreakupByMatno();
           },
           routes: [
+            GoRoute(
+                path: GetProductBreakup.routeName,
+                name: GetProductBreakup.routeName,
+                builder: (context, state) {
+                  return const GetProductBreakup();
+                }),
+
+            GoRoute(
+                path: UpdateProductBreakup.routeName,
+                name: UpdateProductBreakup.routeName,
+                builder: (context, state) {
+                  return const UpdateProductBreakup();
+                }),
+
             GoRoute(
                 path: ProductBreakupDetails.routeName,
                 name: ProductBreakupDetails.routeName,
@@ -1531,6 +1813,18 @@ class AppRouter {
                 name: ProductBreakupReport.routeName,
                 builder: (context, state) {
                   return const ProductBreakupReport();
+                }),
+            GoRoute(
+                path: PbCostingReportForm.routeName,
+                name: PbCostingReportForm.routeName,
+                builder: (context, state) {
+                  return const PbCostingReportForm();
+                }),
+            GoRoute(
+                path: PbCostingReport.routeName,
+                name: PbCostingReport.routeName,
+                builder: (context, state) {
+                  return const PbCostingReport();
                 }),
           ]),
       GoRoute(
@@ -1821,20 +2115,21 @@ class AppRouter {
           name: AddJobWorkOut.routeName,
           builder: (context, state) {
             return const AddJobWorkOut();
-          }, routes: [
-        GoRoute(
-            path: JobWorkoutReportForm.routeName,
-            name: JobWorkoutReportForm.routeName,
-            builder: (context, state) {
-              return const JobWorkoutReportForm();
-            }),
-        GoRoute(
-            path: JobWorkoutReport.routeName,
-            name: JobWorkoutReport.routeName,
-            builder: (context, state) {
-              return const JobWorkoutReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: JobWorkoutReportForm.routeName,
+                name: JobWorkoutReportForm.routeName,
+                builder: (context, state) {
+                  return const JobWorkoutReportForm();
+                }),
+            GoRoute(
+                path: JobWorkoutReport.routeName,
+                name: JobWorkoutReport.routeName,
+                builder: (context, state) {
+                  return const JobWorkoutReport();
+                }),
+          ]),
       GoRoute(
           path: AddReq.routeName,
           name: AddReq.routeName,
@@ -1917,26 +2212,34 @@ class AppRouter {
                 builder: (context, state) {
                   return const ReqIssueSummary();
                 }),
+            GoRoute(
+                path: ReqIssueMatEdit.routeName,
+                name: ReqIssueMatEdit.routeName,
+                builder: (context, state) {
+                  return ReqIssueMatEdit(
+                      reqdId: state.uri.queryParameters['reqdId'] ?? "");
+                }),
           ]),
       GoRoute(
           path: AddDlChallan.routeName,
           name: AddDlChallan.routeName,
           builder: (context, state) {
             return const AddDlChallan();
-          }, routes: [
-        GoRoute(
-            path: DlChallanReportForm.routeName,
-            name: DlChallanReportForm.routeName,
-            builder: (context, state) {
-              return const DlChallanReportForm();
-            }),
-        GoRoute(
-            path: DlChallanReport.routeName,
-            name: DlChallanReport.routeName,
-            builder: (context, state) {
-              return const DlChallanReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: DlChallanReportForm.routeName,
+                name: DlChallanReportForm.routeName,
+                builder: (context, state) {
+                  return const DlChallanReportForm();
+                }),
+            GoRoute(
+                path: DlChallanReport.routeName,
+                name: DlChallanReport.routeName,
+                builder: (context, state) {
+                  return const DlChallanReport();
+                }),
+          ]),
       GoRoute(
           path: AddJobWorkOutChallanClear.routeName,
           name: AddJobWorkOutChallanClear.routeName,
@@ -1948,14 +2251,39 @@ class AppRouter {
           name: AddProductionPlan.routeName,
           builder: (context, state) {
             return const AddProductionPlan();
-          }, routes: [
-        GoRoute(
-            path: DeleteProductionPlan.routeName,
-            name: DeleteProductionPlan.routeName,
-            builder: (context, state) {
-              return const DeleteProductionPlan();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: DeleteProductionPlan.routeName,
+                name: DeleteProductionPlan.routeName,
+                builder: (context, state) {
+                  return const DeleteProductionPlan();
+                }),
+            GoRoute(
+                path: ProductionPlanReportForm.routeName,
+                name: ProductionPlanReportForm.routeName,
+                builder: (context, state) {
+                  return const ProductionPlanReportForm();
+                }),
+            GoRoute(
+                path: ProductionPlanReportPLN.routeName,
+                name: ProductionPlanReportPLN.routeName,
+                builder: (context, state) {
+                  return const ProductionPlanReportPLN();
+                }),
+            GoRoute(
+                path: ProductionPlanReportRm.routeName,
+                name: ProductionPlanReportRm.routeName,
+                builder: (context, state) {
+                  return const ProductionPlanReportRm();
+                }),
+            GoRoute(
+                path: ProductionPlanReportAs.routeName,
+                name: ProductionPlanReportAs.routeName,
+                builder: (context, state) {
+                  return const ProductionPlanReportAs();
+                }),
+          ]),
       GoRoute(
           path: AddProductionPlanA.routeName,
           name: AddProductionPlanA.routeName,
@@ -1967,7 +2295,21 @@ class AppRouter {
           name: AddLineRejection.routeName,
           builder: (context, state) {
             return const AddLineRejection();
-          }),
+          },
+          routes: [
+            GoRoute(
+                path: GetLineRejection.routeName,
+                name: GetLineRejection.routeName,
+                builder: (context, state) {
+                  return const GetLineRejection();
+                }),
+            GoRoute(
+                path: LineRejectionPending.routeName,
+                name: LineRejectionPending.routeName,
+                builder: (context, state) {
+                  return const LineRejectionPending();
+                }),
+          ]),
       GoRoute(
           path: AddMaterialReturn.routeName,
           name: AddMaterialReturn.routeName,
@@ -1990,21 +2332,25 @@ class AppRouter {
           path: AddPaymentInwardClear.routeName,
           name: AddPaymentInwardClear.routeName,
           builder: (context, state) {
-            return AddPaymentInwardClear(details: state.uri.queryParameters['details'] ?? "");
+            return AddPaymentInwardClear(
+                details: state.uri.queryParameters['details'] ?? "");
           }),
       GoRoute(
           path: AddAdvanceReq.routeName,
           name: AddAdvanceReq.routeName,
           builder: (context, state) {
             return const AddAdvanceReq();
-          }, routes: [
-        GoRoute(
-            path: AdvanceReqReport.routeName,
-            name: AdvanceReqReport.routeName,
-            builder: (context, state) {
-              return AdvanceReqReport(reportData: state.uri.queryParameters['reportData'] ?? "");
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: AdvanceReqReport.routeName,
+                name: AdvanceReqReport.routeName,
+                builder: (context, state) {
+                  return AdvanceReqReport(
+                      reportData:
+                          state.uri.queryParameters['reportData'] ?? "");
+                }),
+          ]),
       GoRoute(
           path: TransportSlip.routeName,
           name: TransportSlip.routeName,
@@ -2028,14 +2374,15 @@ class AppRouter {
           name: ReOrderBalMatReportForm.routeName,
           builder: (context, state) {
             return const ReOrderBalMatReportForm();
-          }, routes: [
-        GoRoute(
-            path: ReOrderBalMatReport.routeName,
-            name: ReOrderBalMatReport.routeName,
-            builder: (context, state) {
-              return const ReOrderBalMatReport();
-            }),
-      ]),
+          },
+          routes: [
+            GoRoute(
+                path: ReOrderBalMatReport.routeName,
+                name: ReOrderBalMatReport.routeName,
+                builder: (context, state) {
+                  return const ReOrderBalMatReport();
+                }),
+          ]),
       GoRoute(
           path: ExportEdbNote.routeName,
           name: ExportEdbNote.routeName,
@@ -2060,38 +2407,495 @@ class AppRouter {
           name: B2bReportForm.routeName,
           builder: (context, state) {
             return B2bReportForm(type: state.uri.queryParameters['type'] ?? "");
+          },
+          routes: [
+            GoRoute(
+                path: B2bReport.routeName,
+                name: B2bReport.routeName,
+                builder: (context, state) {
+                  return const B2bReport();
+                }),
+            GoRoute(
+                path: B2cReport.routeName,
+                name: B2cReport.routeName,
+                builder: (context, state) {
+                  return const B2cReport();
+                }),
+            GoRoute(
+                path: GstHsnReport.routeName,
+                name: GstHsnReport.routeName,
+                builder: (context, state) {
+                  return const GstHsnReport();
+                }),
+            GoRoute(
+                path: GstHsnReportForm.routeName,
+                name: GstHsnReportForm.routeName,
+                builder: (context, state) {
+                  return const GstHsnReportForm();
+                }),
+            GoRoute(
+                path: CrdrNote.routeName,
+                name: CrdrNote.routeName,
+                builder: (context, state) {
+                  return const CrdrNote();
+                }),
+            GoRoute(
+                path: DocTypeReport.routeName,
+                name: DocTypeReport.routeName,
+                builder: (context, state) {
+                  return const DocTypeReport();
+                }),
+            GoRoute(
+                path: B2ClReport.routeName,
+                name: B2ClReport.routeName,
+                builder: (context, state) {
+                  return const B2ClReport();
+                }),
+
+            GoRoute(
+                path: GetB2bNoMatch.routeName,
+                name: GetB2bNoMatch.routeName,
+                builder: (context, state) {
+                  return const GetB2bNoMatch();
+                }),
+
+            GoRoute(
+                path: B2bNoMatchReport.routeName,
+                name: B2bNoMatchReport.routeName,
+                builder: (context, state) {
+                  return const B2bNoMatchReport();
+                }),
+
+            GoRoute(
+                path: GetB2bMatch.routeName,
+                name: GetB2bMatch.routeName,
+                builder: (context, state) {
+                  return const GetB2bMatch();
+                }),
+
+            GoRoute(
+                path: B2bMatchReport.routeName,
+                name: B2bMatchReport.routeName,
+                builder: (context, state) {
+                  return const B2bMatchReport();
+                }),
+
+            // NOT IN
+
+            GoRoute(
+                path: GetB2bNotIn.routeName,
+                name: GetB2bNotIn.routeName,
+                builder: (context, state) {
+                  return const GetB2bNotIn();
+                }),
+
+            GoRoute(
+                path: B2bNotInReport.routeName,
+                name: B2bNotInReport.routeName,
+                builder: (context, state) {
+                  return const B2bNotInReport();
+                }),
+
+            GoRoute(
+                path: UpdateB2b.routeName,
+                name: UpdateB2b.routeName,
+                builder: (context, state) {
+                  return UpdateB2b(
+                      transId: state.uri.queryParameters['transId'] ?? "");
+                }),
+
+            GoRoute(
+                path: PostB2b.routeName,
+                name: PostB2b.routeName,
+                builder: (context, state) {
+                  return const PostB2b();
+                }),
+          ]),
+      GoRoute(
+          path: AddReverseCharge.routeName,
+          name: AddReverseCharge.routeName,
+          builder: (context, state) {
+            return const AddReverseCharge();
+          }),
+      GoRoute(
+          path: GstR2bUpload.routeName,
+          name: GstR2bUpload.routeName,
+          builder: (context, state) {
+            return const GstR2bUpload();
+          }),
+      GoRoute(
+          path: Ledger.routeName,
+          name: Ledger.routeName,
+          builder: (context, state) {
+            return const Ledger();
+          }),
+      GoRoute(
+          path: Trial.routeName,
+          name: Trial.routeName,
+          builder: (context, state) {
+            return const Trial();
+          }),
+
+      GoRoute(
+          path: PartSearch.routeName,
+          name: PartSearch.routeName,
+          builder: (context, state) {
+            return const PartSearch();
+          },
+          routes: [
+            GoRoute(
+                path: PartSearchReport.routeName,
+                name: PartSearchReport.routeName,
+                builder: (context, state) {
+                  return const PartSearchReport();
+                }),
+            GoRoute(
+                path: NotInBillOfMaterial.routeName,
+                name: NotInBillOfMaterial.routeName,
+                builder: (context, state) {
+                  return const NotInBillOfMaterial();
+                }),
+            GoRoute(
+                path: NotInBillOfMaterialReport.routeName,
+                name: NotInBillOfMaterialReport.routeName,
+                builder: (context, state) {
+                  return const NotInBillOfMaterialReport();
+                }),
+          ]),
+      GoRoute(
+          path: ObMaterialScreen.routeName,
+          name: ObMaterialScreen.routeName,
+          builder: (context, state) {
+            return ObMaterialScreen(
+                editing: state.uri.queryParameters['editing'] ?? "");
+          },
+          routes: [
+            GoRoute(
+                path: GetObMaterial.routeName,
+                name: GetObMaterial.routeName,
+                builder: (context, state) {
+                  final bool delete = state.extra as bool? ?? false;
+                  return GetObMaterial(delete: delete);
+                }),
+            GoRoute(
+                path: ObMaterialReportForm.routeName,
+                name: ObMaterialReportForm.routeName,
+                builder: (context, state) {
+                  return const ObMaterialReportForm();
+                }),
+            GoRoute(
+                path: ObMaterialReport.routeName,
+                name: ObMaterialReport.routeName,
+                builder: (context, state) {
+                  return const ObMaterialReport();
+                }),
+          ]),
+
+      GoRoute(
+          path: MaterialAssembly.routeName,
+          name: MaterialAssembly.routeName,
+          builder: (context, state) {
+            final bool editing = state.extra as bool? ?? false;
+            return MaterialAssembly(editing: editing);
+          },
+          routes: [
+            GoRoute(
+                path: MaterialAssemblyDetails.routeName,
+                name: MaterialAssemblyDetails.routeName,
+                builder: (context, state) {
+                  return const MaterialAssemblyDetails();
+                }),
+            GoRoute(
+                path: MaterialAssemblyProcessing.routeName,
+                name: MaterialAssemblyProcessing.routeName,
+                builder: (context, state) {
+                  return const MaterialAssemblyProcessing();
+                }),
+            GoRoute(
+                path: DeleteMaterialAssembly.routeName,
+                name: DeleteMaterialAssembly.routeName,
+                builder: (context, state) {
+                  return const DeleteMaterialAssembly();
+                }),
+            GoRoute(
+                path: DeleteMaterialAssemblyDetails.routeName,
+                name: DeleteMaterialAssemblyDetails.routeName,
+                builder: (context, state) {
+                  return const DeleteMaterialAssemblyDetails();
+                }),
+            GoRoute(
+                path: DeleteMaterialAssemblyProcessing.routeName,
+                name: DeleteMaterialAssemblyProcessing.routeName,
+                builder: (context, state) {
+                  return const DeleteMaterialAssemblyProcessing();
+                }),
+            GoRoute(
+                path: GetMaterialAssembly.routeName,
+                name: GetMaterialAssembly.routeName,
+                builder: (context, state) {
+                  return const GetMaterialAssembly();
+                }),
+            GoRoute(
+                path: MaterialAssemblyReportForm.routeName,
+                name: MaterialAssemblyReportForm.routeName,
+                builder: (context, state) {
+                  return const MaterialAssemblyReportForm();
+                }),
+            GoRoute(
+                path: MaterialAssemblyCostingReportForm.routeName,
+                name: MaterialAssemblyCostingReportForm.routeName,
+                builder: (context, state) {
+                  return const MaterialAssemblyCostingReportForm();
+                }),
+            GoRoute(
+                path: MaterialAssemblyCostingReport.routeName,
+                name: MaterialAssemblyCostingReport.routeName,
+                builder: (context, state) {
+                  return const MaterialAssemblyCostingReport();
+                }),
+          ]),
+
+      GoRoute(
+          path: BusinessPartnerOnBoard.routeName,
+          name: BusinessPartnerOnBoard.routeName,
+          builder: (context, state) {
+            return BusinessPartnerOnBoard(
+                editing: state.uri.queryParameters['editing'] ?? "");
+          },
+          routes: [
+            GoRoute(
+                path: GetBpOnBoard.routeName,
+                name: GetBpOnBoard.routeName,
+                builder: (context, state) {
+                  final bool delete = state.extra as bool? ?? false;
+                  return GetBpOnBoard(delete: delete);
+                }),
+            GoRoute(
+                path: BpObMaterialForm.routeName,
+                name: BpObMaterialForm.routeName,
+                builder: (context, state) {
+                  return const BpObMaterialForm();
+                }),
+            GoRoute(
+                path: BpObReport.routeName,
+                name: BpObReport.routeName,
+                builder: (context, state) {
+                  return const BpObReport();
+                }),
+            GoRoute(
+                path: BpOnBoardReportForm.routeName,
+                name: BpOnBoardReportForm.routeName,
+                builder: (context, state) {
+                  return const BpOnBoardReportForm();
+                }),
+            GoRoute(
+                path: BpOnBoardReport.routeName,
+                name: BpOnBoardReport.routeName,
+                builder: (context, state) {
+                  return const BpOnBoardReport();
+                }),
+          ]),
+
+      GoRoute(
+          path: BpObMaterial.routeName,
+          name: BpObMaterial.routeName,
+          builder: (context, state) {
+            return BpObMaterial(editing: state.uri.queryParameters['editing']);
+          },
+          routes: [
+            GoRoute(
+                path: GetBpObMaterial.routeName,
+                name: GetBpObMaterial.routeName,
+                builder: (context, state) {
+                  final bool delete = state.extra as bool? ?? false;
+                  return GetBpObMaterial(delete: delete);
+                }),
+          ]),
+
+      GoRoute(
+          path: MaterialAssemblyTechDetails.routeName,
+          name: MaterialAssemblyTechDetails.routeName,
+          builder: (context, state) {
+            return MaterialAssemblyTechDetails(
+                editing: state.uri.queryParameters['editing']);
+          },
+          routes: [
+            GoRoute(
+                path: GetMatAssemblyTechDetails.routeName,
+                name: GetMatAssemblyTechDetails.routeName,
+                builder: (context, state) {
+                  final bool delete = state.extra as bool? ?? false;
+                  return GetMatAssemblyTechDetails(delete: delete);
+                }),
+          ]),
+
+      GoRoute(
+          path: BpBreakup.routeName,
+          name: BpBreakup.routeName,
+          builder: (context, state) {
+            final bool edit = state.extra as bool? ?? false;
+            return BpBreakup(editing: edit);
+          },
+          routes: [
+            GoRoute(
+                path: BpBreakupDetails.routeName,
+                name: BpBreakupDetails.routeName,
+                builder: (context, state) {
+                  return const BpBreakupDetails();
+                }),
+            GoRoute(
+                path: BpBreakupProcessing.routeName,
+                name: BpBreakupProcessing.routeName,
+                builder: (context, state) {
+                  return const BpBreakupProcessing();
+                }),
+            GoRoute(
+                path: GetBpBreakup.routeName,
+                name: GetBpBreakup.routeName,
+                builder: (context, state) {
+                  final bool edit = state.extra as bool? ?? false;
+                  return GetBpBreakup(delete: edit);
+                }),
+            GoRoute(
+                path: DeleteBpBreakup.routeName,
+                name: DeleteBpBreakup.routeName,
+                builder: (context, state) {
+                  return const DeleteBpBreakup();
+                }),
+            GoRoute(
+                path: DeleteBpBreakupDetails.routeName,
+                name: DeleteBpBreakupDetails.routeName,
+                builder: (context, state) {
+                  return const DeleteBpBreakupDetails();
+                }),
+            GoRoute(
+                path: DeleteBpBreakupProcessing.routeName,
+                name: DeleteBpBreakupProcessing.routeName,
+                builder: (context, state) {
+                  return const DeleteBpBreakupProcessing();
+                }),
+            GoRoute(
+                path: BpBreakupReportForm.routeName,
+                name: BpBreakupReportForm.routeName,
+                builder: (context, state) {
+                  return const BpBreakupReportForm();
+                })
+          ]),
+
+      GoRoute(
+          path: BpProcessing.routeName,
+          name: BpProcessing.routeName,
+          builder: (context, state) {
+            return BpProcessing(
+                editing: state.uri.queryParameters['editing'] ?? "");
+          },
+          routes: [
+            GoRoute(
+                path: GetBpProcessing.routeName,
+                name: GetBpProcessing.routeName,
+                builder: (context, state) {
+                  final bool edit = state.extra as bool? ?? false;
+                  return GetBpProcessing(delete: edit);
+                }),
+          ]),
+      GoRoute(
+          path: GenerateIrn.routeName,
+          name: GenerateIrn.routeName,
+          builder: (context, state) {
+            return const GenerateIrn();
+          }),
+      GoRoute(
+          path: TodReportForm.routeName,
+          name: TodReportForm.routeName,
+          builder: (context, state) {
+            return const TodReportForm();
+          }),
+      GoRoute(
+          path: ReverseChargeReportForm.routeName,
+          name: ReverseChargeReportForm.routeName,
+          builder: (context, state) {
+            return const ReverseChargeReportForm();
+          }),
+
+      GoRoute(
+          path: AddUnadjustedPaymentInwardClear.routeName,
+          name: AddUnadjustedPaymentInwardClear.routeName,
+          builder: (context, state) {
+            return AddUnadjustedPaymentInwardClear(
+                details: state.uri.queryParameters['details'] ?? "");
+          }),
+      GoRoute(
+          path: AddUnadjustedPaymentClear.routeName,
+          name: AddUnadjustedPaymentClear.routeName,
+          builder: (context, state) {
+            return AddUnadjustedPaymentClear(
+                details: state.uri.queryParameters['details'] ?? "");
+          }),
+      GoRoute(
+          path: AddMaterialTechDetails.routeName,
+          name: AddMaterialTechDetails.routeName,
+          builder: (context, state) {
+            final bool edit = state.extra as bool? ?? false;
+            return AddMaterialTechDetails(editing: edit);
+          },
+          routes: [
+            GoRoute(
+                path: DeleteMaterialTechDetails.routeName,
+                name: DeleteMaterialTechDetails.routeName,
+                builder: (context, state) {
+                  return const DeleteMaterialTechDetails();
+                }),
+            GoRoute(
+                path: MaterialTechDetailReportForm.routeName,
+                name: MaterialTechDetailReportForm.routeName,
+                builder: (context, state) {
+                  return const MaterialTechDetailReportForm();
+                }),
+            GoRoute(
+                path: MaterialTechDetailsReport.routeName,
+                name: MaterialTechDetailsReport.routeName,
+                builder: (context, state) {
+                  return const MaterialTechDetailsReport();
+                }),
+            GoRoute(
+                path: GetMaterialTechDetails.routeName,
+                name: GetMaterialTechDetails.routeName,
+                builder: (context, state) {
+                  return const GetMaterialTechDetails();
+                })
+          ]),
+      // GoRoute(
+      //     path: GstEwayAuto.routeName,
+      //     name: GstEwayAuto.routeName,
+      //     builder: (context, state) {
+      //       return const GstEwayAuto();
+      //     }),
+      GoRoute(
+          path: EinvoicePending.routeName,
+          name: EinvoicePending.routeName,
+          builder: (context, state) {
+            return const EinvoicePending();
+          }),
+      GoRoute(
+          path: AddColor.routeName,
+          name: AddColor.routeName,
+          builder: (context, state) {
+            return AddColor(editing: state.uri.queryParameters["editing"] ?? '');
           }, routes: [
         GoRoute(
-            path: B2bReport.routeName,
-            name: B2bReport.routeName,
+            path: GetColor.routeName,
+            name: GetColor.routeName,
             builder: (context, state) {
-              return const B2bReport();
+              return const GetColor();
             }),
         GoRoute(
-            path: B2cReport.routeName,
-            name: B2cReport.routeName,
+            path: ColorReport.routeName,
+            name: ColorReport.routeName,
             builder: (context, state) {
-              return const B2cReport();
-            }),
-        GoRoute(
-            path: GstHsnReport.routeName,
-            name: GstHsnReport.routeName,
-            builder: (context, state) {
-              return const GstHsnReport();
-            }),
-        GoRoute(
-            path: CrdrNote.routeName,
-            name: CrdrNote.routeName,
-            builder: (context, state) {
-              return const CrdrNote();
-            }),
-        GoRoute(
-            path: DocTypeReport.routeName,
-            name: DocTypeReport.routeName,
-            builder: (context, state) {
-              return const DocTypeReport();
-            }),
-      ]),
+              return const ColorReport();
+            })
+      ])
+
     ],
   );
 }

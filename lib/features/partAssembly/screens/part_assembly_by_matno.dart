@@ -29,6 +29,7 @@ class _PartAssemblyByMatnoState extends State<PartAssemblyByMatno> {
   void initState() {
     super.initState();
     provider = Provider.of<PartAssemblyProvider>(context, listen: false);
+    provider.materialController.clear();
   }
 
   @override

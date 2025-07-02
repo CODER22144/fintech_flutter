@@ -77,10 +77,9 @@ class _TdsReportState extends State<TdsReport> {
                             ),
 
                             DataTable(
-                              columnSpacing: 25,
+                              columnSpacing: 26,
                               columns: const [
                                 DataColumn(label: Text("TransId")),
-                                DataColumn(label: Text("Date")),
                                 DataColumn(label: Text("Party Name")),
                                 DataColumn(label: Text("Bill No.")),
                                 DataColumn(label: Text("Bill Date")),

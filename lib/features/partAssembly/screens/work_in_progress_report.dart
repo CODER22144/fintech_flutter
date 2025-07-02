@@ -41,17 +41,45 @@ class _WorkInProgressReportState extends State<WorkInProgressReport> {
                 padding: const EdgeInsets.all(10),
                 child: Visibility(
                   visible: provider.wip.isNotEmpty,
-                  child: DataTable(
-                    columnSpacing: 30,
-                    columns: const [
-                      DataColumn(label: Text("Material No.")),
-                      DataColumn(label: Text("Production")),
-                      DataColumn(label: Text("Hold")),
-                      DataColumn(label: Text("PACK")),
-                      DataColumn(label: Text("Total Qty")),
-                      DataColumn(label: Text("Amount")),
-                    ],
-                    rows: provider.rows,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Container(
+                      width: 180,
+                      margin: const EdgeInsets.only(top: 10, left: 2),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(5)),
+                          ),
+                        ),
+                        onPressed: () async {
+                          downloadJsonToExcel(provider.wip, "work_in_process_export");
+                        },
+                        child: const Text(
+                          'Export',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+
+                      DataTable(
+                      columnSpacing: 30,
+                      columns: const [
+                        DataColumn(label: Text("Material No.")),
+                        DataColumn(label: Text("Production")),
+                        DataColumn(label: Text("Hold")),
+                        DataColumn(label: Text("PACK")),
+                        DataColumn(label: Text("Total Qty")),
+                        DataColumn(label: Text("Amount")),
+                      ],
+                      rows: provider.rows,
+                    ),
+                  ],
                   ),
                 ),
               ),

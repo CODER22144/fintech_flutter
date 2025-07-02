@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fintech_new_web/features/utility/services/common_utility.dart';
 import 'package:intl/intl.dart';
 import 'package:fintech_new_web/features/purchaseOrder/provider/purchase_order_provider.dart';
 import 'package:fintech_new_web/features/purchaseOrder/screen/purchase_order_row_fields.dart';
@@ -40,17 +41,30 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
   List<Map<String, dynamic>> jsonData = [];
   late PurchaseOrderProvider provider;
 
+  double qtySum = 0;
+
   @override
   void initState() {
     super.initState();
-    provider =
-        Provider.of<PurchaseOrderProvider>(context, listen: false);
+    provider = Provider.of<PurchaseOrderProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
-    tableRows.add(['', '', '', '','']);
+    tableRows.add(['', '', '', '', '']);
     tabController = TabController(length: 2, vsync: this);
     provider.getAllPriority();
     provider.getAllPoType();
+  }
+
+  void totalQty(String qty) {
+    setState(() {
+      qtySum += parseEmptyStringToDouble(qty);
+    });
+  }
+
+  void subTotalQty(String qty) {
+    setState(() {
+      qtySum -= parseEmptyStringToDouble(qty);
+    });
   }
 
   @override
@@ -62,7 +76,7 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
   // Function to add a new row
   void addRow() {
     setState(() {
-      tableRows.add(['', '','','','']);
+      tableRows.add(['', '', '', '', '']);
     });
     provider.addRowController();
   }
@@ -204,191 +218,77 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
                     SingleChildScrollView(
                       child: Center(
                         child: SizedBox(
-                          width: kIsWeb
-                              ? GlobalVariables.deviceWidth / 2
-                              : GlobalVariables.deviceWidth,
+                          width: GlobalVariables.deviceWidth,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(height: 10),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: HexColor("#0B6EFE"),
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(5)))),
-                                    onPressed: () async {
-                                      http.StreamedResponse result =
-                                          await provider.processFormInfo(
-                                              tableRows, manualOrder);
-                                      var message = jsonDecode(
-                                          await result.stream.bytesToString());
-                                      if (result.statusCode == 200) {
-                                        context.pushReplacementNamed(
-                                            PurchaseOrderScreen.routeName);
-                                      } else if (result.statusCode == 400) {
-                                        await showAlertDialog(
-                                            context,
-                                            message['message'].toString(),
-                                            "Continue",
-                                            false);
-                                      } else if (result.statusCode == 500) {
-                                        await showAlertDialog(
-                                            context,
-                                            message['message'],
-                                            "Continue",
-                                            false);
-                                      } else {
-                                        await showAlertDialog(
-                                            context,
-                                            message['message'],
-                                            "Continue",
-                                            false);
-                                      }
-                                    },
-                                    child: const Text(
-                                      'Submit PO',
-                                      style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: manualOrder,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 8, right: 10),
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: HexColor("#1B7B00"),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                1), // Square shape
-                                          ),
-                                          padding: EdgeInsets.zero,
-                                          // Remove internal padding to make it square
-                                          minimumSize: const Size(200,
-                                              50), // Width and height for the button
-                                        ),
-                                        child: const Text(
-                                          "Import Order Materials",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            manualOrder = false;
-                                            autoOrder = true;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: autoOrder,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 8, right: 10),
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: HexColor("#31007B"),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                1), // Square shape
-                                          ),
-                                          padding: EdgeInsets.zero,
-                                          // Remove internal padding to make it square
-                                          minimumSize: const Size(250,
-                                              50), // Width and height for the button
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            manualOrder = true;
-                                            autoOrder = false;
-                                            isFileUploaded = false;
-                                          });
-                                        },
-                                        child: const Text(
-                                          "Manually Add Order Materials",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              for (int i = 0; i < tableRows.length; i++)
-                                Visibility(
-                                  visible: manualOrder,
-                                  child: PurchaseOrderRowFields(
-                                    controllers: provider.rowControllers,
-                                    poType: provider.poType,
-                                    priority: provider.priorities,
-                                      index: i,
-                                      tableRows: tableRows,
-                                      deleteRow: deleteRow),
-                                ),
-                              Visibility(
-                                  visible: autoOrder,
-                                  child: InkWell(
-                                    child: const Text(
-                                      "Click to View file format for Import",
-                                      style: TextStyle(
-                                          color: Colors.blueAccent,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    onTap: () async {
-                                      final Uri uri = Uri.parse(
-                                          "https://docs.google.com/spreadsheets/d/1tWzfqd1aglZQPMMIGHEqMbkZQVVOcn1d55Zj1g3HMK4/edit?usp=sharing");
-                                      if (await canLaunchUrl(uri)) {
-                                        await launchUrl(uri,
-                                            mode: LaunchMode.inAppBrowserView);
-                                      } else {
-                                        throw 'Could not launch';
-                                      }
-                                    },
-                                  )),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .start, // Space buttons evenly
-
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Visibility(
-                                    visible: manualOrder,
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 8, right: 10, left: 60),
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                          backgroundColor: HexColor("#0B6EFE"),
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5)))),
-                                      onPressed: addRow,
-                                      child: const Text('Add Row',
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white)),
+                                        backgroundColor: HexColor("#4166f5"),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              1), // Square shape
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        // Remove internal padding to make it square
+                                        minimumSize: const Size(100,
+                                            50), // Width and height for the button
+                                      ),
+                                      onPressed: () async {
+                                        http.StreamedResponse result =
+                                            await provider.processFormInfo(
+                                                tableRows, manualOrder);
+                                        var message = jsonDecode(await result
+                                            .stream
+                                            .bytesToString());
+                                        if (result.statusCode == 200) {
+                                          context.pushReplacementNamed(
+                                              PurchaseOrderScreen.routeName);
+                                        } else if (result.statusCode == 400) {
+                                          await showAlertDialog(
+                                              context,
+                                              message['message'].toString(),
+                                              "Continue",
+                                              false);
+                                        } else if (result.statusCode == 500) {
+                                          await showAlertDialog(
+                                              context,
+                                              message['message'],
+                                              "Continue",
+                                              false);
+                                        } else {
+                                          await showAlertDialog(
+                                              context,
+                                              message['message'],
+                                              "Continue",
+                                              false);
+                                        }
+                                      },
+                                      child: const Text(
+                                        'Submit PO',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w200,
+                                            color: Colors.white),
+                                      ),
                                     ),
                                   ),
+                                  const SizedBox(width: 10),
                                   Visibility(
-                                    visible: autoOrder,
+                                    visible: manualOrder,
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                           top: 8, right: 10),
                                       child: ElevatedButton(
-                                        onPressed: _importExcel,
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: HexColor("#006B7B"),
+                                          backgroundColor: HexColor("#4166f5"),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                                 1), // Square shape
@@ -399,10 +299,272 @@ class PurchaseOrderScreenState extends State<PurchaseOrderScreen>
                                               50), // Width and height for the button
                                         ),
                                         child: const Text(
+                                          "Import Materials",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w200),
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            manualOrder = false;
+                                            autoOrder = true;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Visibility(
+                                    visible: autoOrder,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 8, right: 10, left: 5),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: HexColor("#4166f5"),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                1), // Square shape
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                          // Remove internal padding to make it square
+                                          minimumSize: const Size(200,
+                                              50), // Width and height for the button
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            manualOrder = true;
+                                            autoOrder = false;
+                                            isFileUploaded = false;
+                                          });
+                                        },
+                                        child: const Text(
+                                          "Manually Add Materials",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w300),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+
+                              // HEADER ROW
+                              Visibility(
+                                visible: manualOrder,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                        width: GlobalVariables.deviceWidth * 0.03,
+                                        height: GlobalVariables.deviceWidth * 0.03,
+                                        margin: const EdgeInsets.only(left: 5),
+                                        color: Colors.transparent,
+                                        child: const SizedBox()),
+
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.16,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text("Material No.", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 100,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(" Quantity", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 100,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text("Rate", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.09,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text("HSN Code", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.08,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text("Delivery Date", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.08,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text("PO Type", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.08,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text("Priority", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    Container(
+                                        width: GlobalVariables.deviceWidth * 0.03,
+                                        height: GlobalVariables.deviceWidth * 0.03,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        color: Colors.transparent,
+                                        child: const SizedBox()),
+                                  ],
+                                ),
+                              ),
+
+
+                              for (int i = 0; i < tableRows.length; i++)
+                                Visibility(
+                                  visible: manualOrder,
+                                  child: PurchaseOrderRowFields(
+                                      subTotalQty: subTotalQty,
+                                      totalQty: totalQty,
+                                      addRow: addRow,
+                                      controllers: provider.rowControllers,
+                                      poType: provider.poType,
+                                      priority: provider.priorities,
+                                      index: i,
+                                      tableRows: tableRows,
+                                      deleteRow: deleteRow),
+                                ),
+
+                              Visibility(
+                                visible: manualOrder,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                        width: GlobalVariables.deviceWidth * 0.03,
+                                        height: GlobalVariables.deviceWidth * 0.03,
+                                        margin: const EdgeInsets.only(left: 5),
+                                        color: Colors.transparent,
+                                        child: const SizedBox()),
+
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.16,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text("GRAND TOTAL", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 100,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(" $qtySum", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 100,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(""),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.09,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(""),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.08,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(""),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.08,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(""),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: GlobalVariables.deviceWidth * 0.08,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(""),
+                                      ),
+                                    ),
+                                    Container(
+                                        width: GlobalVariables.deviceWidth * 0.03,
+                                        height: GlobalVariables.deviceWidth * 0.03,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        color: Colors.transparent,
+                                        child: const SizedBox())
+                                  ],
+                                ),
+                              ),
+                              Visibility(
+                                  visible: autoOrder,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 8, right: 10, left: 60),
+                                    child: InkWell(
+                                      child: const Text(
+                                        "Click to View file format for Import",
+                                        style: TextStyle(
+                                            color: Colors.blueAccent,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      onTap: () async {
+                                        final Uri uri = Uri.parse(
+                                            "https://docs.google.com/spreadsheets/d/1tWzfqd1aglZQPMMIGHEqMbkZQVVOcn1d55Zj1g3HMK4/edit?usp=sharing");
+                                        if (await canLaunchUrl(uri)) {
+                                          await launchUrl(uri,
+                                              mode:
+                                                  LaunchMode.inAppBrowserView);
+                                        } else {
+                                          throw 'Could not launch';
+                                        }
+                                      },
+                                    ),
+                                  )),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment
+                                    .start, // Space buttons evenly
+
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Visibility(
+                                    visible: autoOrder,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 8, right: 10, left: 60),
+                                      child: ElevatedButton(
+                                        onPressed: _importExcel,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: HexColor("#4166f5"),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                1), // Square shape
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                          // Remove internal padding to make it square
+                                          minimumSize: const Size(110,
+                                              50), // Width and height for the button
+                                        ),
+                                        child: const Text(
                                           'Choose File',
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontWeight: FontWeight.bold),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w300),
                                         ),
                                       ),
                                     ),

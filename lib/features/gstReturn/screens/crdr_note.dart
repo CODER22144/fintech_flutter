@@ -32,7 +32,7 @@ class _CrdrNoteState extends State<CrdrNote> {
                   appBar: PreferredSize(
                       preferredSize:
                       Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-                      child: const CommonAppbar(title: 'CR/DR Note')),
+                      child: const CommonAppbar(title: 'CR/DB Note')),
                   body: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: SingleChildScrollView(

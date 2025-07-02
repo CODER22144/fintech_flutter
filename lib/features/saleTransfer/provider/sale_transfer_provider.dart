@@ -170,7 +170,7 @@ class SaleTransferProvider with ChangeNotifier {
     formFieldDetails.clear();
     reportWidgetList.clear();
     String jsonData =
-        '[{"id":"lcode","name":"Party Code","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}, {"id" : "bpState","name" : "States", "isMandatory": false, "inputType" : "dropdown", "dropdownMenuItem" : "/get-states/"}]';
+        '[{"id":"lcode","name":"Party Code","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}, {"id" : "bpState","name" : "States", "isMandatory": false, "inputType" : "dropdown", "dropdownMenuItem" : "/get-states/"},{"id":"pdays","name":"Days","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-days/"}]';
 
     for (var element in jsonDecode(jsonData)) {
       formFieldDetails.add(FormUI(
@@ -235,7 +235,7 @@ class SaleTransferProvider with ChangeNotifier {
       double payAmountSum = 0;
       double bAmountSum = 0;
 
-      entries.insert(0, {"transId" : lcode, "dDate" : entries[0]['lName']});
+      entries.insert(0, {"transId" : lcode, "dDate" : entries[0]['lName'], 'vtype' : entries[0]['bpCity'], 'billNo' : entries[0]['stateName']});
       for (var item in entries) {
         double amount = parseEmptyStringToDouble(item['amount'].toString());
         double payamount = parseEmptyStringToDouble(item['payamount'].toString());
@@ -245,6 +245,9 @@ class SaleTransferProvider with ChangeNotifier {
         payAmountSum += payamount;
         bAmountSum += bamount;
 
+        if(bAmountSum != 0) {
+          item['run'] = bAmountSum;
+        }
         finalList.add(item);
       }
 

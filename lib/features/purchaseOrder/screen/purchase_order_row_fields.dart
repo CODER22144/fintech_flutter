@@ -4,6 +4,7 @@ import 'package:fintech_new_web/features/network/service/network_service.dart';
 import 'package:fintech_new_web/features/purchaseOrder/provider/purchase_order_provider.dart';
 import 'package:fintech_new_web/features/utility/global_variables.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart';
@@ -12,6 +13,9 @@ class PurchaseOrderRowFields extends StatefulWidget {
   final int index;
   final List<List<String>> tableRows;
   final Function deleteRow;
+  final Function addRow;
+  final Function totalQty;
+  final Function subTotalQty;
   final List<SearchableDropdownMenuItem<String>> priority;
   final List<SearchableDropdownMenuItem<String>> poType;
   final List<List<TextEditingController>> controllers;
@@ -19,7 +23,12 @@ class PurchaseOrderRowFields extends StatefulWidget {
       {super.key,
       required this.index,
       required this.tableRows,
-      required this.deleteRow, required this.priority, required this.poType, required this.controllers});
+      required this.deleteRow,
+      required this.priority,
+      required this.poType,
+      required this.controllers,
+      required this.addRow,
+      required this.totalQty, required this.subTotalQty});
 
   @override
   State<PurchaseOrderRowFields> createState() => _PurchaseOrderRowFieldsState();
@@ -50,112 +59,109 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 8, left: 10),
-              child: Text(
-                "Item : ${widget.index + 1}",
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.grey),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8, right: 10),
+        Container(
+            width: GlobalVariables.deviceWidth * 0.03,
+            height: GlobalVariables.deviceWidth * 0.03,
+            margin: const EdgeInsets.only(left: 5),
+            color: Colors.transparent,
+            child: Visibility(
+              visible: widget.index == widget.tableRows.length - 1,
               child: IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  widget.deleteRow(widget.index);
-                },
-              ),
-            )
-          ],
-        ),
-        Focus(
-          onFocusChange: (hasFocus) async {
-            if (!hasFocus) {
-              NetworkService networkService = NetworkService();
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: const RoundedRectangleBorder()),
+                  onPressed: () {
+                    widget.addRow();
+                  },
+                  icon: const Icon(Icons.add),
+                  color: Colors.white),
+            )),
 
-              http.StreamedResponse response = await networkService.post(
-                  "/get-material-source-details/", {"matno" : widget.tableRows[widget.index][0], "bpCode" : GlobalVariables.requestBody[PurchaseOrderProvider.featureName]['bpCode']});
-              if (response.statusCode == 200) {
-                var data = jsonDecode(await response.stream.bytesToString())[0];
-                setState(() {
-                  widget.controllers[widget.index][2].text = data['bpRate'];
-                  widget.controllers[widget.index][3].text = data['hsnCode'];
+        SizedBox(
+          width: GlobalVariables.deviceWidth * 0.16,
+          height: 50,
+          child: Focus(
+            onFocusChange: (hasFocus) async {
+              if (!hasFocus) {
+                NetworkService networkService = NetworkService();
+
+                http.StreamedResponse response =
+                    await networkService.post("/get-material-source-details/", {
+                  "matno": widget.tableRows[widget.index][0],
+                  "bpCode": GlobalVariables
+                      .requestBody[PurchaseOrderProvider.featureName]['bpCode']
                 });
+                if (response.statusCode == 200) {
+                  var data =
+                      jsonDecode(await response.stream.bytesToString())[0];
+                  setState(() {
+                    widget.controllers[widget.index][2].text = data['bpRate'];
+                    widget.controllers[widget.index][3].text = data['hsnCode'];
+                  });
+                }
               }
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: widget.controllers[widget.index][0],
-              onChanged: (value) async {
-                setState(() {
-                  widget.tableRows[widget.index][0] = value;
-                });
-              },
-              decoration: InputDecoration(
-                label: RichText(
-                  text: const TextSpan(
-                    text: "Material No.",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w300,
-                    ),
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              child: TextFormField(
+                inputFormatters: <TextInputFormatter>[
+                  LengthLimitingTextInputFormatter(15)
+                ],
+                textAlignVertical: TextAlignVertical.center,
+                controller: widget.controllers[widget.index][0],
+                onChanged: (value) async {
+                  setState(() {
+                    widget.tableRows[widget.index][0] = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 0),
                   ),
                 ),
-                border: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey)),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 0),
-                ),
+                validator: (String? val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Material No. is Mandatory';
+                  }
+                },
               ),
-              validator: (String? val) {
-                if (val == null || val.isEmpty) {
-                  return 'Material No. is Mandatory';
-                }
-              },
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return 'Quantity is Mandatory';
+        SizedBox(
+          width: 100,
+          height: 50,
+          child: Focus(
+            onFocusChange: (hasFocus) async {
+              if (!hasFocus) {
+                widget.totalQty(widget.tableRows[widget.index][1]);
               }
             },
-            controller: widget.controllers[widget.index][1],
-            onChanged: (value) {
-              setState(() {
-                widget.tableRows[widget.index][1] = value;
-              });
-            },
-            decoration: InputDecoration(
-              label: RichText(
-                text: const TextSpan(
-                  text: "Quantity",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              child: TextFormField(
+                validator: (String? val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Quantity is Mandatory';
+                  }
+                },
+                controller: widget.controllers[widget.index][1],
+                onChanged: (value) {
+                  setState(() {
+                    widget.tableRows[widget.index][1] = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 0),
                   ),
                 ),
-              ),
-              border: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black, width: 0),
               ),
             ),
           ),
@@ -163,50 +169,38 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
 
         // DISPLAY ONLY FIELD
 
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            readOnly: true,
-            controller: widget.controllers[widget.index][2],
-            decoration: InputDecoration(
-              label: RichText(
-                text: const TextSpan(
-                  text: "Rate",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
-                  ),
+        SizedBox(
+          width: 100,
+          height: 50,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            child: TextFormField(
+              readOnly: true,
+              controller: widget.controllers[widget.index][2],
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 0),
                 ),
-              ),
-              border: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black, width: 0),
               ),
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            readOnly: true,
-            controller: widget.controllers[widget.index][3],
-            decoration: InputDecoration(
-              label: RichText(
-                text: const TextSpan(
-                  text: "HSN Code",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
-                  ),
+        SizedBox(
+          width: GlobalVariables.deviceWidth * 0.09,
+          height: 50,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            child: TextFormField(
+              readOnly: true,
+              controller: widget.controllers[widget.index][3],
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 0),
                 ),
-              ),
-              border: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black, width: 0),
               ),
             ),
           ),
@@ -214,141 +208,100 @@ class _PurchaseOrderRowFieldsState extends State<PurchaseOrderRowFields> {
 
         // END DISPLAY
 
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            controller: dateController,
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              hintText: "Select Date...",
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              border: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black, width: 2),
-              ),
-              label: RichText(
-                text: const TextSpan(
-                  text: "Delivery Date",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
-                  ),
-                  children: [
-                    TextSpan(text: "*", style: TextStyle(color: Colors.red))
-                  ],
+        SizedBox(
+          width: GlobalVariables.deviceWidth * 0.08,
+          height: 50,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            child: TextFormField(
+              controller: dateController,
+              style: const TextStyle(color: Colors.black, fontSize: 12),
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 2),
                 ),
               ),
+              readOnly: true,
+              onTap: () => _selectDate(context, widget.index),
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
+                  return 'Delivery date field is Mandatory';
+                }
+              },
             ),
-            readOnly: true,
-            onTap: () => _selectDate(context, widget.index),
-            validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return 'Delivery date field is Mandatory';
-              }
-            },
           ),
         ),
-        Stack(
-          children: [
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SearchableDropdown<String>(
-                  isEnabled: true,
-                  backgroundDecoration: (child) => Container(
-                    height: 40,
-                    margin: EdgeInsets.zero,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Colors.black, width: 0.5),
-                    ),
-                    child: child,
+        SizedBox(
+          width: GlobalVariables.deviceWidth * 0.08,
+          height: 50,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              child: SearchableDropdown<String>(
+                isEnabled: true,
+                backgroundDecoration: (child) => Container(
+                  height: 48,
+                  margin: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: Colors.black, width: 0.5),
                   ),
-                  items: widget.poType,
-                  onChanged: (value) {
-                    setState(() {
-                      widget.tableRows[widget.index][4] = value!;
-                    });
-                  },
-                  hasTrailingClearIcon: false,
-                )),
-            Positioned(
-              left: 15,
-              top: 1,
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: const Wrap(
-                  children: [
-                    Text(
-                      "PO Type",
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      "*",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ],
+                  child: child,
                 ),
-              ),
-            ),
-          ],
+                items: widget.poType,
+                onChanged: (value) {
+                  setState(() {
+                    widget.tableRows[widget.index][4] = value!;
+                  });
+                },
+                hasTrailingClearIcon: false,
+              )),
         ),
-        Stack(
-          children: [
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SearchableDropdown<String>(
-                  isEnabled: true,
-                  backgroundDecoration: (child) => Container(
-                    height: 40,
-                    margin: EdgeInsets.zero,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Colors.black, width: 0.5),
-                    ),
-                    child: child,
+        SizedBox(
+          width: GlobalVariables.deviceWidth * 0.08,
+          height: 50,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              child: SearchableDropdown<String>(
+                isEnabled: true,
+                backgroundDecoration: (child) => Container(
+                  height: 48,
+                  margin: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: Colors.black, width: 0.5),
                   ),
-                  items: widget.priority,
-                  onChanged: (value) {
-                    setState(() {
-                      widget.tableRows[widget.index][3] = value!;
-                    });
-                  },
-                  hasTrailingClearIcon: false,
-                )),
-            Positioned(
-              left: 15,
-              top: 1,
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: const Wrap(
-                  children: [
-                    Text(
-                      "Priority",
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      "*",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ],
+                  child: child,
                 ),
-              ),
-            ),
-          ],
+                items: widget.priority,
+                onChanged: (value) {
+                  setState(() {
+                    widget.tableRows[widget.index][3] = value!;
+                  });
+                },
+                hasTrailingClearIcon: false,
+              )),
         ),
+        Container(
+            width: GlobalVariables.deviceWidth * 0.03,
+            height: GlobalVariables.deviceWidth * 0.03,
+            margin: const EdgeInsets.only(right: 5),
+            color: Colors.transparent,
+            child: Visibility(
+              visible: widget.tableRows.length != 1,
+              child: IconButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: const RoundedRectangleBorder()),
+                  onPressed: () {
+                    widget.subTotalQty(widget.tableRows[widget.index][1] ?? 0);
+                    widget.deleteRow(widget.index);
+                  },
+                  icon: const Icon(Icons.delete_outline),
+                  color: Colors.white),
+            ))
       ],
     );
   }

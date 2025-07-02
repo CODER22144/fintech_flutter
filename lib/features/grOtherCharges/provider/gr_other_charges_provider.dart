@@ -12,9 +12,12 @@ import '../../utility/services/generate_form_service.dart';
 
 class GrOtherChargesProvider with ChangeNotifier {
   static const String featureName = "grOtherCharges";
+  static const String pendingFeature = "grOtherChargesPending";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
+
+  List<dynamic> grOtherChargesPending = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -157,6 +160,42 @@ class GrOtherChargesProvider with ChangeNotifier {
     GlobalVariables.requestBody[featureName]['tAmount'] =
         totalAmountController.text;
 
+    notifyListeners();
+  }
+
+  void initPendingWidget() async {
+    GlobalVariables.requestBody[pendingFeature] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
+    String jsonData =
+        '[{"id":"repType","name":"Rep Type","isMandatory":false,"inputType":"text","maxCharacter":1, "default" : "P"},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          defaultValue: element['default'],
+          controller: controller));
+    }
+
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, pendingFeature);
+    widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getGrOtherChargesPending() async {
+    grOtherChargesPending.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/gr-other-charges-pending/", GlobalVariables.requestBody[pendingFeature]);
+    if(response.statusCode == 200) {
+      grOtherChargesPending = jsonDecode(await response.stream.bytesToString());
+    }
     notifyListeners();
   }
 }

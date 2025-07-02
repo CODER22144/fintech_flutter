@@ -5,8 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class NetworkService {
-
   static const String baseUrl = "http://mapp.rcinz.com";
+  static const String productionGstBaseUrl = "https://api.whitebooks.in";
+
   //static const String baseUrl = "http://localhost:8000";
 
   Future<http.StreamedResponse> get(String url) async {
@@ -16,8 +17,7 @@ class NetworkService {
       'Content-Type': 'application/json',
       "Authorization": "Bearer $token"
     };
-    var request =
-    http.Request('GET', Uri.parse(baseUrl + url));
+    var request = http.Request('GET', Uri.parse(baseUrl + url));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     return response;
@@ -26,10 +26,11 @@ class NetworkService {
   Future<http.StreamedResponse> post(String url, dynamic requestBody) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString("auth_token");
-    var headers = {'Content-Type': 'application/json', "Authorization" : "Bearer $token"};
-    var request = http.Request(
-        'POST',
-        Uri.parse(baseUrl + url));
+    var headers = {
+      'Content-Type': 'application/json',
+      "Authorization": "Bearer $token"
+    };
+    var request = http.Request('POST', Uri.parse(baseUrl + url));
     request.body = jsonEncode(requestBody);
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -43,8 +44,7 @@ class NetworkService {
       'Content-Type': 'application/json',
       "Authorization": "Bearer $token"
     };
-    var request =
-    http.Request('DELETE', Uri.parse(baseUrl + url));
+    var request = http.Request('DELETE', Uri.parse(baseUrl + url));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     return response;
@@ -53,10 +53,11 @@ class NetworkService {
   Future<http.StreamedResponse> put(String url, dynamic requestBody) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString("auth_token");
-    var headers = {'Content-Type': 'application/json', "Authorization" : "Bearer $token"};
-    var request = http.Request(
-        'PUT',
-        Uri.parse(baseUrl + url));
+    var headers = {
+      'Content-Type': 'application/json',
+      "Authorization": "Bearer $token"
+    };
+    var request = http.Request('PUT', Uri.parse(baseUrl + url));
     request.body = jsonEncode(requestBody);
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -66,10 +67,31 @@ class NetworkService {
   Future<bool> isTokenValid() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString("auth_token");
-    if(token != null) {
+    if (token != null) {
       return !JwtDecoder.isExpired(token);
     }
     return false;
   }
 
+  Future<http.StreamedResponse> authorizeGst(dynamic requestBody, String url) async {
+    Map<String, String> headers = {
+      'accept': '*/*',
+      'username': requestBody['usrname'],
+      'password': requestBody['pwd'],
+      'ip_address': requestBody['ipAddress'],
+      'client_id': requestBody['clId'],
+      'client_secret': requestBody['clSec'],
+      'gstin': requestBody['gstin']
+    };
+
+    var request = http.Request(
+        'GET',
+        Uri.parse(
+            '$url/einvoice/authenticate?email=${requestBody['email']}'));
+    request.bodyFields = {};
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+
+    return response;
+  }
 }

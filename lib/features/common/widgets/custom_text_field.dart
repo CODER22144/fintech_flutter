@@ -14,24 +14,34 @@ class CustomTextField extends StatefulWidget {
   final TextInputType inputType;
   final Function? customMethod;
   final Widget? suffixWidget;
+  final bool focus;
   const CustomTextField(
       {super.key,
       required this.field,
       required this.feature,
       required this.inputType,
-      this.customMethod, this.suffixWidget});
+      this.customMethod, this.suffixWidget, this.focus = false});
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
+  late FocusNode _focusNode;
+
   @override
   void initState() {
+    super.initState();
     widget.field.controller?.text = "${widget.field.defaultValue ?? ''}";
     GlobalVariables.requestBody[widget.feature][widget.field.id] =
         (widget.field.defaultValue == "null" || widget.field.defaultValue == '') ? null : widget.field.defaultValue;
-    super.initState();
+
+    _focusNode = FocusNode();
+    // Request focus when widget is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+
   }
 
   @override
@@ -39,6 +49,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextFormField(
+        focusNode: widget.focus ? _focusNode : null,
         style: (widget.field.readOnly)
             ? TextStyle(color: HexColor("#555555"), fontSize: 14)
             : const TextStyle(color: Colors.black, fontSize: 14),
@@ -129,7 +140,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             }
           }
         },
-        maxLines: 1,
+        maxLines: null,
         onChanged: (value) {
           GlobalVariables.requestBody[widget.feature][widget.field.id] =
               value == "" ? null : value;

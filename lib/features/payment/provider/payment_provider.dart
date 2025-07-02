@@ -126,7 +126,7 @@ class PaymentProvider with ChangeNotifier {
     formFieldDetails.clear();
     reportWidgetList.clear();
     String jsonData =
-        '[{"id":"lcode","name":"Party Code","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}]';
+        '[{"id":"lcode","name":"Party Code","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"},{"id":"pdays","name":"Days","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-days/"}]';
 
     for (var element in jsonDecode(jsonData)) {
       formFieldDetails.add(FormUI(
@@ -186,6 +186,9 @@ class PaymentProvider with ChangeNotifier {
         payAmountSum += payamount;
         bAmountSum += bamount;
 
+        if(bAmountSum != 0) {
+          item['run'] = bAmountSum.toStringAsFixed(2);
+        }
         finalList.add(item);
       }
 

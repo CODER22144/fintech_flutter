@@ -16,6 +16,8 @@ import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart
 
 class WireSizeProvider with ChangeNotifier {
   static const String featureName = "wireSize";
+  static const String reportFeature = "wireSizeTL";
+  static const String repFeature = "wireSizeReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
@@ -24,6 +26,7 @@ class WireSizeProvider with ChangeNotifier {
   TextEditingController materialController = TextEditingController();
   dynamic wireSizeDesc = {};
   List<dynamic> listWireSizeDetails = [];
+  List<dynamic> wsReport = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -148,9 +151,11 @@ class WireSizeProvider with ChangeNotifier {
         "jTL": tableRows[i][16] == "" ? null : tableRows[i][16]
       });
     }
-    wireSizeDetails = manual ? wireSizeDetails : GlobalVariables.requestBody[featureName]['WireSizeDetails'];
-    http.StreamedResponse response =
-        await networkService.post("/add-wire-size-details-only/", wireSizeDetails);
+    wireSizeDetails = manual
+        ? wireSizeDetails
+        : GlobalVariables.requestBody[featureName]['WireSizeDetails'];
+    http.StreamedResponse response = await networkService.post(
+        "/add-wire-size-details-only/", wireSizeDetails);
     return response;
   }
 
@@ -158,6 +163,9 @@ class WireSizeProvider with ChangeNotifier {
     GlobalVariables.requestBody[featureName] = jsonDecode(editData);
     formFieldDetails.clear();
     widgetList.clear();
+
+    var data = jsonDecode(editData);
+    data['matno'] = wireSizeDesc['matno'];
 
     String jsonData =
         '[{"id":"wireNo","name":"Wire No","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"matno","name":"Material No","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"partNo","name":"Part No","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"colNo","name":"Column No","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"wlength","name":"Wire Length","isMandatory":true,"inputType":"number"},{"id":"leftSL","name":"Left SL","isMandatory":false,"inputType":"number"},{"id":"leftPL","name":"Left PL","isMandatory":false,"inputType":"number"},{"id":"rightSL","name":"Right SL","isMandatory":false,"inputType":"number"},{"id":"rightPL","name":"Right PL","isMandatory":false,"inputType":"number"},{"id":"leftTL","name":"Left TL","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"rightTL","name":"Right TL","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"leftCap","name":"Left Cap","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"rightCap","name":"Right Cap","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"leftSleeve","name":"Left Sleeve","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"rightSleeve","name":"Right Sleeve","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"jWireNo","name":"Junction Wire No","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"jTL","name":"Junction TL","isMandatory":false,"inputType":"text","maxCharacter":15}]';
@@ -172,7 +180,7 @@ class WireSizeProvider with ChangeNotifier {
           dropdownMenuItem: element['dropdownMenuItem'] ?? "",
           maxCharacter: element['maxCharacter'] ?? 255,
           controller: editController,
-          defaultValue: jsonDecode(editData)[element['id']]));
+          defaultValue: data[element['id']]));
     }
 
     List<Widget> widgets =
@@ -182,8 +190,8 @@ class WireSizeProvider with ChangeNotifier {
   }
 
   Future<http.StreamedResponse> processUpdateFormInfo() async {
-    http.StreamedResponse response = await networkService
-        .post("/update-wire-size-details/", GlobalVariables.requestBody[featureName]);
+    http.StreamedResponse response = await networkService.post(
+        "/update-wire-size-details/", GlobalVariables.requestBody[featureName]);
     return response;
   }
 
@@ -212,14 +220,14 @@ class WireSizeProvider with ChangeNotifier {
     }
 
     List<Widget> widgets =
-    await formService.generateDynamicForm(formFieldDetails, featureName);
+        await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
     notifyListeners();
   }
 
   Future<http.StreamedResponse> processMasterUpdateFormInfo() async {
-    http.StreamedResponse response = await networkService
-        .post("/update-wire-size/", GlobalVariables.requestBody[featureName]);
+    http.StreamedResponse response = await networkService.post(
+        "/update-wire-size/", GlobalVariables.requestBody[featureName]);
     return response;
   }
 
@@ -246,4 +254,63 @@ class WireSizeProvider with ChangeNotifier {
         ));
   }
 
+  void initReportWidget() async {
+    String jsonData =
+        '[{"id":"matno","name":"Material No.","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"repId","name":"Wire Rep Type","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/wire-rep/"},{"id":"soId","name":"Wire Sort Type","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/wire-sort-type/"}]';
+    GlobalVariables.requestBody[reportFeature] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          controller: controller,
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          defaultValue: element['default']));
+    }
+    List<Widget> widgets =
+        await formService.generateDynamicForm(formFieldDetails, reportFeature);
+    widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void initWireSizeReportWidget() async {
+    String jsonData =
+        '[{"id":"csId","name":"Cost Status","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-cost-status/"},{"id":"fmatno","name":"From Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"tmatno","name":"To Material No.","isMandatory":false,"inputType":"text","maxCharacter":15}]';
+    GlobalVariables.requestBody[repFeature] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          controller: controller,
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          defaultValue: element['default']));
+    }
+    List<Widget> widgets =
+        await formService.generateDynamicForm(formFieldDetails, repFeature);
+    widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getWireSizeReport() async {
+    wsReport.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/ws-report/", GlobalVariables.requestBody[repFeature]);
+    if (response.statusCode == 200) {
+      wsReport = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
+  }
 }

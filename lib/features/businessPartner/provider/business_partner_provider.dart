@@ -12,6 +12,7 @@ import '../../utility/services/generate_form_service.dart';
 class BusinessPartnerProvider with ChangeNotifier {
   static const String featureName = "businessPartner";
   static const String reportFeature = "businessPartnerSaleDiscount";
+  static const String reportInfoFeature = "businessPartnerPaymentInfo";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
@@ -19,6 +20,7 @@ class BusinessPartnerProvider with ChangeNotifier {
   TextEditingController editController = TextEditingController();
 
   List<dynamic> bpSaleDiscount = [];
+  List<dynamic> bpPaymentInfo = [];
 
   List<SearchableDropdownMenuItem<String>> bpCodes = [];
 
@@ -142,4 +144,40 @@ class BusinessPartnerProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void initPaymentInfoReport() async {
+    GlobalVariables.requestBody[reportInfoFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"bpName","name":"Business Partner Name","isMandatory":false,"inputType":"text","maxCharacter":100},{"id":"bpState","name":"State","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-states/"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, reportInfoFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getPaymentInfoReport() async {
+    bpPaymentInfo.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/get-bp-payment-info/", GlobalVariables.requestBody[reportInfoFeature]);
+    if (response.statusCode == 200) {
+      bpPaymentInfo = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
+  }
+
+
+
 }

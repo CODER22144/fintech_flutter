@@ -2,12 +2,16 @@ import 'dart:convert';
 
 import 'package:fintech_new_web/features/common/widgets/custom_text_field.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 
+import '../../common/widgets/pop_ups.dart';
 import '../../network/service/network_service.dart';
 import '../../utility/global_variables.dart';
 import '../../utility/models/forms_UI.dart';
 import '../../utility/services/generate_form_service.dart';
+import '../screens/pack_order.dart';
 
 class OrderPackagingProvider with ChangeNotifier {
   static const String featureName = "orderPackaging";
@@ -17,6 +21,8 @@ class OrderPackagingProvider with ChangeNotifier {
   List<dynamic> orderPackagingPending = [];
   List<dynamic> orderPackagingPosted = [];
   List<dynamic> orderBalance = [];
+
+  bool entered = false;
 
   TextEditingController materialController = TextEditingController();
   TextEditingController qtyController = TextEditingController();
@@ -37,7 +43,7 @@ class OrderPackagingProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void initWidget(String orderId) async {
+  void initWidget(String orderId, BuildContext context) async {
     GlobalVariables.requestBody[featureName] = {};
     formFieldDetails.clear();
     widgetList.clear();
@@ -61,7 +67,7 @@ class OrderPackagingProvider with ChangeNotifier {
         await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
 
-    initOrderPackedInfo(orderId);
+    initOrderPackedInfo(orderId, context);
   }
 
   void packedOrderInfo(String orderId) async {
@@ -70,25 +76,59 @@ class OrderPackagingProvider with ChangeNotifier {
     orderPackagingPosted.clear();
     if (response.statusCode == 200) {
       var data = jsonDecode(await response.stream.bytesToString());
-    orderPackagingPosted = data;
-  }
+      orderPackagingPosted = data;
+    }
     notifyListeners();
   }
 
-  void initOrderPackedInfo(String orderId) async {
+  void initOrderPackedInfo(String orderId, BuildContext context) async {
     packedOrderInfo(orderId);
 
     widgetList.addAll([
-      CustomTextField(
-          field: FormUI(
-              id: "icode",
-              name: "Material No.",
-              isMandatory: true,
-              inputType: "text",
-              controller: materialController),
-          feature: featureName,
-          inputType: TextInputType.text,
-          customMethod: inputQuantity),
+      KeyboardListener(
+        focusNode: FocusNode(),
+        onKeyEvent: (event) async {
+          if (event.logicalKey == LogicalKeyboardKey.enter &&
+              GlobalVariables.requestBody[featureName]['qty'] != null && !entered) {
+
+            entered = true;
+            
+            http.StreamedResponse result = await processFormInfo();
+            if (result.statusCode == 200) {
+              context.pushReplacementNamed(PackOrder.routeName,
+                  queryParameters: {"orderId": orderId});
+            } else if (result.statusCode == 400) {
+              var message = jsonDecode(
+                  await result.stream.bytesToString());
+              await showAlertDialog(
+                  context,
+                  message['message'].toString(),
+                  "Continue",
+                  false);
+            } else {
+              var message = jsonDecode(
+                  await result.stream.bytesToString());
+              await showAlertDialog(context,
+                  message['message'], "Continue", false);
+            }
+            
+            Future.delayed(Duration(milliseconds: 200), () {
+              entered = false;
+            });
+          }
+        },
+        child: CustomTextField(
+            field: FormUI(
+                id: "icode",
+                name: "Material No.",
+                isMandatory: true,
+                inputType: "text",
+                controller: materialController),
+            feature: featureName,
+            inputType: TextInputType.text,
+            customMethod: inputQuantity,
+            focus: true),
+      ),
       CustomTextField(
           field: FormUI(
               id: "qty",

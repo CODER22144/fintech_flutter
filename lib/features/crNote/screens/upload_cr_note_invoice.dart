@@ -46,7 +46,7 @@ class _UploadCrNoteInvoiceState extends State<UploadCrNoteInvoice> {
             preferredSize:
             Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
             child: const CommonAppbar(
-                title: 'Upload EInvoice For Credit Note')),
+                title: 'Upload E-Invoice Db/Cr Note')),
         body: SingleChildScrollView(
           child: Center(
             child: Container(

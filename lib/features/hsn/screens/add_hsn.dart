@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:fintech_new_web/features/common/widgets/pop_ups.dart';
 import 'package:fintech_new_web/features/hsn/provider/hsn_provider.dart';
+import 'package:fintech_new_web/features/hsn/screens/get_hsn.dart';
 import 'package:fintech_new_web/features/inwardVoucher/provider/inward_voucher_provider.dart';
 import 'package:fintech_new_web/features/utility/global_variables.dart';
 import 'package:flutter/foundation.dart';
@@ -34,8 +35,7 @@ class _AddHsnState extends State<AddHsn> {
   @override
   void initState() {
     super.initState();
-    provider =
-    Provider.of<HsnProvider>(context, listen: false);
+    provider = Provider.of<HsnProvider>(context, listen: false);
     if (widget.editing == "true") {
       provider.reset();
       provider.initEditWidget();
@@ -47,7 +47,7 @@ class _AddHsnState extends State<AddHsn> {
   @override
   void dispose() {
     super.dispose();
-    if(widget.editing == "true") {
+    if (widget.editing == "true") {
       provider.reset();
     }
   }
@@ -59,8 +59,9 @@ class _AddHsnState extends State<AddHsn> {
       return Scaffold(
         appBar: PreferredSize(
             preferredSize:
-            Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-            child: CommonAppbar(title: widget.editing != "true" ? 'Add Hsn' : "Update Hsn")),
+                Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
+            child: CommonAppbar(
+                title: widget.editing != "true" ? 'Add Hsn' : "Update Hsn")),
         body: SingleChildScrollView(
           child: Center(
             child: Container(
@@ -102,24 +103,31 @@ class _AddHsnState extends State<AddHsn> {
                               backgroundColor: HexColor("#0B6EFE"),
                               shape: const RoundedRectangleBorder(
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(5)))),
+                                      BorderRadius.all(Radius.circular(5)))),
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
                               bool confirmation =
-                              await showConfirmationDialogue(
-                                  context,
-                                  "Do you want to submit the records?",
-                                  "SUBMIT",
-                                  "CANCEL");
+                                  await showConfirmationDialogue(
+                                      context,
+                                      "Do you want to submit the records?",
+                                      "SUBMIT",
+                                      "CANCEL");
                               if (confirmation) {
                                 http.StreamedResponse result =
-                                widget.editing == "true"
-                                    ? await provider.processUpdateFormInfo()
-                                    : await provider.processFormInfo();
+                                    widget.editing == "true"
+                                        ? await provider.processUpdateFormInfo()
+                                        : await provider.processFormInfo();
                                 var message = jsonDecode(
                                     await result.stream.bytesToString());
                                 if (result.statusCode == 200) {
-                                  context.pushReplacementNamed(AddHsn.routeName);
+                                  if (widget.editing == "true") {
+                                    context.pop();
+                                    context
+                                        .pushReplacementNamed(GetHsn.routeName);
+                                  } else {
+                                    context
+                                        .pushReplacementNamed(AddHsn.routeName);
+                                  }
                                 } else if (result.statusCode == 400) {
                                   await showAlertDialog(
                                       context,

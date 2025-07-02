@@ -1,13 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
 import 'package:fintech_new_web/features/orderPackaging/provider/order_packaging_provider.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../common/widgets/pop_ups.dart';
@@ -25,12 +25,14 @@ class PackOrder extends StatefulWidget {
 }
 
 class _PackOrderState extends State<PackOrder> {
+  bool loading = false;
+
   @override
   void initState() {
     super.initState();
     OrderPackagingProvider provider =
         Provider.of<OrderPackagingProvider>(context, listen: false);
-    provider.initWidget(widget.orderId);
+    provider.initWidget(widget.orderId, context);
     provider.getOrderBalance(widget.orderId);
   }
 
@@ -64,8 +66,8 @@ class _PackOrderState extends State<PackOrder> {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: HexColor("#0B6EFE"),
                                 shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(5)))),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)))),
                             onPressed: () {
                               _showTablePopup(context, provider.orderBalance);
                             },
@@ -89,8 +91,8 @@ class _PackOrderState extends State<PackOrder> {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: HexColor("#0B6EFE"),
                                 shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(5)))),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)))),
                             onPressed: () {
                               _showPackedOrderTable(context, provider);
                             },
@@ -114,19 +116,20 @@ class _PackOrderState extends State<PackOrder> {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: HexColor("#0B6EFE"),
                                 shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(5)))),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)))),
                             onPressed: () async {
                               NetworkService networkService = NetworkService();
-                              http.StreamedResponse response = await networkService
-                                  .post("/order-clear-value/",
-                                  {"orderId": widget.orderId});
+                              http.StreamedResponse response =
+                                  await networkService.post(
+                                      "/order-clear-value/",
+                                      {"orderId": widget.orderId});
                               if (response.statusCode == 200) {
                                 orderClearTablePopup(
                                     context,
                                     jsonDecode(
                                         await response.stream.bytesToString()));
-                            }
+                              }
                             },
                             child: const Text(
                               'Order Clear Value',
@@ -160,54 +163,49 @@ class _PackOrderState extends State<PackOrder> {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: HexColor("#0B6EFE"),
                                 shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(5)))),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)))),
                             onPressed: () async {
                               if (formKey.currentState!.validate()) {
-                                bool confirmation =
-                                    await showConfirmationDialogue(
-                                        context,
-                                        "Do you want to submit the records?",
-                                        "SUBMIT",
-                                        "CANCEL");
-                                if (confirmation) {
-                                  http.StreamedResponse result =
-                                      await provider.processFormInfo();
-                                  if (result.statusCode == 200) {
-                                    context.pop();
-                                    context.pushNamed(PackOrder.routeName,
-                                        queryParameters: {
-                                          "orderId": widget.orderId
-                                        });
-                                  } else if (result.statusCode == 400) {
-                                    var message = jsonDecode(
-                                        await result.stream.bytesToString());
-                                    await showAlertDialog(
-                                        context,
-                                        message['message'].toString(),
-                                        "Continue",
-                                        false);
-                                  } else if (result.statusCode == 500) {
-                                    var message = jsonDecode(
-                                        await result.stream.bytesToString());
-                                    await showAlertDialog(
-                                        context,
-                                        message['message'],
-                                        "Continue",
-                                        false);
-                                  } else {
-                                    var message = jsonDecode(
-                                        await result.stream.bytesToString());
-                                    await showAlertDialog(
-                                        context,
-                                        message['message'],
-                                        "Continue",
-                                        false);
-                                  }
+                                setState(() {
+                                  loading = true;
+                                });
+                                http.StreamedResponse result =
+                                    await provider.processFormInfo();
+                                if (result.statusCode == 200) {
+                                  context.pushReplacementNamed(PackOrder.routeName,
+                                      queryParameters: {
+                                        "orderId": widget.orderId
+                                      });
+                                } else if (result.statusCode == 400) {
+                                  var message = jsonDecode(
+                                      await result.stream.bytesToString());
+                                  await showAlertDialog(
+                                      context,
+                                      message['message'].toString(),
+                                      "Continue",
+                                      false);
+                                } else if (result.statusCode == 500) {
+                                  var message = jsonDecode(
+                                      await result.stream.bytesToString());
+                                  await showAlertDialog(context,
+                                      message['message'], "Continue", false);
+                                } else {
+                                  var message = jsonDecode(
+                                      await result.stream.bytesToString());
+                                  await showAlertDialog(context,
+                                      message['message'], "Continue", false);
                                 }
+
+                                setState(() {
+                                  loading = false;
+                                });
                               }
                             },
-                            child: const Text(
+                            child: loading ? const SpinKitFadingCircle(
+                              color: Colors.white,
+                              size: 25,
+                            ) : const Text(
                               'Submit',
                               style: TextStyle(
                                   fontSize: 24,
@@ -229,7 +227,8 @@ class _PackOrderState extends State<PackOrder> {
     });
   }
 
-  void _showPackedOrderTable(BuildContext context, OrderPackagingProvider provider) {
+  void _showPackedOrderTable(
+      BuildContext context, OrderPackagingProvider provider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -255,57 +254,42 @@ class _PackOrderState extends State<PackOrder> {
                         DataCell(Text('${data['icode'] ?? "-"}')),
                         DataCell(Text('${data['qty'] ?? "-"}')),
                         DataCell(Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.red),
+                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
                               bool confirmation =
-                              await showConfirmationDialogue(
-                                  context,
-                                  "Do you want to delete the records?",
-                                  "SUBMIT",
-                                  "CANCEL");
+                                  await showConfirmationDialogue(
+                                      context,
+                                      "Do you want to delete the records?",
+                                      "SUBMIT",
+                                      "CANCEL");
                               if (confirmation) {
                                 http.StreamedResponse result =
-                                await provider
-                                    .deleteOrderPackaging(
-                                    '${data['opid'] ?? "-"}');
+                                    await provider.deleteOrderPackaging(
+                                        '${data['opid'] ?? "-"}');
                                 if (result.statusCode == 204) {
-                                  provider.packedOrderInfo(
-                                      widget.orderId);
+                                  provider.packedOrderInfo(widget.orderId);
                                   provider.getOrderBalance(widget.orderId);
                                   context.pop();
-                                } else if (result.statusCode ==
-                                    400) {
+                                } else if (result.statusCode == 400) {
                                   var message = jsonDecode(
-                                      await result.stream
-                                          .bytesToString());
+                                      await result.stream.bytesToString());
                                   await showAlertDialog(
                                       context,
                                       message['message'].toString(),
                                       "Continue",
                                       false);
-                                } else if (result.statusCode ==
-                                    500) {
+                                } else if (result.statusCode == 500) {
                                   var message = jsonDecode(
-                                      await result.stream
-                                          .bytesToString());
-                                  await showAlertDialog(
-                                      context,
-                                      message['message'],
-                                      "Continue",
-                                      false);
+                                      await result.stream.bytesToString());
+                                  await showAlertDialog(context,
+                                      message['message'], "Continue", false);
                                 } else {
                                   var message = jsonDecode(
-                                      await result.stream
-                                          .bytesToString());
-                                  await showAlertDialog(
-                                      context,
-                                      message['message'],
-                                      "Continue",
-                                      false);
+                                      await result.stream.bytesToString());
+                                  await showAlertDialog(context,
+                                      message['message'], "Continue", false);
                                 }
                               }
                             },

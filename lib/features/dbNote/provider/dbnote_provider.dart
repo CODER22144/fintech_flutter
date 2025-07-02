@@ -37,8 +37,12 @@ class DbnoteProvider with ChangeNotifier {
   TextEditingController tdsController = TextEditingController();
   TextEditingController tdsRateController = TextEditingController();
 
-  SearchableDropdownController<String> supplyController = SearchableDropdownController<String>();
-  SearchableDropdownController<String> supplierController = SearchableDropdownController<String>();
+  SearchableDropdownController<String> supplyController =
+      SearchableDropdownController<String>();
+  SearchableDropdownController<String> supplierController =
+      SearchableDropdownController<String>();
+
+  List<List<TextEditingController>> rowControllers = [];
 
   void initWidget() async {
     supplyController.clear();
@@ -47,7 +51,7 @@ class DbnoteProvider with ChangeNotifier {
     formFieldDetails.clear();
     widgetList.clear();
     String jsonData =
-        '[{"id":"docno","name":"Document No.","isMandatory":true,"inputType":"number"},{"id":"docDate","name":"Document Date","isMandatory":true,"inputType":"datetime"},{"id":"lcode","name":"Party Code","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"},{"id":"drId","name":"Documnet Reason","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-reason/"},{"id":"daId","name":"Document Against","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-against/"},{"id":"crCode","name":"Credit Code","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}]';
+        '[{"id":"docDate","name":"Document Date","isMandatory":true,"inputType":"datetime"},{"id":"lcode","name":"Party Code","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"},{"id":"drId","name":"Documnet Reason","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-reason/"},{"id":"daId","name":"Document Against","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-doc-against/"},{"id":"crCode","name":"Credit Code","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-ledger-codes/"}]';
 
     for (var element in jsonDecode(jsonData)) {
       TextEditingController controller = TextEditingController();
@@ -60,7 +64,8 @@ class DbnoteProvider with ChangeNotifier {
           maxCharacter: element['maxCharacter'] ?? 255,
           defaultValue: element['default'],
           controller: controller,
-          eventTrigger: element['id'] == 'lcode' ? autoFillDetailsByPartyCode : null));
+          eventTrigger:
+              element['id'] == 'lcode' ? autoFillDetailsByPartyCode : null));
     }
 
     List<Widget> widgets =
@@ -70,14 +75,20 @@ class DbnoteProvider with ChangeNotifier {
     materialUnit.clear();
     materialUnit = await formService.getDropdownMenuItem("/get-material-unit/");
 
+    List<List<String>> tableRows = [
+      ['', '', '', '', '', '', '', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '', '']
+    ];
+    rowControllers = tableRows
+        .map((row) =>
+            row.map((field) => TextEditingController(text: field)).toList())
+        .toList();
+
     initCustomObject();
   }
 
   void setDropdowns() async {
-    supplyType =
-        await formService.getDropdownMenuItem("/get-supply-type/");
-    supplierType =
-        await formService.getDropdownMenuItem("/get-supplier-type/");
+    supplyType = await formService.getDropdownMenuItem("/get-supply-type/");
+    supplierType = await formService.getDropdownMenuItem("/get-supplier-type/");
     notifyListeners();
   }
 
@@ -129,8 +140,9 @@ class DbnoteProvider with ChangeNotifier {
         "gstAmount": tableRows[i][16],
         // "tcsAmount": tableRows[i][17],
         "tamount": tableRows[i][18],
-        "unit" : tableRows[i][19],
-        "docno": GlobalVariables.requestBody[featureName]['docno']
+        "unit": tableRows[i][19],
+        "vtype": tableRows[i][20],
+        "wdocno": tableRows[i][21]
       });
     }
     GlobalVariables.requestBody[featureName]['DbNoteDetails'] = inwardDetails;
@@ -167,9 +179,10 @@ class DbnoteProvider with ChangeNotifier {
 
   void autoFillDetailsByPartyCode() async {
     var partyCode = GlobalVariables.requestBody[featureName]['lcode'];
-    if(partyCode != null && partyCode != "") {
-      http.StreamedResponse response = await networkService.get("/get-ledger-code-supply/$partyCode/");
-      if(response.statusCode == 200) {
+    if (partyCode != null && partyCode != "") {
+      http.StreamedResponse response =
+          await networkService.get("/get-ledger-code-supply/$partyCode/");
+      if (response.statusCode == 200) {
         var details = jsonDecode(await response.stream.bytesToString())[0];
         var supplyItem = findDropdownMenuItem(supplyType, details['slId']);
         supplyController.selectedItem.value = supplyItem;
@@ -201,7 +214,7 @@ class DbnoteProvider with ChangeNotifier {
     }
 
     List<Widget> widgets =
-    await formService.generateDynamicForm(formFieldDetails, reportFeature);
+        await formService.generateDynamicForm(formFieldDetails, reportFeature);
     reportWidgetList.addAll(widgets);
     notifyListeners();
   }
@@ -217,12 +230,13 @@ class DbnoteProvider with ChangeNotifier {
   }
 
   void getRows() {
-    List<double> totals = [0,0,0,0,0,0,0,0,0];
+    List<double> totals = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     rows.clear();
 
     for (var data in dbNoteReport) {
       totals[0] = totals[0] + parseEmptyStringToDouble('${data['amount']}');
-      totals[1] = totals[1] + parseEmptyStringToDouble('${data['discountAmount']}');
+      totals[1] =
+          totals[1] + parseEmptyStringToDouble('${data['discountAmount']}');
       totals[2] = totals[2] + parseEmptyStringToDouble('${data['taxAmount']}');
       totals[3] = totals[3] + parseEmptyStringToDouble('${data['cessAmount']}');
       totals[4] = totals[4] + parseEmptyStringToDouble('${data['gstAmount']}');
@@ -232,7 +246,6 @@ class DbnoteProvider with ChangeNotifier {
       totals[8] = totals[8] + parseEmptyStringToDouble('${data['bamount']}');
 
       rows.add(DataRow(cells: [
-
         DataCell(InkWell(
             onTap: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -248,10 +261,6 @@ class DbnoteProvider with ChangeNotifier {
             child: Text('${data['docno'] ?? "-"}',
                 style: const TextStyle(
                     color: Colors.blueAccent, fontWeight: FontWeight.w500)))),
-
-
-
-
         DataCell(Text('${data['ddocDate'] ?? "-"}')),
         DataCell(Visibility(
           visible: data['DocProof'] != null && data['DocProof'] != "",
@@ -262,7 +271,7 @@ class DbnoteProvider with ChangeNotifier {
                     borderRadius: BorderRadius.all(Radius.circular(5)))),
             onPressed: () async {
               final Uri uri =
-              Uri.parse("${NetworkService.baseUrl}${data['DocProof']}");
+                  Uri.parse("${NetworkService.baseUrl}${data['DocProof']}");
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
               } else {
@@ -290,15 +299,33 @@ class DbnoteProvider with ChangeNotifier {
         DataCell(Text('${data['bpState'] ?? "-"}')),
         DataCell(Text('${data['bpZipCode'] ?? "-"}')),
         DataCell(Text('${data['bpGSTIN'] ?? "-"}')),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['amount']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['discountAmount']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['taxAmount']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['cessAmount']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['gstAmount']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['roff']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['tamount']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['adjusted']}')))),
-        DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${data['bamount']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['amount']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['discountAmount']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['taxAmount']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['cessAmount']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['gstAmount']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['roff']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['tamount']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['adjusted']}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
+            child: Text(parseDoubleUpto2Decimal('${data['bamount']}')))),
       ]));
     }
 
@@ -308,7 +335,8 @@ class DbnoteProvider with ChangeNotifier {
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
-      const DataCell(Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold))),
+      const DataCell(
+          Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold))),
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
@@ -318,17 +346,77 @@ class DbnoteProvider with ChangeNotifier {
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[0]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[1]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[2]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[3]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[4]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[5]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[6]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[7]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
-      DataCell(Align(alignment: Alignment.centerRight, child: Text(parseDoubleUpto2Decimal('${totals[8]}'), style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[0]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[1]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[2]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[3]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[4]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[5]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[6]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[7]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(parseDoubleUpto2Decimal('${totals[8]}'),
+              style: const TextStyle(fontWeight: FontWeight.bold)))),
     ]));
 
+    notifyListeners();
+  }
+
+  void deleteRowController(int index) {
+    rowControllers.removeAt(index);
+    notifyListeners();
+  }
+
+  void addRowController() {
+    rowControllers.add([
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(text: '0'),
+      TextEditingController(text: 'N'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(text: '0'),
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+    ]);
     notifyListeners();
   }
 }

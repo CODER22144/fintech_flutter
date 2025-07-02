@@ -51,6 +51,7 @@ class _PaymentPendingReportState extends State<PaymentPendingReport> {
                     const DataColumn(label: Text("Amount")),
                     const DataColumn(label: Text("Pay\nAmount")),
                     const DataColumn(label: Text("Balance\nAmount")),
+                    const DataColumn(label: Text("Balance\nTotal")),
                     DataColumn(label: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
@@ -103,6 +104,7 @@ class _PaymentPendingReportState extends State<PaymentPendingReport> {
                                 ? const TextStyle(fontWeight: FontWeight.bold)
                                 : null),
                       )),
+                      DataCell(Align(alignment: Alignment.centerRight,child: Text('${data['run'] ?? ""}'))),
                       const DataCell(SizedBox())
                     ]);
                   }).toList(),

@@ -29,6 +29,8 @@ class InwardProvider with ChangeNotifier {
   List<Widget> widgetList = [];
   List<Widget> reportWidgetList = [];
 
+  List<dynamic> exportInward = [];
+
   DataTable table =
       DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
 
@@ -360,12 +362,13 @@ class InwardProvider with ChangeNotifier {
         "/get-inward-bill-report/", GlobalVariables.requestBody[reportFeature]);
     if (response.statusCode == 200) {
       inwardBillPending = jsonDecode(await response.stream.bytesToString());
+      exportInward = inwardBillPending;
     }
     PaymentProvider paymentProvider =
         Provider.of<PaymentProvider>(context, listen: false);
 
     List<DataRow> dataRows = [];
-    List<double> totalAmounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    List<double> totalAmounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0];
 
     for (var data in inwardBillPending) {
       totalAmounts = [
@@ -381,7 +384,8 @@ class InwardProvider with ChangeNotifier {
         totalAmounts[9] + parseEmptyStringToDouble(data['roff']),
         totalAmounts[10] + parseEmptyStringToDouble(data['tamount']),
         totalAmounts[11] + parseEmptyStringToDouble(data['payamount']),
-        totalAmounts[12] + parseEmptyStringToDouble(data['bamount'])
+        totalAmounts[12] + parseEmptyStringToDouble(data['tdsAmount']),
+        totalAmounts[13] + parseEmptyStringToDouble(data['bamount'])
       ];
       dataRows.add(DataRow(cells: [
         DataCell(InkWell(
@@ -392,7 +396,6 @@ class InwardProvider with ChangeNotifier {
                   '${data['transId'] ?? "-"}', '${data['vtype'] ?? "-"}');
               billClearencePopup(context, resp);
             })),
-        DataCell(Text('${data['dtDate'] ?? "-"}')),
         DataCell(Visibility(
           visible: data['DocProof'] != null && data['DocProof'] != "",
           child: ElevatedButton(
@@ -409,13 +412,7 @@ class InwardProvider with ChangeNotifier {
                 throw 'Could not launch';
               }
             },
-            child: const Text(
-              'Show Bill',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.white),
-            ),
+            child: const Icon(Icons.file_present_outlined, color: Colors.white),
           ),
         )),
         DataCell(Text('${data['brId'] ?? "-"}')),
@@ -424,7 +421,7 @@ class InwardProvider with ChangeNotifier {
         DataCell(Text('${data['lcode'] ?? "-"}')),
         DataCell(Text('${data['lName'] ?? "-"}')),
         DataCell(Text('${data['billNo'] ?? "-"}')),
-        DataCell(Text('${data['billDate'] ?? "-"}')),
+        DataCell(Text('${data['DbillDate'] ?? "-"}')),
         DataCell(Text('${data['tdsCode'] ?? "-"}')),
         DataCell(Align(
             alignment: Alignment.centerRight,
@@ -479,6 +476,10 @@ class InwardProvider with ChangeNotifier {
                 Text(parseDoubleUpto2Decimal('${data['payamount'] ?? ""}')))),
         DataCell(Align(
             alignment: Alignment.centerRight,
+            child:
+            Text(parseDoubleUpto2Decimal('${data['tdsAmount'] ?? ""}')))),
+        DataCell(Align(
+            alignment: Alignment.centerRight,
             child: Text(parseDoubleUpto2Decimal('${data['bamount'] ?? ""}')))),
       ]));
     }
@@ -489,7 +490,7 @@ class InwardProvider with ChangeNotifier {
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
-      const DataCell(SizedBox()),
+
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
       const DataCell(SizedBox()),
@@ -581,12 +582,18 @@ class InwardProvider with ChangeNotifier {
             totalAmounts[12].toStringAsFixed(2),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ))),
+      DataCell(Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            totalAmounts[13].toStringAsFixed(2),
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ))),
     ]));
 
     table = DataTable(
+      columnSpacing: 25,
       columns: const [
         DataColumn(label: Text("Tran Id")),
-        DataColumn(label: Text("Trans Date")),
         DataColumn(label: Text("Bill")),
         DataColumn(label: Text("BR Id")),
         DataColumn(label: Text("GR No.")),
@@ -613,6 +620,7 @@ class InwardProvider with ChangeNotifier {
         DataColumn(label: Text("Roff.")),
         DataColumn(label: Text("Total\nAmount")),
         DataColumn(label: Text("Pay\nAmount")),
+        DataColumn(label: Text("Tds\nAmount")),
         DataColumn(label: Text("Balance\nAmount")),
       ],
       rows: dataRows,
@@ -753,7 +761,6 @@ class InwardProvider with ChangeNotifier {
 
       rows.add(DataRow(cells: [
         DataCell(Hyperlink(text: '${data['transId']}', url: "${NetworkService.baseUrl}${data['DocProof']}")),
-        DataCell(Text('${data['dtDate'] ?? "-"}')),
         DataCell(Text('${data['lcode'] ?? "-"} - ${data['lName'] ?? "-"}')),
         DataCell(Text('${data['billNo'] ?? "-"}')),
         DataCell(Text('${data['dbillDate'] ?? "-"}')),
@@ -774,7 +781,6 @@ class InwardProvider with ChangeNotifier {
     }
 
     rows.add(DataRow(cells: [
-      const DataCell(SizedBox()),
       const DataCell(SizedBox()),
       const DataCell(Text("GRAND TOTAL", style: TextStyle(fontWeight: FontWeight.bold))),
       const DataCell(SizedBox()),

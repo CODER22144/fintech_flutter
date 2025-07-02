@@ -29,6 +29,7 @@ class _ProductBreakupByMatnoState extends State<ProductBreakupByMatno> {
   void initState() {
     super.initState();
     provider = Provider.of<ProductBreakupProvider>(context, listen: false);
+    provider.materialController.clear();
   }
 
   @override

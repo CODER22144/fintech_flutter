@@ -18,14 +18,21 @@ class LineRejectionProvider with ChangeNotifier {
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
 
+  List<dynamic> rejPending = [];
+
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
+
+  List<SearchableDropdownMenuItem<String>> bpCodes = [];
+
+  TextEditingController editController = TextEditingController();
 
   void initWidget() async {
     GlobalVariables.requestBody[featureName] = {};
     formFieldDetails.clear();
     widgetList.clear();
-    String jsonData = '[{"id":"bpCode","name":"Business Partner","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-business-partner/"},{"id":"matno","name":"Material No.","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"qty","name":"Quantity","isMandatory":true,"inputType":"number"},{"id":"rate","name":"Rate","isMandatory":true,"inputType":"number"}]';
+    String jsonData =
+        '[{"id":"bpCode","name":"Business Partner","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-business-partner/"},{"id":"matno","name":"Material No.","isMandatory":true,"inputType":"text","maxCharacter":15},{"id":"qty","name":"Quantity","isMandatory":true,"inputType":"number"}]';
 
     for (var element in jsonDecode(jsonData)) {
       TextEditingController controller = TextEditingController();
@@ -40,8 +47,13 @@ class LineRejectionProvider with ChangeNotifier {
     }
 
     List<Widget> widgets =
-    await formService.generateDynamicForm(formFieldDetails, featureName);
+        await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getBpCodes() async {
+    bpCodes = await formService.getDropdownMenuItem("/get-business-partner/");
     notifyListeners();
   }
 
@@ -49,5 +61,15 @@ class LineRejectionProvider with ChangeNotifier {
     http.StreamedResponse response = await networkService.post(
         "/add-line-rejection/", [GlobalVariables.requestBody[featureName]]);
     return response;
+  }
+
+  void getLineRejectionPending() async {
+    rejPending.clear();
+    http.StreamedResponse response = await networkService
+        .post("/line-rejection-pending/", {"bpCode": editController.text.isEmpty ? null : editController.text});
+    if (response.statusCode == 200) {
+      rejPending = jsonDecode(await response.stream.bytesToString());
+    }
+    notifyListeners();
   }
 }

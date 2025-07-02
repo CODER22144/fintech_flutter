@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import 'package:fintech_new_web/features/paymentInward/provider/payment_inward_provider.dart';
+import 'package:fintech_new_web/features/paymentInward/screens/add_unadjusted_payment_inward_clear.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 
 import '../../common/widgets/comman_appbar.dart';
-import '../../common/widgets/pop_ups.dart';
 
 class UnadjustedPaymentInward extends StatefulWidget {
   static String routeName = "unadjustedPaymentInward";
@@ -72,41 +71,9 @@ class _UnadjustedPaymentInwardState extends State<UnadjustedPaymentInward> {
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(5)))),
                             onPressed: () async {
-                              bool confirmation = await showConfirmationDialogue(
-                                  context,
-                                  "Payment Of Amount: ${data['bamount']} will be adjusted against Party code: ${data['lcode']} ?",
-                                  "CONFIRM",
-                                  "CANCEL");
-                              if (confirmation) {
-                                http.StreamedResponse result =
-                                    await provider.addPaymentInwardClear({
-                                  "transId": '${data['docno']}',
-                                  "ptype": '${data['ptype']}',
-                                  "lcode": '${data['lcode']}',
-                                  "amount": '${data['bamount']}'
-                                });
-                                if (result.statusCode == 200) {
-                                  provider.getUnadjustedPaymentInward();
-                                } else if (result.statusCode == 400) {
-                                  var message = jsonDecode(
-                                      await result.stream.bytesToString());
-                                  await showAlertDialog(
-                                      context,
-                                      message['message'].toString(),
-                                      "Continue",
-                                      false);
-                                } else if (result.statusCode == 500) {
-                                  var message = jsonDecode(
-                                      await result.stream.bytesToString());
-                                  await showAlertDialog(context,
-                                      message['message'], "Continue", false);
-                                } else {
-                                  var message = jsonDecode(
-                                      await result.stream.bytesToString());
-                                  await showAlertDialog(context,
-                                      message['message'], "Continue", false);
-                                }
-                              }
+                              context.pushNamed(AddUnadjustedPaymentInwardClear.routeName, queryParameters: {
+                                "details" : jsonEncode(data)
+                              });
                             },
                             child: const Text(
                               'Adjust Payment',

@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-              child: Image.asset("assets/login.png"),
+              child: Image.asset("assets/login.png", height: GlobalVariables.deviceHeight*0.50),
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 29, vertical: 10),

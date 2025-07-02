@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fintech_new_web/features/reqIssue/screens/req_issue_mat_edit.dart';
 import 'package:fintech_new_web/features/utility/global_variables.dart';
 import 'package:fintech_new_web/features/utility/models/forms_UI.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,9 +21,12 @@ import '../screens/add_req_issue.dart';
 class ReqIssueProvider with ChangeNotifier {
   static const String featureName = "ReqIssue";
   static const String pendingFeature = "ReqIssuePending";
+  static const String editFeature = "EditReqIssuePending";
 
   List<FormUI> formFieldDetails = [];
+  List<FormUI> editFormFieldDetails = [];
   List<Widget> widgetList = [];
+  List<Widget> editWidgetList = [];
   List<Widget> pendingWidgetList = [];
   List<dynamic> reqPending = [];
   List<dynamic> reqSummary = [];
@@ -204,12 +208,16 @@ class ReqIssueProvider with ChangeNotifier {
       ]));
       for (var data in value) {
         rows.add(DataRow(cells: [
-          DataCell(Text('${data['matno'] ?? "-"}')),
+          DataCell(Row(children: [InkWell(child: const Icon(Icons.edit_outlined, color: Colors.blueAccent), onTap: () {
+            context.pushNamed(ReqIssueMatEdit.routeName, queryParameters: {
+              "reqdId" : '${data['reqdId'] ?? "-"}'
+            });
+          }), Text('${data['matno'] ?? "-"}')],)),
           DataCell(Text('${data['qty'] ?? "-"}')),
           DataCell(Text('${data['iqty'] ?? "-"}')),
           DataCell(Text('${data['bqty'] ?? "-"}')),
           DataCell(Text('${data['qtyinstock'] ?? "-"}')),
-          DataCell(Text('')),
+          const DataCell(Text('')),
         ]));
       }
     });
@@ -297,4 +305,58 @@ class ReqIssueProvider with ChangeNotifier {
     ]);
     notifyListeners();
   }
+
+
+  void editRest() {
+    GlobalVariables.requestBody[editFeature] = {};
+    editFormFieldDetails.clear();
+    editWidgetList.clear();
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> getByIdReqDetails(String reqdId) async {
+    http.StreamedResponse response =
+    await networkService.post("/req-detail-byId/", {"reqdId": reqdId});
+    if (response.statusCode == 200) {
+      return jsonDecode(await response.stream.bytesToString())[0];
+    }
+    return {};
+  }
+
+  void initEdit(String reqdId) async {
+    Map<String, dynamic> editMapData = await getByIdReqDetails(reqdId);
+    GlobalVariables.requestBody[editFeature] = editMapData;
+    editFormFieldDetails.clear();
+    editWidgetList.clear();
+
+    String jsonData =
+        '[{"id":"matno","name":"Material No.","isMandatory":true,"inputType":"text","maxCharacter":15, "default" : "${editMapData['matno']}"},{"id":"cqty","name":"Qty","isMandatory":true,"inputType":"number", "default" : "${editMapData['bqty']}"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController editController = TextEditingController();
+      editFormFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          controller: editController,
+          defaultValue: element['default']));
+    }
+
+    List<Widget> widgets = await formService.generateDynamicForm(
+        editFormFieldDetails, editFeature);
+    editWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  Future<http.StreamedResponse> updateReqDetails() async {
+    http.StreamedResponse response = await networkService.post(
+        "/update-req-details/", GlobalVariables.requestBody[editFeature]);
+    return response;
+  }
+
+
+
 }

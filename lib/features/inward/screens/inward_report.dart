@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../common/widgets/comman_appbar.dart';
 import '../../utility/global_variables.dart';
+import '../../utility/services/common_utility.dart';
 
 class InwardReport extends StatefulWidget {
   static String routeName = "InwardReport";
@@ -41,7 +42,36 @@ class _InwardReportState extends State<InwardReport> {
                   padding: const EdgeInsets.all(10),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: provider.table,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 180,
+                          margin: const EdgeInsets.only(top: 10, left: 2),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5)),
+                              ),
+                            ),
+                            onPressed: () async {
+                              downloadJsonToExcel(provider.exportInward, "inward_bill_export");
+                            },
+                            child: const Text(
+                              'Export',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+
+                        provider.table
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -27,6 +27,7 @@ class B2bReportForm extends StatefulWidget {
 
 class _B2bReportFormState extends State<B2bReportForm> {
   Map<String, String> routes = {};
+  Map<String, String> titles = {};
 
   @override
   void initState() {
@@ -43,6 +44,16 @@ class _B2bReportFormState extends State<B2bReportForm> {
       "CRDR" : CrdrNote.routeName,
       "DOC" : DocTypeReport.routeName
     };
+
+    titles = {
+      "B2B" : "B2B Report",
+      "B2C" : "B2C Report",
+      "B2CL" : "B2CL Report",
+      "HSN" : "Gst Hsn Summary",
+      "CRDR" : "CR/DB Note Report",
+      "DOC" : "Doc Type Report"
+    };
+
   }
 
   @override
@@ -54,7 +65,7 @@ class _B2bReportFormState extends State<B2bReportForm> {
             appBar: PreferredSize(
                 preferredSize:
                 Size.fromHeight(MediaQuery.of(context).size.height * 0.07),
-                child: const CommonAppbar(title: 'B2B Report')),
+                child: CommonAppbar(title: titles[widget.type]!)),
             body: SingleChildScrollView(
               child: Center(
                 child: Container(

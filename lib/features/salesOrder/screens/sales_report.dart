@@ -1,10 +1,9 @@
 import 'package:fintech_new_web/features/salesOrder/provider/sales_order_provider.dart';
-import 'package:fintech_new_web/features/utility/services/common_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../common/widgets/comman_appbar.dart';
-import '../../network/service/network_service.dart';
+import '../../utility/services/common_utility.dart';
 
 class SalesReport extends StatefulWidget {
   static String routeName = "SalesReport";
@@ -41,21 +40,50 @@ class _SalesReportState extends State<SalesReport> {
                   padding: const EdgeInsets.all(10),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text("Invoice No.")),
-                        DataColumn(label: Text("Date")),
-                        DataColumn(label: Text("Business Partner")),
-                        DataColumn(label: Text("City")),
-                        DataColumn(label: Text("State")),
-                        DataColumn(label: Text("Supply Type")),
-                        DataColumn(label: Text("Supplier Type")),
-                        DataColumn(label: Text("Is IGST ?")),
-                        DataColumn(label: Text("Amount")),
-                        DataColumn(label: Text("GST Amount")),
-                        DataColumn(label: Text("Total Amount")),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 180,
+                          margin: const EdgeInsets.only(top: 10, left: 2),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5)),
+                              ),
+                            ),
+                            onPressed: () async {
+                              downloadJsonToExcel(provider.salesReport, "sales_export");
+                            },
+                            child: const Text(
+                              'Export',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+
+                        DataTable(
+                          columns: const [
+                            DataColumn(label: Text("Invoice No.")),
+                            DataColumn(label: Text("Date")),
+                            DataColumn(label: Text("Business Partner")),
+                            DataColumn(label: Text("City")),
+                            DataColumn(label: Text("State")),
+                            DataColumn(label: Text("Supply Type")),
+                            DataColumn(label: Text("Supplier Type")),
+                            DataColumn(label: Text("Is IGST ?")),
+                            DataColumn(label: Text("Amount")),
+                            DataColumn(label: Text("GST Amount")),
+                            DataColumn(label: Text("Total Amount")),
+                          ],
+                          rows: provider.rows,
+                        ),
                       ],
-                      rows: provider.rows,
                     ),
                   ),
                 ),

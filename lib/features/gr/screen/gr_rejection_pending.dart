@@ -74,7 +74,7 @@ class _GrRejectionPendingState extends State<GrRejectionPending> {
                             bool confirmation =
                             await showConfirmationDialogue(
                                 context,
-                                "Do you want to create PR Tax Invoice Against GR: ${data['grno'] ?? "-"}?",
+                                "Do you want to create Debit Note Against GR: : ${data['grno'] ?? "-"}?",
                                 "SUBMIT",
                                 "CANCEL");
                             if(confirmation) {
@@ -91,7 +91,7 @@ class _GrRejectionPendingState extends State<GrRejectionPending> {
                             }
                           },
                           child: const Text(
-                            'Create Tax Invoice',
+                            'Post Debit Note',
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w300,

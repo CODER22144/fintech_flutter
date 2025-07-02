@@ -17,13 +17,17 @@ import '../../utility/services/generate_form_service.dart';
 class PurchaseOrderProvider with ChangeNotifier {
   static const String featureName = "purchaseOrder";
   static const String reportFeature = "purchaseOrderReport";
+  static const String itemReportFeature = "purchaseOrderItemReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
+  List<Widget> reportWidgetList = [];
   List<SearchableDropdownMenuItem<String>> priorities = [];
   List<SearchableDropdownMenuItem<String>> poType = [];
 
   List<List<TextEditingController>> rowControllers = [];
+
+  List<dynamic> poItemReport = [];
 
   DataTable table =
       DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
@@ -52,9 +56,12 @@ class PurchaseOrderProvider with ChangeNotifier {
         await formService.generateDynamicForm(formFieldDetails, featureName);
     widgetList.addAll(widgets);
 
-    List<List<String>> tableRows = [['', '', '', '','']];
+    List<List<String>> tableRows = [
+      ['', '', '', '', '']
+    ];
     rowControllers = tableRows
-        .map((row) => row.map((field) => TextEditingController(text: field)).toList())
+        .map((row) =>
+            row.map((field) => TextEditingController(text: field)).toList())
         .toList();
     notifyListeners();
   }
@@ -113,7 +120,8 @@ class PurchaseOrderProvider with ChangeNotifier {
   }
 
   void nestedTable() async {
-    table = DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
+    table =
+        DataTable(columns: const [DataColumn(label: Text(""))], rows: const []);
     var purchaseOrderReport = await getPurchaseOrderReport();
     List<DataRow> rows = [];
     int counter = 0;
@@ -190,10 +198,12 @@ class PurchaseOrderProvider with ChangeNotifier {
           DataCell(Text('${poData['matDescription'] ?? "-"}')),
           DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(parseDoubleUpto2Decimal('${poData['poQty'] ?? "-"}')))),
+              child:
+                  Text(parseDoubleUpto2Decimal('${poData['poQty'] ?? "-"}')))),
           DataCell(Align(
               alignment: Alignment.centerRight,
-              child: Text(parseDoubleUpto2Decimal('${poData['poRate'] ?? "-"}')))),
+              child:
+                  Text(parseDoubleUpto2Decimal('${poData['poRate'] ?? "-"}')))),
           DataCell(Align(
               child: Text(
             parseDoubleUpto2Decimal('${poData['poAmount'] ?? "-"}'),
@@ -283,6 +293,39 @@ class PurchaseOrderProvider with ChangeNotifier {
       TextEditingController(),
       TextEditingController(),
     ]);
+    notifyListeners();
+  }
+
+  void initPoItemReport() async {
+    GlobalVariables.requestBody[itemReportFeature] = {};
+    formFieldDetails.clear();
+    reportWidgetList.clear();
+    String jsonData =
+        '[{"id":"bpCode","name":"Business Partner","isMandatory":false,"inputType":"dropdown","dropdownMenuItem":"/get-business-partner/"},{"id":"poId","name":"Purchase Order ID","isMandatory":false,"inputType":"text","maxCharacter":16},{"id":"frommatno","name":"From Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"tomatno","name":"To Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"fromDate","name":"From Date","isMandatory":true,"inputType":"datetime"},{"id":"toDate","name":"To Date","isMandatory":true,"inputType":"datetime"}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255));
+    }
+
+    List<Widget> widgets = await formService.generateDynamicForm(
+        formFieldDetails, itemReportFeature);
+    reportWidgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getPoItemReport() async {
+    poItemReport.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/po-item-report/", GlobalVariables.requestBody[itemReportFeature]);
+    if (response.statusCode == 200) {
+      poItemReport = jsonDecode(await response.stream.bytesToString());
+    }
     notifyListeners();
   }
 }

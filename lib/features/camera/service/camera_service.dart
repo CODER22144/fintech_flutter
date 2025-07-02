@@ -52,6 +52,40 @@ class Camera {
     return "";
   }
 
+  Future<String> uploadDrawing(String blobPath, String name) async {
+    var headers = {'Content-Type': 'application/x-www-form-urlencoded'};
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('${NetworkService.baseUrl}/upload-file/'));
+    if (kIsWeb) {
+      // Fetch the blob
+      final response = await http.get(Uri.parse(blobPath));
+
+      if (response.statusCode == 200) {
+        final Uint8List bytes = response.bodyBytes;
+
+        // Create a multipart file
+        final http.MultipartFile multipartFile = http.MultipartFile.fromBytes(
+          'drawing',
+          bytes,
+          filename: name,
+          contentType: MediaType('image', 'png'),
+        );
+
+        // Add the multipart file to the request
+        request.files.add(multipartFile);
+      }
+    } else {
+      request.files.add(await http.MultipartFile.fromPath('drawing', blobPath));
+    }
+    request.headers.addAll(headers);
+
+    http.StreamedResponse resp = await request.send();
+    if (resp.statusCode == 201) {
+      return jsonDecode(await resp.stream.bytesToString())["drawing"];
+    }
+    return "";
+  }
+
   Future<XFile?> showPicker(context, {provider, bool? removeImage}) async {
     XFile? ImagePath;
     await showModalBottomSheet(

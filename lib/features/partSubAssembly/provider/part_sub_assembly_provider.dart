@@ -5,7 +5,10 @@ import 'package:fintech_new_web/features/utility/models/forms_UI.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../billReceipt/screen/hyperlink.dart';
 import '../../camera/service/camera_service.dart';
 import '../../network/service/network_service.dart';
 import '../../utility/services/generate_form_service.dart';
@@ -14,6 +17,7 @@ import 'package:searchable_paginated_dropdown/searchable_paginated_dropdown.dart
 class PartSubAssemblyProvider with ChangeNotifier {
   static const String featureName = "partSubAssembly";
   static const String reportFeature = "partSubAssemblyReport";
+  static const String repFeature = "partSubAssemblyCostingReport";
 
   List<FormUI> formFieldDetails = [];
   List<Widget> widgetList = [];
@@ -28,6 +32,10 @@ class PartSubAssemblyProvider with ChangeNotifier {
   List<dynamic> partSubAssemblyDetailsList = [];
   List<dynamic> partSubAssemblyProcessingList = [];
   List<dynamic> partSubAssemblyReport = [];
+
+  List<DataColumn> costColumns = [];
+  List<DataRow> costRows = [];
+  List<dynamic> partAssCostRep = [];
 
   NetworkService networkService = NetworkService();
   GenerateFormService formService = GenerateFormService();
@@ -59,7 +67,7 @@ class PartSubAssemblyProvider with ChangeNotifier {
     }
 
     String jsonData =
-        '[{"id":"matno","name":"Material No.","isMandatory":false,"inputType":"text","readOnly":true, "default" : "${materialController.text ?? ''}"},{"id":"revisionNo","name":"Revision No.","isMandatory":false,"inputType":"text"} ,{"id":"csId","name":"Cost Status","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-cost-status/"}]';
+        '[{"id":"matno","name":"Material No.","isMandatory":false,"inputType":"text","readOnly":true, "default" : "${materialController.text ?? ''}"},{"id":"revisionNo","name":"Revision No.","isMandatory":false,"inputType":"text"} ,{"id":"csId","name":"Cost Status","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-cost-status/"},{"id":"processing","name":"Processing","isMandatory":true,"inputType":"number","default":0},{"id":"rejection","name":"Rejection","isMandatory":true,"inputType":"number","default":0},{"id":"icc","name":"ICC","isMandatory":true,"inputType":"number","default":0},{"id":"overhead","name":"Overhead","isMandatory":true,"inputType":"number","default":0},{"id":"profit","name":"Profit","isMandatory":true,"inputType":"number","default":0}]';
 
     for (var element in jsonDecode(jsonData)) {
       TextEditingController controller = TextEditingController();
@@ -274,6 +282,229 @@ class PartSubAssemblyProvider with ChangeNotifier {
       String respData = jsonDecode(await response.stream.bytesToString());
       partSubAssemblyReport = jsonDecode(respData);
     }
+    notifyListeners();
+  }
+
+  void initAssemblyCostingReport() async {
+    String jsonData =
+        '[{"id":"csId","name":"Cost Status","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-cost-status/"},{"id":"fmatno","name":"From Material No.","isMandatory":false,"inputType":"text","maxCharacter":15},{"id":"tmatno","name":"To Material No.","isMandatory":false,"inputType":"text","maxCharacter":15}]';
+    GlobalVariables.requestBody[repFeature] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          controller: controller,
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          defaultValue: element['default']));
+    }
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, repFeature);
+    widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  void getPbCostingReport() async {
+    partAssCostRep.clear();
+    http.StreamedResponse response = await networkService.post(
+        "/part-sub-assembly-costing/", GlobalVariables.requestBody[repFeature]);
+    if (response.statusCode == 200) {
+      partAssCostRep = jsonDecode(await response.stream.bytesToString());
+    }
+    assemblyCostingTable();
+  }
+
+  void assemblyCostingTable() async {
+    costColumns = [];
+    costRows = [];
+
+    for (int i = 0; i < partAssCostRep.length; i++) {
+      var data = partAssCostRep[i];
+
+      costColumns = const [
+        DataColumn(
+            label: Text("Description",
+                style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label: Text("Drawing", style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label:
+            Text("Rate(%)", style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label: Text("Basic Cost",
+                style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label:
+            Text("Amount", style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label:
+            Text("Total", style: TextStyle(fontWeight: FontWeight.bold))),
+      ];
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var cid = prefs.getString("currentLoginCid");
+      costRows.addAll([
+        DataRow(cells: [
+          DataCell(Hyperlink(
+              text: data['matno'],
+              url: "/part-sub-assembly/${data['matno']}/$cid/")),
+          DataCell(Text("RV: ${data['revisionNo'] ?? ''}")),
+          DataCell(Text("REJ: ${data['rejection'] ?? '0.00'}")),
+          DataCell(Text("RMC: ${data['asamount'] ?? '0.00'}")),
+          DataCell(Text("REJ: ${data['rejamount'] ?? '0.00'}")),
+          DataCell(Text("TOT: ${data['tamount'] ?? '0.00'}"))
+        ]),
+        DataRow(cells: [
+          DataCell(Text("${data['chrDescription'] ?? ''}")),
+          DataCell(Row(children: [
+            const Text("PIC: "),
+            Visibility(
+              visible: data['pic'] != null && data['pic'] != "",
+              child: InkWell(
+                child: const Icon(
+                  Icons.file_present_outlined,
+                  color: Colors.green,
+                ),
+                onTap: () async {
+                  final Uri uri = Uri.parse(
+                      "${NetworkService.baseUrl}${data['pic']}");
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+                  } else {
+                    throw 'Could not launch';
+                  }
+                },
+              ),
+            )
+          ])),
+          DataCell(Text("ICC: ${data['icc'] ?? '0.00'}")),
+          DataCell(Text("F: ${data['processing'] ?? '0.00'}")),
+          DataCell(Text("ICC: ${data['iccamount'] ?? '0.00'}")),
+          const DataCell(Text("")),
+        ]),
+        DataRow(cells: [
+          DataCell(Text("${data['rmType']}")),
+          DataCell(Row(children: [
+            const Text("DR: "),
+            Visibility(
+              visible: data['drawing'] != null && data['drawing'] != "",
+              child: InkWell(
+                child: const Icon(
+                  Icons.file_present_outlined,
+                  color: Colors.green,
+                ),
+                onTap: () async {
+                  final Uri uri = Uri.parse(
+                      "${NetworkService.baseUrl}${data['drawing']}");
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+                  } else {
+                    throw 'Could not launch';
+                  }
+                },
+              ),
+            )
+          ])),
+          DataCell(Text("OH: ${data['overhead'] ?? '0.00'}")),
+          DataCell(Text("LB: ${data['pramount'] ?? '0.00'}")),
+          DataCell(Text("OH: ${data['overheadamount'] ?? '0.00'}")),
+          const DataCell(Text("")),
+        ]),
+        DataRow(cells: [
+          DataCell(Text("Status: ${data['csId']}")),
+
+          DataCell(Row(children: [
+            const Text("ADR: "),
+            Visibility(
+              visible: data['asdrawing'] != null && data['asdrawing'] != "",
+              child: InkWell(
+                child: const Icon(
+                  Icons.file_present_outlined,
+                  color: Colors.green,
+                ),
+                onTap: () async {
+                  final Uri uri = Uri.parse(
+                      "${NetworkService.baseUrl}${data['asdrawing']}");
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+                  } else {
+                    throw 'Could not launch';
+                  }
+                },
+              ),
+            )
+          ])),
+          DataCell(Text("PR: ${data['profit'] ?? '0.00'}")),
+          const DataCell(Text("")),
+          DataCell(Text("PR: ${data['profitamount'] ?? '0.00'}")),
+          const DataCell(Text(""))
+        ]),
+        const DataRow(cells: [
+          DataCell(Text("")),
+          DataCell(Text("")),
+          DataCell(Text("")),
+          DataCell(Text("")),
+          DataCell(Text("")),
+          DataCell(Text(""))
+        ]),
+      ]);
+    }
+    notifyListeners();
+  }
+
+  void initEditWidget() async {
+    http.StreamedResponse response =
+    await networkService.get("/get-psa-matno/${materialController.text}/");
+
+    Map<String, dynamic> editData = {};
+
+    if(response.statusCode == 200) {
+      editData = jsonDecode(await response.stream.bytesToString())[0];
+    }
+
+    GlobalVariables.requestBody[featureName] = editData;
+    formFieldDetails.clear();
+    widgetList.clear();
+
+    String jsonData =
+        '[{"id":"matno","name":"Material No.","isMandatory":false,"inputType":"text","readOnly":true},{"id":"revisionNo","name":"Revision No.","isMandatory":false,"inputType":"text"} ,{"id":"csId","name":"Cost Status","isMandatory":true,"inputType":"dropdown","dropdownMenuItem":"/get-cost-status/"},{"id":"processing","name":"Processing","isMandatory":true,"inputType":"number","default":0},{"id":"rejection","name":"Rejection","isMandatory":true,"inputType":"number","default":0},{"id":"icc","name":"ICC","isMandatory":true,"inputType":"number","default":0},{"id":"overhead","name":"Overhead","isMandatory":true,"inputType":"number","default":0},{"id":"profit","name":"Profit","isMandatory":true,"inputType":"number","default":0}]';
+
+    for (var element in jsonDecode(jsonData)) {
+      TextEditingController controller = TextEditingController();
+      formFieldDetails.add(FormUI(
+          id: element['id'],
+          name: element['name'],
+          isMandatory: element['isMandatory'],
+          inputType: element['inputType'],
+          dropdownMenuItem: element['dropdownMenuItem'] ?? "",
+          maxCharacter: element['maxCharacter'] ?? 255,
+          defaultValue: editData[element['id']],
+          controller: controller,
+          readOnly: element['readOnly'] ?? false));
+    }
+
+    List<Widget> widgets =
+    await formService.generateDynamicForm(formFieldDetails, featureName);
+    widgetList.addAll(widgets);
+    notifyListeners();
+  }
+
+  Future<http.StreamedResponse> processUpdateFormInfo() async {
+    http.StreamedResponse response = await networkService.post(
+        "/update-psa/", GlobalVariables.requestBody[featureName]);
+    return response;
+  }
+
+  void resetEdit() {
+    GlobalVariables.requestBody[featureName] = {};
+    formFieldDetails.clear();
+    widgetList.clear();
     notifyListeners();
   }
 

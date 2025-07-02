@@ -43,14 +43,16 @@ class DbNoteDetailsState extends State<DbNoteDetails>
   TextEditingController discRateController = TextEditingController(text: '0');
   TextEditingController hsnController = TextEditingController();
 
+  late DbnoteProvider provider;
+
   @override
   void initState() {
     super.initState();
-    DbnoteProvider provider =
+    provider =
     Provider.of<DbnoteProvider>(context, listen: false);
     provider.initWidget();
     // Add one empty row at the beginning
-    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
+    tableRows.add(['', '','', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','', '', '']);
     tabController = TabController(length: 2, vsync: this);
     provider.getDiscountType();
     provider.setDropdowns();
@@ -65,8 +67,9 @@ class DbNoteDetailsState extends State<DbNoteDetails>
   // Function to add a new row
   void addRow() {
     setState(() {
-      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','']);
+      tableRows.add(['', '', '', '', '','','', '0', 'N', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0','', '', '']);
     });
+    provider.addRowController();
   }
 
   // Function to delete a row
@@ -74,6 +77,7 @@ class DbNoteDetailsState extends State<DbNoteDetails>
     setState(() {
       tableRows.removeAt(index);
     });
+    provider.deleteRowController(index);
   }
 
   @override
@@ -169,6 +173,7 @@ class DbNoteDetailsState extends State<DbNoteDetails>
                                   const SizedBox(height: 10),
                                   for (int i = 0; i < tableRows.length; i++)
                                     DbnoteRowFields(
+                                        controllers: provider.rowControllers,
                                         index: i,
                                         tableRows: tableRows,
                                         discountType: provider.discountType,
