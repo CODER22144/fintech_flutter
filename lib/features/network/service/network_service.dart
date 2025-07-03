@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+// PRODUCTION APPLICATION
+
 class NetworkService {
   static const String baseUrl = "http://mapp.rcinz.com";
   static const String productionGstBaseUrl = "https://api.whitebooks.in";
